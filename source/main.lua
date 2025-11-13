@@ -24,6 +24,8 @@ gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.setLineWidth(2)
 gfx.setStrokeLocation(gfx.kStrokeInside)
 
+-- TODO: add number commalization
+
 pack = nil
 
 catalog = false
@@ -90,7 +92,7 @@ music = nil
 
 -- Fades the music out, and trashes it when finished. Should be called alongside a scene change, only if the music is expected to change. Delay can set the delay (in seconds) of the fade
 function fademusic(delay)
-    delay = delay or 1000
+    delay = delay or 400
     if music ~= nil then
         music:setVolume(0, 0, delay/1000, function()
             music:stop()

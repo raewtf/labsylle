@@ -76,7 +76,9 @@ function options:init(...)
 			if vars.selections[vars.selection] == 'music' then
 				save.music = not save.music
 				if save.music then
-					-- TODO: restart music
+					newmusic('audio/music/title', true)
+				else
+					stopmusic()
 				end
 			elseif vars.selections[vars.selection] == 'sfx' then
 				save.sfx = not save.sfx

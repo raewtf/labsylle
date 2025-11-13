@@ -1,7 +1,8 @@
 name=Labsylle
 author=rae
-description=A cool word puzzle game, all about the "building blocks" of English language.
+description=A cool word puzzle game, all about the "building blocks" of the English language.
 bundleID=wtf.rae.labsylle
 version=1.0.0
-buildNumber=1708
+buildNumber=1757
 imagePath=images/system
+launchSound=audio/sfx/bubble1

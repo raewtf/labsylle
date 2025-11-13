@@ -211,7 +211,7 @@ function title:init(...)
 		gfx.fillRect(0, 0, 400, 240)
 	end)
 
-	-- TODO: add music
+	newmusic('audio/music/title', true)
 	self:add()
 end
 

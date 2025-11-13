@@ -195,6 +195,7 @@ function packselect:init(...)
 		gfx.fillRect(0, 0, 400, 240)
 	end)
 
+	newmusic('audio/music/title', true)
 	self:add()
 end
 

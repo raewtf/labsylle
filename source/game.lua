@@ -26,12 +26,16 @@ function game:init(...)
 		menu:removeAllMenuItems()
 		if vars.pack == 'speed' then
 			menu:addMenuItem('quit round', function()
+				stopmusic()
+				assets.speedcountdown:stop()
+				assets.speedcountin:stop()
 				quikword:pause()
 				vars.playing = false
 				scenemanager:transitionscene(title, false, 2)
 			end)
 		else
 			menu:addMenuItem('suspend', function()
+				stopmusic()
 				save[vars.pack.id].puzzle = vars.puzzle
 				save[vars.pack.id].puzzleswaps = vars.swaps
 				save[vars.pack.id].heldpackswaps = vars.packswaps
@@ -42,9 +46,11 @@ function game:init(...)
 				vars.playing = false
 				scenemanager:transitionscene(packselect)
 			end)
-			menu:addMenuItem('retry puzzle', function()
-				game:restart()
-			end)
+			if not vars.finished and vars.playing then
+				menu:addMenuItem('retry puzzle', function()
+					game:restart()
+				end)
+			end
 		end
 	end
 
@@ -173,6 +179,7 @@ function game:init(...)
 	else
 		assets.mask = gfx.image.new('images/mask')
 		assets.bomb = gfx.image.new('images/bomb')
+		assets.ash = gfx.image.new('images/ash')
 		assets.fuse1 = smp.new('audio/sfx/fuse1')
 		assets.fuse2 = smp.new('audio/sfx/fuse2')
 		assets.fuse3 = smp.new('audio/sfx/fuse3')
@@ -183,6 +190,9 @@ function game:init(...)
 		assets.scribble4 = smp.new('audio/sfx/scribble4')
 		assets.scribble5 = smp.new('audio/sfx/scribble5')
 		assets.complete = smp.new('audio/sfx/complete')
+
+		vars.kerplode = pd.timer.new(1, 1, 1)
+		vars.kerplode.discardOnCompletion = false
 
 		if save[vars.pack.id] ~= nil then
 			save[vars.pack.id].status = 'in_progress'
@@ -268,8 +278,8 @@ function game:init(...)
 						quikword.timerEndedCallback = function()
 							game:endround()
 						end
+						newmusic('audio/music/quikword', true)
 					end
-					-- TODO: add music
 					vars.playing = true
 					pd.inputHandlers.push(vars.gameHandlers)
 					vars.cursor:resetnew(300, 1, 0.5, pd.easingFunctions.inOutSine)
@@ -279,11 +289,16 @@ function game:init(...)
 		end
 	else
 		vars['tileoffsetx' .. vars.tiles].timerEndedCallback = function()
-			-- TODO: add music
+			newmusic('audio/music/game', true)
 			vars.playing = true
 			pd.inputHandlers.push(vars.gameHandlers)
 			vars.cursor:resetnew(300, 1, 0.5, pd.easingFunctions.inOutSine)
 			vars['tileoffsetx' .. vars.tiles].timerEndedCallback = nil
+			for n = 1, #vars.bombs do
+				if vars.bombs[n].intensity == 4 then
+					game:kerplode()
+				end
+			end
 		end
 	end
 
@@ -366,6 +381,14 @@ function game:init(...)
 
 		if vars.pack == 'speed' then
 			assets.caldown:drawTextAligned(vars.bigtext, 200, 150, center)
+		else
+			gfx.setColor(white)
+			gfx.setDitherPattern(vars.kerplode.value, bayer4)
+			gfx.fillRect(0, 0, 400, 240)
+			gfx.setColor(black)
+			gfx.setDitherPattern((vars.kerplode.value / 2) + 0.5, bayer4)
+			gfx.fillRect(0, 0, 400, 240)
+			gfx.setColor(black)
 		end
 	end)
 
@@ -380,7 +403,17 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 			bomb = n
 		end
 	end
-	if bomb > 0 then x += vars.rattle.value * vars.bombs[bomb].intensity end
+	if bomb > 0 then
+		if vars.bombs[bomb].intensity == 4 and vars.kerplode.timerEndedCallback ~= nil then
+			assets.ash:draw(x, y + vars.tilevis.height - 17)
+			gfx.setDitherPattern(vars.kerplode.value / 2, bayer4)
+			gfx.fillCircleAtPoint(x + (vars.tilevis.width / 2), y + (vars.tilevis.height / 3), (vars.tilevis.height / 2) + (vars.kerplode.value * 15))
+			gfx.setColor(black)
+			return
+		else
+			x += vars.rattle.value * vars.bombs[bomb].intensity
+		end
+	end
 	gfx.setColor(black)
 	gfx.fillRoundRect(x, y, width, height, radius)
 	gfx.setColor(white)
@@ -405,15 +438,8 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 end
 
 function game:swap(dir)
-	randomizesfx(assets.swish1, assets.swish2, assets.swish3)
-	vars.swaps += 1
-	vars.boomp = 5
-	local hold = vars.word[vars.selection]
-	vars.word[vars.selection] = vars.word[vars.selection + 1]
-	vars.word[vars.selection + 1] = hold
+	local kerploded = false
 	if vars.pack ~= 'speed' then
-		save[vars.pack.id].puzzleswaps = vars.swaps
-		save[vars.pack.id].word = vars.word
 		for n = 1, #vars.bombs do
 			if vars.word[vars.selection] == vars.bombs[n].key or vars.word[vars.selection + 1] == vars.bombs[n].key then
 				vars.bombs[n].swaps -= 1
@@ -427,7 +453,9 @@ function game:swap(dir)
 					vars.bombs[n].intensity = 3
 					playsound(assets.fuse3)
 				elseif vars.bombs[n].swaps == 0 then
+					vars.bombs[n].intensity = 4
 					game:kerplode()
+					kerploded = true
 				end
 			end
 		end
@@ -435,12 +463,38 @@ function game:swap(dir)
 			save[vars.pack.id].bombs = vars.bombs
 		end
 	end
+	if not kerploded then
+		randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+		vars.swaps += 1
+		vars.boomp = 5
+		local hold = vars.word[vars.selection]
+		vars.word[vars.selection] = vars.word[vars.selection + 1]
+		vars.word[vars.selection + 1] = hold
+		if vars.pack ~= 'speed' then
+			save[vars.pack.id].puzzleswaps = vars.swaps
+			save[vars.pack.id].word = vars.word
+		end
+	end
 end
 
 function game:kerplode()
-	playsound(assets.kerplode)
-	-- TODO: KERLPODE!! animation
-	scenemanager:switchscene(game, vars.pack, vars.puzzle, vars.packswaps + vars.swaps, nil, 0, {}, 0)
+	if not vars.finished and vars.playing then
+		playsound(assets.kerplode)
+		vars.playing = false
+		pd.inputHandlers.pop()
+		vars.cursor:resetnew(300, vars.cursor.value, 1, pd.easingFunctions.inOutSine)
+		vars.crank = 0
+		vars.kerplode:resetnew(3500, 0, 2, pd.easingFunctions.outSine)
+		vars.kerplode.timerEndedCallback = function()
+			for i = 1, vars.tiles do
+				vars['tileoffsetx' .. i].delay = (30 * (i - 1))
+				vars['tileoffsetx' .. i]:resetnew(500, 0, -550, pd.easingFunctions.inBack)
+			end
+			vars['tileoffsetx' .. vars.tiles].timerEndedCallback = function()
+				scenemanager:switchscene(game, vars.pack, vars.puzzle, vars.packswaps, nil, 0, {}, 0)
+			end
+		end
+	end
 end
 
 function game:endround()
@@ -512,7 +566,7 @@ function game:endround()
 end
 
 function game:restart()
-	if not vars.finished then
+	if not vars.finished and vars.playing then
 		pd.inputHandlers.pop()
 		vars.cursor:resetnew(300, 0.5, 1, pd.easingFunctions.inOutSine)
 		randomizesfx(assets.scribble1, assets.scribble2, assets.scribble3, assets.scribble4, assets.scribble5, 1.5)
@@ -529,8 +583,10 @@ end
 
 function game:update()
 	if vars.pack == 'speed' then
+		if vars.quikwold ~= nil and vars.quikwold >= 15000 and quikword.value < 15000 then
+			fademusic(9000)
+		end
 		if vars.quikwold ~= nil and vars.quikwold >= 10000 and quikword.value < 10000 then
-			fademusic(5000)
 			playsound(assets.speedcountin)
 		end
 		vars.quikwold = quikword.value
