@@ -29,9 +29,10 @@ gfx.setStrokeLocation(gfx.kStrokeInside)
 pack = nil
 
 catalog = false
-if pd.metadata.bundleID == 'wtf.rae.labsylle' then
-	catalog = true
-end
+-- TODO: vvv uncomment vvv
+--if pd.metadata.bundleID == 'wtf.rae.labsylle' then
+--	catalog = true
+--end
 
 bgblocks = {}
 bgblock_large = gfx.imagetable.new('images/bgblock_large')
@@ -285,5 +286,5 @@ function pd.update()
     -- Catch-all stuff ...
     gfx.sprite.update()
     pd.timer.updateTimers()
-	pd.drawFPS(0, 0)
+	--pd.drawFPS(0, 0)
 end

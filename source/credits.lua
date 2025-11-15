@@ -43,7 +43,7 @@ function credits:init(...)
 		page = 1,
 		bump = 0,
 		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, Voxy'}, {thing = '', name = ''}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
-		credits2 = {{thing = 'Playtesters', name = '???'}, {thing = '', name = ''}, {thing = '', name = ''}, {thing = '', name = ''}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Devon, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, and Panic!'}},
+		credits2 = {{thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = 'and Toad'}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Devon, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, and Panic!'}},
 	}
 	vars.creditsHandlers = {
 		leftButtonDown = function()

@@ -17,6 +17,8 @@ function packselect:init(...)
 	local args = {...} -- Arguments passed in through the scene management will arrive here
 	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
 
+	-- TODO: add key repeat
+
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
@@ -88,8 +90,12 @@ function packselect:init(...)
 		end,
 
 		BButtonDown = function()
+			if pack == packs then
+				scenemanager:transitionscene(title, false, 1)
+			else
+				scenemanager:transitionscene(title, false, 3)
+			end
 			randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
-			scenemanager:transitionscene(title)
 		end,
 
 		AButtonDown = function()
@@ -160,7 +166,7 @@ function packselect:init(...)
 			gfx.fillRoundRect(10 - tonumber(vars.selection == i and 3 + vars.bump or 0), -45 + (55 * i) - tonumber(vars.selection == i and 3 + vars.bump or 0), 360 + tonumber(vars.selection == i and ((3 + vars.bump) * 2) or 0), 50 + tonumber(vars.selection == i and ((3 + vars.bump) * 2) or 0), 5)
 			gfx.setColor(black)
 			gfx.drawRoundRect(10 - tonumber(vars.selection == i and 3 + vars.bump or 0), -45 + (55 * i) - tonumber(vars.selection == i and 3 + vars.bump or 0), 360 + tonumber(vars.selection == i and ((3 + vars.bump) * 2) or 0), 50 + tonumber(vars.selection == i and ((3 + vars.bump) * 2) or 0), 5)
-			assets.disco:drawText(packs[i].name or '', 20, -35 + (55 * i))
+			assets.disco:drawText(pack[i].name or '', 20, -35 + (55 * i))
 			local len = assets.disco:getTextWidth(pack[i].name or '')
 			assets.discoteca:drawText((pack[i].subtitle ~= nil and '(' .. pack[i].subtitle .. ')' or ''), 25 + len, -34 + (55 * i))
 			assets.discoteca:drawText((pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. (pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'), 20, -20 + (55 * i))
@@ -172,10 +178,12 @@ function packselect:init(...)
 				assets.bomb:draw(20 + (pack[i].contains_impostors and 40 or 0) + len, -18 + (55 * i))
 			end
 			if save[pack[i].id] ~= nil then
-				if save[pack[i].id].status == 'in_progress' then
-					assets.discoteca:drawTextAligned('In Progress', 361, -34 + (55 * i), right)
-				elseif save[pack[i].id].status == 'complete' then
-					assets.discoteca:drawTextAligned('Complete!', 361, -34 + (55 * i), right)
+				if save[pack[i].id].status ~= nil then
+					if save[pack[i].id].status == 'in_progress' then
+						assets.discoteca:drawTextAligned('In Progress', 361, -34 + (55 * i), right)
+					elseif save[pack[i].id].status == 'complete' then
+						assets.discoteca:drawTextAligned('Complete!', 361, -34 + (55 * i), right)
+					end
 				end
 				if save[pack[i].id].packswaps ~= nil then
 					assets.discoteca:drawTextAligned('Best: ' .. save[pack[i].id].packswaps .. (save[pack[i].id].packswaps == 1 and ' pack swap' or ' pack swaps'), 361, -20 + (55 * i), right)
@@ -215,6 +223,7 @@ function packselect:scroll()
 end
 
 function packselect:update()
+	-- TODO: add crank scrolling
 	vars.bump -= vars.bump * 0.6
 	vars.sellerp += (vars.selection - vars.sellerp) * 0.6
 	vars.scroll += (vars.scroll_target - vars.scroll) * 0.6

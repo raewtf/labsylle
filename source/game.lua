@@ -21,6 +21,8 @@ function game:init(...)
 	local args = {...} -- Arguments passed in through the scene management will arrive here
 	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
 
+	-- TODO: add logic for accepting multiple solutions. make target a metatable
+
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
@@ -57,6 +59,7 @@ function game:init(...)
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
 		discoteca = gfx.font.new('fonts/discoteca'),
+		doubledisco = gfx.font.new('fonts/doubledisco'),
 		swish1 = smp.new('audio/sfx/swish1'),
 		swish2 = smp.new('audio/sfx/swish2'),
 		swish3 = smp.new('audio/sfx/swish3'),
@@ -99,6 +102,7 @@ function game:init(...)
 			radius = 3,
 			offset = 5,
 			parallax = 5,
+			font = 'disco',
 		},
 		headerx = pd.timer.new(1, 0, 0),
 		rattle = pd.timer.new(50, -1, 1),
@@ -225,6 +229,7 @@ function game:init(...)
 			if vars.pack.puzzles[vars.puzzle].tilevis.radius ~= nil then vars.tilevis.radius = vars.pack.puzzles[vars.puzzle].tilevis.radius end
 			if vars.pack.puzzles[vars.puzzle].tilevis.offset ~= nil then vars.tilevis.offset = vars.pack.puzzles[vars.puzzle].tilevis.offset end
 			if vars.pack.puzzles[vars.puzzle].tilevis.parallax ~= nil then vars.tilevis.parallax = vars.pack.puzzles[vars.puzzle].tilevis.parallax end
+			if vars.pack.puzzles[vars.puzzle].tilevis.font ~= nil then vars.tilevis.font = vars.pack.puzzles[vars.puzzle].tilevis.font end
 		end
 	end
 
@@ -434,7 +439,7 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 		assets.bomb:draw(x + 5, offsety + 5)
 		assets.disco:drawText(vars.bombs[bomb].swaps, x + 19, offsety + 3)
 	end
-	assets.disco:drawTextAligned(vars.word[i], x + (width / 2), offsety + (height / 2) + (bomb > 0 and 0 or -8), center)
+	assets[vars.tilevis.font]:drawTextAligned(vars.word[i], x + (width / 2), offsety + (height / 2) + (bomb > 0 and 0 or -(assets[vars.tilevis.font]:getHeight() / 2.3)), center)
 end
 
 function game:swap(dir)

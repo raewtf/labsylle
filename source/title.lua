@@ -19,6 +19,8 @@ function title:init(...)
 	local args = {...} -- Arguments passed in through the scene management will arrive here
 	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
 
+	-- TODO: add key repeat?
+
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
@@ -128,14 +130,16 @@ function title:init(...)
 				pack = packs
 				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 2 then
-				pd.inputHandlers.pop()
-				fademusic()
-				vars.gaming:resetnew(350, 1, -0.75)
-				vars.gaming.timerEndedCallback = function()
-					scenemanager:switchscene(game, 'speed', 1, 0, nil, 0, {}, 1)
-				end
+				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				vars.bump = -3
+				--pd.inputHandlers.pop()
+				--fademusic()
+				--vars.gaming:resetnew(350, 1, -0.75)
+				--vars.gaming.timerEndedCallback = function()
+				--	scenemanager:switchscene(game, 'speed', 1, 0, nil, 0, {}, 1)
+				--end
 			elseif vars.selection == 3 then
-				pack = shapes
+				pack = bonus
 				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 4 then
 				scenemanager:transitionscene(options)
@@ -179,6 +183,9 @@ function title:init(...)
 		gfx.fillRoundRect(100 - tonumber(vars.selection == 4 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 4 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 4 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 4 and ((3 + vars.bump) * 2) or 0), 5)
 		gfx.fillRoundRect(203 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 5)
 		gfx.setColor(black)
+		gfx.setDitherPattern(0.75, bayer4)
+		gfx.fillRoundRect(100 - tonumber(vars.selection == 2 and 3 + vars.bump or 0), 165 - tonumber(vars.selection == 2 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 2 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 2 and ((3 + vars.bump) * 2) or 0), 5)
+		gfx.setColor(black)
 
 		if vars.selection == 1 then gfx.setLineWidth(4) end
 		gfx.drawRoundRect(100 - tonumber(vars.selection == 1 and 3 + vars.bump or 0), 110 - tonumber(vars.selection == 1 and 3 + vars.bump or 0), 200 + tonumber(vars.selection == 1 and ((3 + vars.bump) * 2) or 0), 50 + tonumber(vars.selection == 1 and ((3 + vars.bump) * 2) or 0), 5)
@@ -196,11 +203,11 @@ function title:init(...)
 		gfx.drawRoundRect(203 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 5)
 		if vars.selection == 5 then gfx.setLineWidth(2) end
 
-		assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Let\'s Play!\n(Word Puzzle Packs)', 200, 120, center)
+		assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Let\'s Play!\n(Word Puzzle Paks)', 200, 120, center)
 		assets[vars.selection == 2 and 'disco' or 'discoteca']:drawTextAligned('Quik-Word', 148, 173, center)
-		assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Shapes!', 251, 173, center)
+		assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Bonus Paks', 252, 173, center)
 		assets[vars.selection == 4 and 'disco' or 'discoteca']:drawTextAligned('Options', 148, 208, center)
-		assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned('Credits', 251, 208, center)
+		assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned('Credits', 252, 208, center)
 
 		if vars.launch then
 			assets.launch:drawFaded(0, 0, vars.launchfade.value, bayer4)
@@ -216,5 +223,6 @@ function title:init(...)
 end
 
 function title:update()
+	-- TODO: add crank scrolling (increment/decrement)
 	vars.bump -= vars.bump * 0.4
 end

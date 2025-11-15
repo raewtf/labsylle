@@ -16,6 +16,7 @@ function options:init(...)
 	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
 
 	-- TODO: add in-game background number-counter
+	-- TODO: add key repeat
 
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
@@ -139,5 +140,6 @@ function options:init(...)
 end
 
 function options:update()
+	-- TODO: add crank scrolling
 	vars.bump -= vars.bump * 0.4
 end
