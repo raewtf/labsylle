@@ -19,14 +19,17 @@ local random <const> = math.random
 local floor <const> = math.floor
 local ceil <const> = math.ceil
 
-pd.display.setRefreshRate(0)
+pd.display.setRefreshRate(30)
 gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.setLineWidth(2)
 gfx.setStrokeLocation(gfx.kStrokeInside)
 
 -- TODO: add number commalization
+-- TODO: add achievements
+-- TODO: compress SFX and music a bit more
 
 pack = nil
+redraw = false
 
 catalog = false
 -- TODO: vvv uncomment vvv
@@ -56,10 +59,14 @@ function savecheck()
 	save.hours = save.hours or 0
 
 	save.quikwordbest = save.quikwordbest or 0
+	save.background = save.background or 1
+	save.darkmode = save.darkmode or 2
 end
 
 -- ... now we run that!
 savecheck()
+
+local lasthour = pd.getTime().hour
 
 -- When the game closes...
 function pd.gameWillTerminate()
@@ -152,16 +159,16 @@ function commalize(amount)
   	return formatted
 end
 
-function create_bg()
-	if not save.menubg then return end
-	for i = 1, 25 do
+function create_bg(game)
+	if not game and not save.menubg then return end
+	for i = 1, 10 do
 		local x = random(-20, 420)
 		local y = random(-190, -20)
 		local fallspeed = random(25, 50)
 		local delay = random(500, 9000)
 		local rotspeed = random()
 		local size
-		if i <= 13 then
+		if i <= 5 then
 			size = 'small'
 		else
 			size = 'large'
@@ -170,9 +177,9 @@ function create_bg()
 	end
 end
 
-function draw_bg()
-	if bgblocks[1] == nil or not save.menubg then return end
-	for i = 1, 25 do
+function draw_bg(game)
+	if bgblocks[1] == nil or (not game and not save.menubg) then return end
+	for i = 1, 10 do
 		bgblocks[i].y += (bgblocks[i].fallspeed / 20)
 		if bgblocks[i].y >= 260 then
 			bgblocks[i].y = -40
@@ -184,7 +191,11 @@ function draw_bg()
 		_G['bgblock_' .. bgblocks[i].size][math.floor(bgblocks[i].rotation)]:draw(bgblocks[i].x, bgblocks[i].y)
 	end
 	gfx.setColor(gfx.kColorWhite)
-	gfx.setDitherPattern(0.5, gfx.image.kDitherTypeBayer2x2)
+	if game then
+		gfx.setDitherPattern(0.25, gfx.image.kDitherTypeBayer2x2)
+	else
+		gfx.setDitherPattern(0.5, gfx.image.kDitherTypeBayer2x2)
+	end
 	gfx.fillRect(0, 0, 400, 240)
 	gfx.setColor(gfx.kColorBlack)
 end
@@ -197,6 +208,21 @@ function remove_bg()
 	end
 	bgblocks = {}
 end
+
+function isdarkmode()
+	local hour = pd.getTime().hour
+	if save.darkmode == 0 then
+		return false
+	elseif save.darkmode == 1 then
+		return true
+	elseif save.darkmode == 2 and not (hour >= 6 and hour <= 18) then
+		return true
+	else
+		return false
+	end
+end
+
+pd.display.setInverted(isdarkmode())
 
 function playsound(sound)
 	if save.sfx then
@@ -286,5 +312,22 @@ function pd.update()
     -- Catch-all stuff ...
     gfx.sprite.update()
     pd.timer.updateTimers()
-	--pd.drawFPS(0, 0)
+
+	-- Automatic dark mode
+	local hour = pd.getTime().hour
+	if save.darkmode == 2 then
+		if lasthour < 18 and hour >= 18 then
+			pd.display.setInverted(true)
+			lasthour = hour
+		elseif lasthour < 6 and hour >= 6 then
+			pd.display.setInverted(false)
+			lasthour = hour
+		end
+	else
+		if lasthour ~= hour then
+			lasthour = hour
+		end
+	end
+
+	pd.drawFPS(0, 0)
 end

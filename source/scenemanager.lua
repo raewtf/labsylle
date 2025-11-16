@@ -10,10 +10,18 @@ function scenemanager:init()
     self.transitioning = false
 
 	self.loading4 = gfx.image.new('images/system/launchImage')
+	self.loading4d = self.loading4:invertedImage()
+
 	self.loading3 = self.loading4:fadedImage(0.75, bayer2)
 	self.loading2 = self.loading4:fadedImage(0.50, bayer2)
 	self.loading1 = self.loading4:fadedImage(0.25, bayer2)
+
+	self.loading3d = self.loading4d:fadedImage(0.75, bayer2)
+	self.loading2d = self.loading4d:fadedImage(0.50, bayer2)
+	self.loading1d = self.loading4d:fadedImage(0.25, bayer2)
+
 	self.loading0 = gfx.image.new(400, 240, gfx.kColorClear)
+	self.loading0d = gfx.image.new(400, 240, gfx.kColorClear)
 
 	self.sprite = gfx.sprite.new()
 	self.sprite:setZIndex(26000)
@@ -50,7 +58,7 @@ function scenemanager:transitionscene(scene, ...)
 	self.sprite:add()
 	self.timer = pd.timer.new(self.transitiontime, 0, 4.99, pd.easingFunctions.outQuart)
 	self.timer.updateCallback = function(timer)
-		self.sprite:setImage(self['loading' .. floor(timer.value)])
+		self.sprite:setImage(self['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
 	end
 	-- After the first timer ends...
 	self.timer.timerEndedCallback = function()
@@ -58,7 +66,7 @@ function scenemanager:transitionscene(scene, ...)
 		self.sprite:add()
 		self.timer = pd.timer.new(self.transitiontime, 4.99, 0, pd.easingFunctions.inQuart)
 		self.timer.updateCallback = function(timer)
-			self.sprite:setImage(self['loading' .. floor(timer.value)])
+			self.sprite:setImage(self['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
 		end
 		self.timer.timerEndedCallback = function()
 			-- After this timer's over, remove the transition and the sprites.

@@ -17,7 +17,14 @@ class('title').extends(gfx.sprite) -- Create the scene's class
 function title:init(...)
 	title.super.init(self)
 	local args = {...} -- Arguments passed in through the scene management will arrive here
-	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
+	-- Should this scene redraw the sprites constantly?
+	if save.menubg then
+		gfx.sprite.setAlwaysRedraw(true)
+		redraw = true
+	else
+		gfx.sprite.setAlwaysRedraw(false)
+		redraw = false
+	end
 
 	-- TODO: add key repeat?
 
@@ -46,6 +53,10 @@ function title:init(...)
 		pop5 = smp.new('audio/sfx/pop5'),
 	}
 
+	if isdarkmode() then
+		assets.launch:setInverted(true)
+	end
+
 	vars = {
 		launch = args[1] or false,
 		selection = args[2] or 1,
@@ -58,6 +69,7 @@ function title:init(...)
 		upButtonDown = function()
 			if vars.selection ~= 1 then
 				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				gfx.sprite.redrawBackground()
 			end
 			if vars.selection == 2 then
 				vars.selection = 1
@@ -76,6 +88,7 @@ function title:init(...)
 		downButtonDown = function()
 			if vars.selection < 4 then
 				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				gfx.sprite.redrawBackground()
 			end
 			if vars.selection == 1 then
 				if vars.dir then
@@ -96,6 +109,7 @@ function title:init(...)
 		leftButtonDown = function()
 			if vars.selection == 3 or vars.selection == 5 then
 				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				gfx.sprite.redrawBackground()
 			end
 			vars.dir = false
 			if vars.selection == 3 then
@@ -112,6 +126,7 @@ function title:init(...)
 			vars['selectionoffset' .. vars.selection] = 0
 			if vars.selection % 2 == 0 then
 				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				gfx.sprite.redrawBackground()
 			end
 			vars.dir = true
 			if vars.selection == 2 then
@@ -125,8 +140,8 @@ function title:init(...)
 		end,
 
 		AButtonDown = function()
-			randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
 			if vars.selection == 1 then
+				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
 				pack = packs
 				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 2 then
@@ -139,11 +154,14 @@ function title:init(...)
 				--	scenemanager:switchscene(game, 'speed', 1, 0, nil, 0, {}, 1)
 				--end
 			elseif vars.selection == 3 then
+				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
 				pack = bonus
 				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 4 then
+				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
 				scenemanager:transitionscene(options)
 			elseif vars.selection == 5 then
+				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
 				scenemanager:transitionscene(credits)
 			end
 		end,
@@ -173,7 +191,7 @@ function title:init(...)
 		gfx.fillRect(0, 0, 80, 240)
 		gfx.fillRect(320, 0, 80, 240)
 
-		assets.logo:draw(25, -18 + (vars.logopull ~= nil and vars.logopull.value or 0))
+		assets.logo:draw(65, 6 + (vars.logopull ~= nil and vars.logopull.value or 0))
 
 		gfx.setColor(white)
 		gfx.setDitherPattern(0.15, bayer4)
@@ -225,4 +243,13 @@ end
 function title:update()
 	-- TODO: add crank scrolling (increment/decrement)
 	vars.bump -= vars.bump * 0.4
+	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
+		vars.bump = 0
+	end
+
+	if not redraw then
+		if (vars.launchfade ~= nil and vars.launchfade.timeLeft ~= 0) or (vars.logopull ~= nil and vars.logopull.timeLeft ~= 0) or vars.bump ~= 0 then
+			gfx.sprite.redrawBackground()
+		end
+	end
 end

@@ -13,7 +13,14 @@ class('credits').extends(gfx.sprite) -- Create the scene's class
 function credits:init(...)
 	credits.super.init(self)
 	local args = {...} -- Arguments passed in through the scene management will arrive here
-	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
+	-- Should this scene redraw the sprites constantly?
+	if save.menubg then
+		gfx.sprite.setAlwaysRedraw(true)
+		redraw = true
+	else
+		gfx.sprite.setAlwaysRedraw(false)
+		redraw = false
+	end
 
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
@@ -42,14 +49,15 @@ function credits:init(...)
 	vars = {
 		page = 1,
 		bump = 0,
-		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, Voxy'}, {thing = '', name = ''}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
-		credits2 = {{thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = 'and Toad'}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Devon, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, and Panic!'}},
+		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, & Voxy'}, {thing = '', name = ''}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
+		credits2 = {{thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = '& Toad'}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
 	}
 	vars.creditsHandlers = {
 		leftButtonDown = function()
 			if vars.page > 1 then
 				vars.page -= 1
 				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				gfx.sprite.redrawBackground()
 			else
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				vars.bump = -3
@@ -60,6 +68,7 @@ function credits:init(...)
 			if vars.page < 2 then
 				vars.page += 1
 				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				gfx.sprite.redrawBackground()
 			else
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				vars.bump = -3
@@ -107,4 +116,13 @@ end
 
 function credits:update()
 	vars.bump -= vars.bump * 0.4
+	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
+		vars.bump = 0
+	end
+
+	if not redraw then
+		if vars.bump ~= 0 then
+			gfx.sprite.redrawBackground()
+		end
+	end
 end

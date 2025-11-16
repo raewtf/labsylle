@@ -13,7 +13,14 @@ class('results').extends(gfx.sprite) -- Create the scene's class
 function results:init(...)
 	results.super.init(self)
 	local args = {...} -- Arguments passed in through the scene management will arrive here
-	gfx.sprite.setAlwaysRedraw(true) -- Should this scene redraw the sprites constantly?
+	-- Should this scene redraw the sprites constantly?
+	if save.menubg then
+		gfx.sprite.setAlwaysRedraw(true)
+		redraw = true
+	else
+		gfx.sprite.setAlwaysRedraw(false)
+		redraw = false
+	end
 
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
@@ -135,4 +142,7 @@ function results:init(...)
 end
 
 function results:update()
+	if vars.bump.timeLeft ~= 0 or vars.fade.timeLeft ~= 0 then
+		gfx.sprite.redrawBackground()
+	end
 end
