@@ -1,6 +1,7 @@
 -- Importing things
 import 'CoreLibs/math'
 import 'CoreLibs/timer'
+import 'CoreLibs/crank'
 import 'CoreLibs/object'
 import 'CoreLibs/sprites'
 import 'CoreLibs/graphics'
@@ -24,15 +25,16 @@ gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.setLineWidth(2)
 gfx.setStrokeLocation(gfx.kStrokeInside)
 
--- TODO: add number commalization
--- TODO: add achievements
--- TODO: compress SFX and music a bit more
+-- TODOish: add achievements
+-- TODOish: daily seeded quik-word?
+-- TODO: solver/optimum swaps finder function, that returns a number
+-- TODO: submit to catalog
 
 pack = nil
 redraw = false
 
 catalog = false
--- TODO: vvv uncomment vvv
+-- TODOish: vvv uncomment vvv
 --if pd.metadata.bundleID == 'wtf.rae.labsylle' then
 --	catalog = true
 --end
@@ -59,8 +61,67 @@ function savecheck()
 	save.hours = save.hours or 0
 
 	save.quikwordbest = save.quikwordbest or 0
-	save.background = save.background or 1
-	save.darkmode = save.darkmode or 2
+
+	save.background = save.background or 0
+	save.darkmode = save.darkmode or 0
+
+	if save.boldtext == nil then save.boldtext = false end
+	if save.autosubmit == nil then save.autosubmit = false end
+	if save.showcontrols == nil then save.showcontrols = true end
+end
+
+function resetsave(keepoptions, keepquikword)
+	newsave = {}
+
+	if keepoptions then
+		newsave.music = save.music
+		newsave.sfx = save.sfx
+
+		newsave.crank = save.crank
+
+		newsave.time = save.time
+		newsave.menubg = save.menubg
+		newsave.hours = save.hours
+
+		newsave.background = save.background
+		newsave.darkmode = save.darkmode
+
+		newsave.boldtext = save.boldtext
+		newsave.autosubmit = save.autosubmit
+		newsave.showcontrols = save.showcontrols
+	else
+		newsave.music = true
+		newsave.sfx = true
+
+		newsave.crank = true
+
+		newsave.time = true
+		newsave.menubg = true
+		newsave.hours = 0
+
+		newsave.background = 0
+		newsave.darkmode = 0
+
+		newsave.boldtext = false
+		newsave.autosubmit = false
+		newsave.showcontrols = true
+	end
+
+	if keepquikword then
+		newsave.quikwordbest = save.quikwordbest
+	else
+		newsave.quikwordbest = 0
+	end
+
+	save = newsave
+	newsave = nil
+
+	newmusic('audio/music/title', true)
+	create_bg()
+	gfx.sprite.setAlwaysRedraw(true)
+	redraw = true
+	pd.display.setInverted(isdarkmode())
+	assets.discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca')
 end
 
 -- ... now we run that!
@@ -328,6 +389,4 @@ function pd.update()
 			lasthour = hour
 		end
 	end
-
-	pd.drawFPS(0, 0)
 end

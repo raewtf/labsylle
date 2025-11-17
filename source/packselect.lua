@@ -25,8 +25,7 @@ function packselect:init(...)
 		redraw = false
 	end
 
-	-- TODO: add key repeat
-	-- TODO: make scroll bar hanger larger
+	-- TODO: add control bar
 
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
@@ -44,29 +43,23 @@ function packselect:init(...)
 		end)
 		if catalog then
 			menu:addMenuItem('pack boards', function()
-				-- TODO: leaderboard popup for given pack
+				-- TODOish: catalog leaderboard popup for given pack
 			end)
 		end
 	end
 
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new('fonts/discoteca'),
+		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
 		mask = gfx.image.new('images/mask'),
 		bomb = gfx.image.new('images/bomb'),
-		swish1 = smp.new('audio/sfx/swish1'),
-		swish2 = smp.new('audio/sfx/swish2'),
-		swish3 = smp.new('audio/sfx/swish3'),
+		swish = smp.new('audio/sfx/swish'),
 		block1 = smp.new('audio/sfx/block1'),
 		block2 = smp.new('audio/sfx/block2'),
 		block3 = smp.new('audio/sfx/block3'),
 		block4 = smp.new('audio/sfx/block4'),
 		block5 = smp.new('audio/sfx/block5'),
-		pop1 = smp.new('audio/sfx/pop1'),
-		pop2 = smp.new('audio/sfx/pop2'),
-		pop3 = smp.new('audio/sfx/pop3'),
-		pop4 = smp.new('audio/sfx/pop4'),
-		pop5 = smp.new('audio/sfx/pop5'),
+		pop = smp.new('audio/sfx/pop'),
 	}
 
 	vars = {
@@ -81,44 +74,61 @@ function packselect:init(...)
 	}
 	vars.packselectHandlers = {
 		upButtonDown = function()
-			if vars.selection > 1 then
-				vars.selection -= 1
-				packselect:scroll(true)
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
-				gfx.sprite.redrawBackground()
-			else
-				vars.scroll += 10
-				vars.sellerp -= 1
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
+			local function keytimercallback()
+				if vars.selection > 1 then
+					vars.selection -= 1
+					packselect:scroll(true)
+					playsound(assets.swish)
+					gfx.sprite.redrawBackground()
+				else
+					vars.scroll += 10
+					vars.sellerp -= 1
+					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				end
 			end
+			vars.keytimer = pd.timer.keyRepeatTimer(keytimercallback)
+		end,
+
+		upButtonUp = function()
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
 		end,
 
 		downButtonDown = function()
-			if vars.selection < #pack then
-				vars.selection += 1
-				packselect:scroll(true)
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
-				gfx.sprite.redrawBackground()
-			else
-				vars.scroll -= 10
-				vars.sellerp += 1
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
+			local function keytimercallback()
+				if vars.selection < #pack then
+					vars.selection += 1
+					packselect:scroll(true)
+					playsound(assets.swish)
+					gfx.sprite.redrawBackground()
+				else
+					vars.scroll -= 10
+					vars.sellerp += 1
+					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				end
 			end
+			vars.keytimer = pd.timer.keyRepeatTimer(keytimercallback)
+		end,
+
+		downButtonUp = function()
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
 		end,
 
 		BButtonDown = function()
+			-- TODO: this is bugged, and isn't working
 			if pack == packs then
 				scenemanager:transitionscene(title, false, 1)
 			else
 				scenemanager:transitionscene(title, false, 3)
 			end
-			randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+			playsound(assets.pop)
 		end,
 
 		AButtonDown = function()
 			if pack[vars.selection].puzzles ~= nil and #pack[vars.selection].puzzles > 0 then
 				fademusic()
-				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+				playsound(assets.pop)
 				pd.inputHandlers.pop()
 				vars.gaming:resetnew(350, 1, -0.75)
 				vars.gaming.timerEndedCallback = function()
@@ -145,6 +155,18 @@ function packselect:init(...)
 	else
 		pd.inputHandlers.push(vars.packselectHandlers)
 	end
+
+	newpack = {}
+	for i = 1, #pack do
+		if pack[i] ~= nil and pack[i].id ~= nil and pack[i].id ~= 'tbd' then
+			table.insert(newpack, pack[i])
+		end
+	end
+	pack = table.deepcopy(newpack)
+	for i = 1, #newpack do
+		newpack[i] = nil
+	end
+	newpack = nil
 
 	for i = 1, #pack do
 		if vars.return_pack == pack[i] then
@@ -215,8 +237,8 @@ function packselect:drawpacktext(i)
 	assets.disco:drawText(pack[i].name or '', 20, 21)
 	local len = assets.disco:getTextWidth(pack[i].name or '')
 	assets.discoteca:drawText((pack[i].subtitle ~= nil and '(' .. pack[i].subtitle .. ')' or ''), 25 + len, 21)
-	assets.discoteca:drawText((pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. (pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'), 20, 35)
-	local len = assets.discoteca:getTextWidth((pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. (pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'))
+	assets.discoteca:drawText((pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'), 20, 35)
+	local len = assets.discoteca:getTextWidth((pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'))
 	if pack[i].contains_impostors then
 		assets.mask:draw(22 + len, 37)
 	end
@@ -232,9 +254,9 @@ function packselect:drawpacktext(i)
 			end
 		end
 		if save[pack[i].id].packswaps ~= nil then
-			assets.discoteca:drawTextAligned('Best: ' .. save[pack[i].id].packswaps .. (save[pack[i].id].packswaps == 1 and ' pack swap' or ' pack swaps'), 361, 35, right)
+			assets.discoteca:drawTextAligned('Best: ' .. commalize(save[pack[i].id].packswaps) .. (save[pack[i].id].packswaps == 1 and ' pack swap' or ' pack swaps'), 361, 35, right)
 		else
-			assets.discoteca:drawTextAligned(save[pack[i].id].puzzle - 1 .. ' of ' .. (pack[i].puzzles ~= nil and #pack[i].puzzles or 0) .. ' completed', 361, 35, right)
+			assets.discoteca:drawTextAligned(commalize(save[pack[i].id].puzzle - 1) .. ' of ' .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or 0) .. ' completed', 361, 35, right)
 		end
 	else
 		assets.discoteca:drawTextAligned('Unplayed', 361, 28, right)
@@ -257,7 +279,26 @@ function packselect:scroll(lerp)
 end
 
 function packselect:update()
-	-- TODO: add crank scrolling
+	local ticks = pd.getCrankTicks(6)
+	if ticks ~= 0 and not scenemanager.transitioning then
+		vars.selection += ticks
+		if vars.selection > #pack then
+			vars.selection = #pack
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.scroll -= 10
+			vars.sellerp += 1
+		elseif vars.selection < 1 then
+			vars.selection = 1
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.scroll -= 10
+			vars.sellerp += 1
+		else
+			packselect:scroll(true)
+			playsound(assets.swish)
+			gfx.sprite.redrawBackground()
+		end
+	end
+
 	vars.bump -= vars.bump * 0.6
 	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
 		vars.bump = 0

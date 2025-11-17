@@ -26,7 +26,8 @@ function title:init(...)
 		redraw = false
 	end
 
-	-- TODO: add key repeat?
+	-- TODO: add control bar
+	-- TODO: re-open bonus paks menu
 
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
@@ -35,22 +36,16 @@ function title:init(...)
 
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new('fonts/discoteca'),
+		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
 		logo = gfx.image.new('images/logo'),
 		launch = gfx.image.new('images/system/launchImage'),
-		swish1 = smp.new('audio/sfx/swish1'),
-		swish2 = smp.new('audio/sfx/swish2'),
-		swish3 = smp.new('audio/sfx/swish3'),
+		swish = smp.new('audio/sfx/swish'),
 		block1 = smp.new('audio/sfx/block1'),
 		block2 = smp.new('audio/sfx/block2'),
 		block3 = smp.new('audio/sfx/block3'),
 		block4 = smp.new('audio/sfx/block4'),
 		block5 = smp.new('audio/sfx/block5'),
-		pop1 = smp.new('audio/sfx/pop1'),
-		pop2 = smp.new('audio/sfx/pop2'),
-		pop3 = smp.new('audio/sfx/pop3'),
-		pop4 = smp.new('audio/sfx/pop4'),
-		pop5 = smp.new('audio/sfx/pop5'),
+		pop = smp.new('audio/sfx/pop'),
 	}
 
 	if isdarkmode() then
@@ -67,48 +62,64 @@ function title:init(...)
 	}
 	vars.titleHandlers = {
 		upButtonDown = function()
-			if vars.selection ~= 1 then
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
-				gfx.sprite.redrawBackground()
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
+			local function keytimercallback()
+				if vars.selection ~= 1 then
+					playsound(assets.swish)
+					gfx.sprite.redrawBackground()
+				end
+				if vars.selection == 2 then
+					vars.selection = 1
+				elseif vars.selection == 3 then
+					vars.selection = 1
+				elseif vars.selection == 4 then
+					vars.selection = 2
+				elseif vars.selection == 5 then
+					vars.selection = 3
+				else
+					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+					vars.bump = -3
+				end
 			end
-			if vars.selection == 2 then
-				vars.selection = 1
-			elseif vars.selection == 3 then
-				vars.selection = 1
-			elseif vars.selection == 4 then
-				vars.selection = 2
-			elseif vars.selection == 5 then
-				vars.selection = 3
-			else
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
-			end
+			vars.keytimer = pd.timer.keyRepeatTimer(keytimercallback)
+		end,
+
+		upButtonUp = function()
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
 		end,
 
 		downButtonDown = function()
-			if vars.selection < 4 then
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
-				gfx.sprite.redrawBackground()
-			end
-			if vars.selection == 1 then
-				if vars.dir then
-					vars.selection = 3
-				else
-					vars.selection = 2
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
+			local function keytimercallback()
+				if vars.selection < 4 then
+					playsound(assets.swish)
+					gfx.sprite.redrawBackground()
 				end
-			elseif vars.selection == 2 then
-				vars.selection = 4
-			elseif vars.selection == 3 then
-				vars.selection = 5
-			else
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
+				if vars.selection == 1 then
+					if vars.dir then
+						vars.selection = 3
+					else
+						vars.selection = 2
+					end
+				elseif vars.selection == 2 then
+					vars.selection = 4
+				elseif vars.selection == 3 then
+					vars.selection = 5
+				else
+					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+					vars.bump = -3
+				end
 			end
+			vars.keytimer = pd.timer.keyRepeatTimer(keytimercallback)
+		end,
+
+		downButtonUp = function()
+			if vars.keytimer ~= nil then vars.keytimer:remove() end
 		end,
 
 		leftButtonDown = function()
 			if vars.selection == 3 or vars.selection == 5 then
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				playsound(assets.swish)
 				gfx.sprite.redrawBackground()
 			end
 			vars.dir = false
@@ -125,7 +136,7 @@ function title:init(...)
 		rightButtonDown = function()
 			vars['selectionoffset' .. vars.selection] = 0
 			if vars.selection % 2 == 0 then
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				playsound(assets.swish)
 				gfx.sprite.redrawBackground()
 			end
 			vars.dir = true
@@ -141,27 +152,27 @@ function title:init(...)
 
 		AButtonDown = function()
 			if vars.selection == 1 then
-				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+				playsound(assets.pop)
 				pack = packs
 				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 2 then
+				playsound(assets.pop)
+				pd.inputHandlers.pop()
+				fademusic()
+				vars.gaming:resetnew(350, 1, -0.75)
+				vars.gaming.timerEndedCallback = function()
+					scenemanager:switchscene(game, 'speed', 1, 0, nil, 0, {}, 1)
+				end
+			elseif vars.selection == 3 then
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				vars.bump = -3
-				--pd.inputHandlers.pop()
-				--fademusic()
-				--vars.gaming:resetnew(350, 1, -0.75)
-				--vars.gaming.timerEndedCallback = function()
-				--	scenemanager:switchscene(game, 'speed', 1, 0, nil, 0, {}, 1)
-				--end
-			elseif vars.selection == 3 then
-				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
-				pack = bonus
-				scenemanager:transitionscene(packselect)
+				--pack = bonus
+				--scenemanager:transitionscene(packselect)
 			elseif vars.selection == 4 then
-				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+				playsound(assets.pop)
 				scenemanager:transitionscene(options)
 			elseif vars.selection == 5 then
-				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+				playsound(assets.pop)
 				scenemanager:transitionscene(credits)
 			end
 		end,
@@ -202,7 +213,7 @@ function title:init(...)
 		gfx.fillRoundRect(203 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 5)
 		gfx.setColor(black)
 		gfx.setDitherPattern(0.75, bayer4)
-		gfx.fillRoundRect(100 - tonumber(vars.selection == 2 and 3 + vars.bump or 0), 165 - tonumber(vars.selection == 2 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 2 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 2 and ((3 + vars.bump) * 2) or 0), 5)
+		gfx.fillRoundRect(203 - tonumber(vars.selection == 3 and 3 + vars.bump or 0), 165 - tonumber(vars.selection == 3 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 3 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 3 and ((3 + vars.bump) * 2) or 0), 5)
 		gfx.setColor(black)
 
 		if vars.selection == 1 then gfx.setLineWidth(4) end
@@ -223,7 +234,7 @@ function title:init(...)
 
 		assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Let\'s Play!\n(Word Puzzle Paks)', 200, 120, center)
 		assets[vars.selection == 2 and 'disco' or 'discoteca']:drawTextAligned('Quik-Word', 148, 173, center)
-		assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Bonus Paks', 252, 173, center)
+		assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Unavailable', 252, 173, center)
 		assets[vars.selection == 4 and 'disco' or 'discoteca']:drawTextAligned('Options', 148, 208, center)
 		assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned('Credits', 252, 208, center)
 
@@ -241,7 +252,23 @@ function title:init(...)
 end
 
 function title:update()
-	-- TODO: add crank scrolling (increment/decrement)
+	local ticks = pd.getCrankTicks(4)
+	if ticks ~= 0 and not scenemanager.transitioning then
+		vars.selection += ticks
+		if vars.selection > #vars.selections then
+			vars.selection = #vars.selections
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		elseif vars.selection < 1 then
+			vars.selection = 1
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		else
+			playsound(assets.swish)
+			gfx.sprite.redrawBackground()
+		end
+	end
+
 	vars.bump -= vars.bump * 0.4
 	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
 		vars.bump = 0

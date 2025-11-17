@@ -29,13 +29,9 @@ function results:init(...)
 
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new('fonts/discoteca'),
+		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
 		cal = gfx.font.new('fonts/cal'),
-		pop1 = smp.new('audio/sfx/pop1'),
-		pop2 = smp.new('audio/sfx/pop2'),
-		pop3 = smp.new('audio/sfx/pop3'),
-		pop4 = smp.new('audio/sfx/pop4'),
-		pop5 = smp.new('audio/sfx/pop5'),
+		pop = smp.new('audio/sfx/pop'),
 	}
 
 	vars = {
@@ -47,7 +43,7 @@ function results:init(...)
 	}
 	vars.resultsHandlers = {
 		BButtonDown = function()
-			randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+			playsound(assets.pop)
 			if vars.pack == 'speed' then
 				scenemanager:transitionscene(title, false, 2)
 			else
@@ -57,7 +53,7 @@ function results:init(...)
 
 		AButtonDown = function()
 			if not vars.leaving then
-				randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+				playsound(assets.pop)
 				vars.leaving = true
 				vars.fade:resetnew(300, 0.75, 1)
 				vars.bump:resetnew(500, 0, 50, pd.easingFunctions.inBack)
@@ -122,15 +118,15 @@ function results:init(...)
 				assets.discoteca:drawTextAligned('Did you forget to turn\nyour console off...?', 200, 101 + (vars.bump.value * 4), center)
 			else
 				assets.discoteca:drawTextAligned('You made it up past Round...', 200, 77 + (vars.bump.value * 4), center)
-				assets.cal:drawTextAligned(vars.variable .. '!', 200, 94 + (vars.bump.value * 4), center)
+				assets.cal:drawTextAligned(commalize(vars.variable) .. '!', 200, 94 + (vars.bump.value * 4), center)
 			end
 			assets.discoteca:drawTextAligned(tostring(vars.best and 'That\'s a new best score!' or 'Your current best is ' .. save.quikwordbest .. tostring(save.quikwordbest == 1 and ' round.' or ' rounds.')), 200, 143 + (vars.bump.value * 4), center)
 		else
 			assets.cal:drawTextAligned('Pack Complete!', 200, 11 - (vars.bump.value * 1.5), center)
 			assets.disco:drawTextAligned(vars.pack.name or '', 200, 75 + (vars.bump.value * 4), center)
 			assets.discoteca:drawTextAligned((vars.pack.subtitle ~= nil and '(' .. vars.pack.subtitle .. ')' or ''), 200, 89 + (vars.bump.value * 4), center)
-			assets.discoteca:drawTextAligned((vars.pack.difficulty ~= nil and vars.pack.difficulty .. ' — ' or '') .. (vars.pack.puzzles ~= nil and #vars.pack.puzzles or '0') .. ((vars.pack.puzzles ~= nil and #vars.pack.puzzles == 1) and ' puzzle' or ' puzzles'), 200, 103 + (vars.bump.value * 4), center)
-			assets.discoteca:drawTextAligned('You beat this pack in ' .. vars.variable .. ' swaps.', 200, 129 + (vars.bump.value * 4), center)
+			assets.discoteca:drawTextAligned((vars.pack.difficulty ~= nil and vars.pack.difficulty .. ' — ' or '') .. commalize(vars.pack.puzzles ~= nil and #vars.pack.puzzles or '0') .. ((vars.pack.puzzles ~= nil and #vars.pack.puzzles == 1) and ' puzzle' or ' puzzles'), 200, 103 + (vars.bump.value * 4), center)
+			assets.discoteca:drawTextAligned('You beat this pack in ' .. commalize(vars.variable) .. ' swaps.', 200, 129 + (vars.bump.value * 4), center)
 			assets.discoteca:drawTextAligned(vars.sayings[vars.randsaying], 200, 143 + (vars.bump.value * 4), center)
 		end
 		gfx.drawRoundRect(80, 63 + (vars.bump.value * 4), 240, 106, 5)

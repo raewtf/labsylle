@@ -29,11 +29,17 @@ function game:init(...)
 		redraw = false
 	end
 
+	-- TODO: support for shapes and colored shapes
+	-- TODO: "Perfect!" label when pack ~= 'speed' and optimum route
+	-- TOOD: add timer to quik-word timer when pack == 'speed' and optimum route
+	-- TODO: add save packettes for 'perfect' bool in each puzzle
+	-- TODO: hint after (optimal * 2.5) wrong swaps. find the first wrong one, and indicate its proper position
+
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
 		if vars.pack == 'speed' then
-			menu:addMenuItem('quit round', function()
+			menu:addMenuItem('quit', function()
 				stopmusic()
 				assets.speedcountdown:stop()
 				assets.speedcountin:stop()
@@ -42,6 +48,7 @@ function game:init(...)
 				scenemanager:transitionscene(title, false, 2)
 			end)
 		else
+			-- TODO: "quit" option that doesn't suspend puzzle progress
 			menu:addMenuItem('suspend', function()
 				stopmusic()
 				save[vars.pack.id].puzzle = vars.puzzle
@@ -64,11 +71,9 @@ function game:init(...)
 
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new('fonts/discoteca'),
+		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
 		doubledisco = gfx.font.new('fonts/doubledisco'),
-		swish1 = smp.new('audio/sfx/swish1'),
-		swish2 = smp.new('audio/sfx/swish2'),
-		swish3 = smp.new('audio/sfx/swish3'),
+		swish = smp.new('audio/sfx/swish'),
 		block1 = smp.new('audio/sfx/block1'),
 		block2 = smp.new('audio/sfx/block2'),
 		block3 = smp.new('audio/sfx/block3'),
@@ -82,13 +87,10 @@ function game:init(...)
 		bubble1 = smp.new('audio/sfx/bubble1'),
 		bubble2 = smp.new('audio/sfx/bubble2'),
 		bubble3 = smp.new('audio/sfx/bubble3'),
-		bubble4 = smp.new('audio/sfx/bubble4'),
-		bubble5 = smp.new('audio/sfx/bubble5'),
 		snap1 = smp.new('audio/sfx/snap1'),
 		snap2 = smp.new('audio/sfx/snap2'),
 		snap3 = smp.new('audio/sfx/snap3'),
-		snap4 = smp.new('audio/sfx/snap4'),
-		snap5 = smp.new('audio/sfx/snap5'),
+		scribble = smp.new('audio/sfx/scribble'),
 	}
 
 	vars = {
@@ -126,7 +128,7 @@ function game:init(...)
 				vars['tileoffsety' .. vars.selection + 1]:resetnew(300, 0, vars.tilevis.offset, pd.easingFunctions.outCirc)
 				vars.selection -= 1
 				vars.crank = 0
-				randomizesfx(assets.snap1, assets.snap2, assets.snap3, assets.snap4, assets.snap5)
+				randomizesfx(assets.snap1, assets.snap2, assets.snap3)
 			else
 				vars.sellerp -= 0.5
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
@@ -138,10 +140,25 @@ function game:init(...)
 				vars['tileoffsety' .. vars.selection]:resetnew(300, 0, vars.tilevis.offset, pd.easingFunctions.outCirc)
 				vars.selection += 1
 				vars.crank = 0
-				randomizesfx(assets.snap1, assets.snap2, assets.snap3, assets.snap4, assets.snap5)
+				randomizesfx(assets.snap1, assets.snap2, assets.snap3)
 			else
 				vars.sellerp += 0.5
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			end
+		end,
+
+		upButtonDown = function()
+			if not save.autosubmit then
+				if game:check() then
+					playsound(assets.swish)
+					game:endround()
+					if vars.pack == 'speed' then vars.grace += 1 end
+				else
+					playsound(assets.scribble)
+					for i = 1, vars.tiles do
+						vars['tileoffsety' .. i]:resetnew(600, 0, vars['tileoffsety' .. i].value, pd.easingFunctions.outElastic)
+					end
+				end
 			end
 		end,
 
@@ -204,11 +221,6 @@ function game:init(...)
 		assets.fuse2 = smp.new('audio/sfx/fuse2')
 		assets.fuse3 = smp.new('audio/sfx/fuse3')
 		assets.kerplode = smp.new('audio/sfx/kerplode')
-		assets.scribble1 = smp.new('audio/sfx/scribble1')
-		assets.scribble2 = smp.new('audio/sfx/scribble2')
-		assets.scribble3 = smp.new('audio/sfx/scribble3')
-		assets.scribble4 = smp.new('audio/sfx/scribble4')
-		assets.scribble5 = smp.new('audio/sfx/scribble5')
 		assets.complete = smp.new('audio/sfx/complete')
 
 		assets.mask:setInverted(isdarkmode())
@@ -262,28 +274,35 @@ function game:init(...)
 		end
 	end
 
-	assets.header_base = gfx.image.new(400, 39)
+	assets.header_base = gfx.image.new(400, 40 + (save.showcontrols and 20 or 0))
 	gfx.lockFocus(assets.header_base)
 		gfx.setColor(white)
-		gfx.fillRect(0, 0, 400, 38)
+		gfx.fillRect(0, 0, 400, 38 + (save.showcontrols and 20 or 0))
 		gfx.setColor(black)
 		if vars.pack == 'speed' then
-			assets.cal:drawText(ceil(quikword.value / 1000), 10, 0)
-			assets.disco:drawTextAligned('Quik-Word — Round ' .. vars.puzzle, 390, 5, right)
+			assets.disco:drawTextAligned('Quik-Word — Round ' .. commalize(vars.puzzle), 390, 5, right)
 			if not save.time then
-				assets.discoteca:drawTextAligned('Best score: ' .. (vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds'), 390, 18, right)
+				assets.discoteca:drawTextAligned('Best score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds'), 390, 18, right)
 			end
 		else
 			assets.disco:drawText(vars.pack.name, 10, 5)
-			assets.discoteca:drawText(vars.pack.subtitle .. ' — ' .. vars.puzzle .. ' of ' .. #vars.pack.puzzles, 10, 18)
+			assets.discoteca:drawText(vars.pack.subtitle .. ' — ' .. commalize(vars.puzzle) .. ' of ' .. commalize(#vars.pack.puzzles), 10, 18)
 		end
-		gfx.drawLine(0, 38, 400, 38)
+		gfx.drawLine(0, 38 + (save.showcontrols and 20 or 0), 400, 38 + (save.showcontrols and 20 or 0))
+		if save.showcontrols then
+			gfx.setDitherPattern(0.5, bayer4)
+			gfx.setLineWidth(1)
+			gfx.drawLine(30, 34, 370, 34)
+			gfx.setColor(black)
+			gfx.setLineWidth(2)
+			assets.disco:drawText('↔️ Move  ' .. tostring(save.crank and '🎣' or 'Ⓐ/Ⓑ') .. '  Swap  ' .. tostring(save.autosubmit and '' or '⬆️ Submit'), 10, 38)
+		end
 	gfx.unlockFocus()
 
-	assets.header = gfx.image.new(400, 39)
+	assets.header = gfx.image.new(400, 40 + (save.showcontrols and 20 or 0))
 	game:updateheader(pd.getTime())
 
-	if vars.pack.puzzles[vars.puzzle].text ~= nil then
+	if vars.pack ~= 'speed' and vars.pack.puzzles[vars.puzzle].text ~= nil then
 		assets.text = gfx.image.new(400, 120)
 		gfx.lockFocus(assets.text)
 			assets.disco:drawTextAligned(vars.pack.puzzles[vars.puzzle].text, 200, 0, center)
@@ -293,7 +312,7 @@ function game:init(...)
 	if vars.shouldanimate > 0 then
 		vars.headerx.discardOnCompletion = false
 		if vars.puzzle == 1 or vars.shouldanimate == 2 then
-			vars.headerx:resetnew(500, -50, 0, pd.easingFunctions.outBack)
+			vars.headerx:resetnew(500, -90, 0, pd.easingFunctions.outBack)
 		end
 
 		if vars.pack ~= 'speed' then
@@ -321,26 +340,35 @@ function game:init(...)
 				vars.countdown3 = pd.timer.performAfterDelay(1000, function()
 					playsound(assets.speedcountdown)
 					vars.bigtext = '3'
+					gfx.sprite.redrawBackground()
 				end)
 				vars.countdown2 = pd.timer.performAfterDelay(2000, function()
 					vars.bigtext = '2'
+					gfx.sprite.redrawBackground()
 				end)
 				vars.countdown1 = pd.timer.performAfterDelay(3000, function()
 					vars.bigtext = '1'
+					gfx.sprite.redrawBackground()
 				end)
 				vars.countdownafter = pd.timer.performAfterDelay(5000, function()
 					vars.bigtext = ''
+					gfx.sprite.redrawBackground()
 				end)
 			end
 			vars.countdowngo = pd.timer.performAfterDelay(0 + tonumber(vars.puzzle == 1 and 4000 or 0), function()
 				if not vars.finished then
 					if vars.puzzle == 1 then
 						vars.bigtext = 'GO!'
+						gfx.sprite.redrawBackground()
 						quikword:resetnew(60000, 60000, 0)
 						quikword.timerEndedCallback = function()
+							vars.headerx:resetnew(500, 0, -90, pd.easingFunctions.inBack)
 							game:endround()
 						end
 						newmusic('audio/music/quikword', true)
+					else
+						quikword:start()
+						game:updateheader(pd.getTime())
 					end
 					vars.playing = true
 					pd.inputHandlers.push(vars.gameHandlers)
@@ -369,14 +397,20 @@ function game:init(...)
 	if vars.impostor then comma += vars.tilevis.impostor_gap + 5 end
 	local ccenter = (400 - comma) / 2
 	local tiley = 120 - (vars.tilevis.height / 2)
-	if assets.text ~= nil then tiley -= 18 end
+	if assets.text ~= nil then tiley -= 14 else tiley += 20 end
+	if save.showcontrols then tiley += 7 end
 
 	if save.background == 4 then create_bg(true) end
 
 	gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
 		-- Background drawing
-		if assets.background ~= nil then assets.background:draw(0, 39) end
+		if assets.background ~= nil then assets.background:draw(0, 39 + (save.showcontrols and 10 or 0)) end
 		if save.background == 4 then draw_bg(true) end
+
+		-- Fade in from start and end of scene
+		gfx.setColor(white)
+		gfx.setDitherPattern(((vars.headerx.value / 50) + 1) / (assets.background ~= nil and 4 or 1), bayer4)
+		gfx.fillRect(0, 0, 400, 240)
 
 		-- Top bar
 		assets.header:draw(0, 0 + vars.headerx.value)
@@ -386,11 +420,6 @@ function game:init(...)
 			game:updateheader(time)
 		end
 		vars.lasttime = time
-
-		-- Fade in from start and end of scene
-		gfx.setColor(white)
-		gfx.setDitherPattern((vars.headerx.value / 50) + 1, bayer4)
-		gfx.fillRect(0, 0, 400, 240)
 
 		local parallax = (((vars.tiles / 2) - vars.sellerp) * vars.tilevis.parallax)
 
@@ -460,26 +489,34 @@ function game:init(...)
 	end)
 
 	self:add()
-	randomizesfx(assets.bubble1, assets.bubble2, assets.bubble3, assets.bubble4, assets.bubble5)
+	randomizesfx(assets.bubble1, assets.bubble2, assets.bubble3)
 end
 
 function game:updateheader(time)
 	gfx.lockFocus(assets.header)
 		assets.header_base:draw(0, 0)
 
-		if vars.pack ~= 'speed' then
-			assets.disco:drawTextAligned(vars.swaps .. (vars.swaps == 1 and ' swap' or ' swaps'), 390, 5, right)
+		if vars.pack == 'speed' then
+			assets.cal:drawText(ceil(quikword.value / 1000), 10, -1)
+			if quikword.paused or quikword.timeLeft == 0 then
+				gfx.setColor(white)
+				gfx.setDitherPattern(0.25, bayer4)
+				gfx.fillRect(0, 0, 65, 36)
+				gfx.setColor(black)
+			end
+		else
+			assets.disco:drawTextAligned(commalize(vars.swaps) .. (vars.swaps == 1 and ' swap' or ' swaps'), 390, 5, right)
 		end
 
 		if save.time then
 			if vars.pack == 'speed' then
-				assets.discoteca:drawTextAligned('Best score: ' .. (vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
+				assets.discoteca:drawTextAligned('Best score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
 			else
-				assets.discoteca:drawTextAligned(vars.packswaps + vars.swaps .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
+				assets.discoteca:drawTextAligned(commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
 			end
 		else
 			if vars.pack ~= 'speed' then
-				assets.discoteca:drawTextAligned(vars.packswaps + vars.swaps .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
+				assets.discoteca:drawTextAligned(commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
 			end
 		end
 	gfx.unlockFocus()
@@ -526,7 +563,7 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 	if bomb > 0 then
 		x -= vars.rattle.value * (vars.bombs[bomb].intensity / 3)
 		assets.bomb:draw(x + 5, offsety + 5)
-		assets.disco:drawText(vars.bombs[bomb].swaps, x + 19, offsety + 3)
+		assets.disco:drawText(commalize(vars.bombs[bomb].swaps), x + 19, offsety + 3)
 	end
 	assets[vars.tilevis.font]:drawTextAligned(vars.word[i], x + (width / 2), offsety + (height / 2) + (bomb > 0 and 0 or -(assets[vars.tilevis.font]:getHeight() / 2.3)), center)
 	if isdarkmode() then gfx.setImageDrawMode(gfx.kDrawModeCopy) end
@@ -559,7 +596,7 @@ function game:swap(dir)
 		end
 	end
 	if not kerploded then
-		randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+		playsound(assets.swish)
 		vars.swaps += 1
 		vars.boomp = 5
 		local hold = vars.word[vars.selection]
@@ -568,8 +605,8 @@ function game:swap(dir)
 		if vars.pack ~= 'speed' then
 			save[vars.pack.id].puzzleswaps = vars.swaps
 			save[vars.pack.id].word = vars.word
+			game:updateheader(pd.getTime())
 		end
-		game:updateheader(pd.getTime())
 	end
 end
 
@@ -597,9 +634,20 @@ function game:endround()
 	if not vars.finished then
 		vars.finished = true
 		pd.inputHandlers.pop()
-		if vars.pack ~= 'speed' then
+		if vars.pack == 'speed' then
+			if quikword.timeLeft ~= 0 then
+				quikword:pause()
+				game:updateheader(pd.getTime())
+			end
+		else
 			if vars.puzzle == #vars.pack.puzzles then
 				fademusic()
+			end
+			if vars.puzzle == #vars.pack.puzzles then
+				vars.headerx:resetnew(500, 0, -90, pd.easingFunctions.inBack)
+			end
+			if vars.puzzle + 1 > #vars.pack.puzzles or vars.pack.puzzles[vars.puzzle + 1].text == nil then
+				vars.texx:resetnew(500, 0, 120, pd.easingFunctions.inBack)
 			end
 		end
 		vars.cursor:resetnew(300, vars.cursor.value, 1, pd.easingFunctions.inOutSine)
@@ -618,12 +666,6 @@ function game:endround()
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5, 0.8 + (0.2 * vars.tiles))
 			if vars.pack ~= 'speed' then
 				playsound(assets.complete)
-				if vars.puzzle == #vars.pack.puzzles then
-					vars.headerx:resetnew(500, 0, -50, pd.easingFunctions.inBack)
-				end
-				if vars.puzzle + 1 > #vars.pack.puzzles or vars.pack.puzzles[vars.puzzle + 1].text == nil then
-					vars.texx:resetnew(500, 0, 120, pd.easingFunctions.inBack)
-				end
 			end
 			for i = 1, vars.tiles do
 				vars['tileoffsetx' .. i].delay = (vars.pack == 'speed' and 50 or 900) + (30 * (i - 1))
@@ -665,16 +707,37 @@ function game:restart()
 	if not vars.finished and vars.playing then
 		pd.inputHandlers.pop()
 		vars.cursor:resetnew(300, 0.5, 1, pd.easingFunctions.inOutSine)
-		randomizesfx(assets.scribble1, assets.scribble2, assets.scribble3, assets.scribble4, assets.scribble5, 1.5)
+		playsound(assets.scribble)
 		vars.playing = false
 		for i = 1, vars.tiles do
-			vars['tileoffsetx' .. i].delay = 500 + 25 * (i - 1)
+			vars['tileoffsetx' .. i].delay = 500 + (30 * (i - 1))
 			vars['tileoffsetx' .. i]:resetnew(500, 0, -450, pd.easingFunctions.inBack)
 		end
 		vars['tileoffsetx' .. vars.tiles].timerEndedCallback = function()
 			scenemanager:switchscene(game, vars.pack, vars.puzzle, vars.packswaps, nil, 0, {}, 0)
 		end
 	end
+end
+
+function game:check()
+	local sameword = true
+	if vars.pack == 'speed' then
+		for i = 1, #vars.word do
+			if vars.word[i] ~= vars.target[i] then
+				sameword = false
+			end
+		end
+	else
+		for i = 1, #vars.target do
+			for n = 1, #vars.word do
+				if vars.word[n] ~= vars.target[i][n] then
+					sameword = false
+				end
+			end
+		end
+	end
+
+	return sameword
 end
 
 function game:update()
@@ -707,32 +770,7 @@ function game:update()
 			end
 		end
 
-		local sameword = true
-
-		if vars.pack == 'speed' then
-			for n = 1, #vars.word do
-				if vars.word[i] ~= vars.target[i] then
-					sameword = false
-				end
-			end
-			if vars.quikwold ~= nil and vars.quikwold >= 15000 and quikword.value < 15000 then
-				fademusic(9000)
-			end
-			if vars.quikwold ~= nil and vars.quikwold >= 10000 and quikword.value < 10000 then
-				playsound(assets.speedcountin)
-			end
-			vars.quikwold = quikword.value
-		else
-			for i = 1, #vars.target do
-				for n = 1, #vars.word do
-					if vars.word[n] ~= vars.target[i][n] then
-						sameword = false
-					end
-				end
-			end
-		end
-
-		if sameword then
+		if save.autosubmit and game:check() then
 			game:endround()
 			if vars.pack == 'speed' then vars.grace += 1 end
 		end
@@ -747,8 +785,26 @@ function game:update()
 		end
 	end
 
+	if vars.pack == 'speed' then
+		if vars.quikwold ~= nil then
+			for i = 1, 60 do
+				if vars.quikwold >= (i * 1000) and quikword.value < (i * 1000) then
+					game:updateheader(pd.getTime())
+				end
+			end
+			if vars.quikwold >= 15000 and quikword.value < 15000 then
+				fademusic(9000)
+			end
+			if vars.quikwold >= 10000 and quikword.value < 10000 then
+				-- TODO: split this sound up into individual components. yiiiikes
+				playsound(assets.speedcountin)
+			end
+		end
+		vars.quikwold = quikword.value
+	end
+
 	if save.background ~= 4 then
-		if vars.headerx.timeLeft ~= 0 or vars.kerplode.timeLeft ~= 0 then
+		if vars.headerx.timeLeft ~= 0 or (vars.kerplode ~= nil and vars.kerplode.timeLeft ~= 0) then
 			gfx.sprite.redrawBackground()
 			return
 		end
@@ -762,7 +818,7 @@ function game:update()
 			if vars['tileoffsety' .. i].timeLeft ~= 0 then ydone = true end
 		end
 		if xdone or ydone or vars['tileoffsetx' .. vars.tiles].timeLeft ~= 0 or vars.cursor.timeLeft ~= 0 or vars.sellerp ~= vars.selection or vars.crank ~= 0 then
-			gfx.sprite.addDirtyRect(0, 60 - (assets.text ~= nil and 18 or 0), 400, 110)
+			gfx.sprite.addDirtyRect(0, 60 + (assets.text ~= nil and -14 or 20) + (save.showcontrols and 7 or 0), 400, 110)
 		end
 	end
 end

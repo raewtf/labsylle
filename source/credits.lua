@@ -29,34 +29,28 @@ function credits:init(...)
 
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new('fonts/discoteca'),
+		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
 		cal = gfx.font.new('fonts/cal'),
-		swish1 = smp.new('audio/sfx/swish1'),
-		swish2 = smp.new('audio/sfx/swish2'),
-		swish3 = smp.new('audio/sfx/swish3'),
+		swish = smp.new('audio/sfx/swish'),
 		block1 = smp.new('audio/sfx/block1'),
 		block2 = smp.new('audio/sfx/block2'),
 		block3 = smp.new('audio/sfx/block3'),
 		block4 = smp.new('audio/sfx/block4'),
 		block5 = smp.new('audio/sfx/block5'),
-		pop1 = smp.new('audio/sfx/pop1'),
-		pop2 = smp.new('audio/sfx/pop2'),
-		pop3 = smp.new('audio/sfx/pop3'),
-		pop4 = smp.new('audio/sfx/pop4'),
-		pop5 = smp.new('audio/sfx/pop5'),
+		pop = smp.new('audio/sfx/pop'),
 	}
 
 	vars = {
 		page = 1,
 		bump = 0,
-		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, & Voxy'}, {thing = '', name = ''}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
+		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, & Voxy'}, {thing = 'Quik-Word List', name = 'Gaute Solheim'}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
 		credits2 = {{thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = '& Toad'}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
 	}
 	vars.creditsHandlers = {
 		leftButtonDown = function()
 			if vars.page > 1 then
 				vars.page -= 1
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				playsound(assets.swish)
 				gfx.sprite.redrawBackground()
 			else
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
@@ -67,7 +61,7 @@ function credits:init(...)
 		rightButtonDown = function()
 			if vars.page < 2 then
 				vars.page += 1
-				randomizesfx(assets.swish1, assets.swish2, assets.swish3)
+				playsound(assets.swish)
 				gfx.sprite.redrawBackground()
 			else
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
@@ -76,7 +70,7 @@ function credits:init(...)
 		end,
 
 		BButtonDown = function()
-			randomizesfx(assets.pop1, assets.pop2, assets.pop3, assets.pop4, assets.pop5)
+			playsound(assets.pop)
 			scenemanager:transitionscene(title, false, 5)
 		end,
 	}
