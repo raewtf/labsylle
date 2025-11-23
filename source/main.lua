@@ -25,8 +25,8 @@ gfx.setBackgroundColor(gfx.kColorWhite)
 gfx.setLineWidth(2)
 gfx.setStrokeLocation(gfx.kStrokeInside)
 
--- TODOish: add achievements
--- TODOish: daily seeded quik-word?
+-- NOTE: add achievements
+-- NOTE: daily seeded quik-word?
 -- TODO: solver/optimum swaps finder function, that returns a number
 -- TODO: submit to catalog
 
@@ -34,7 +34,7 @@ pack = nil
 redraw = false
 
 catalog = false
--- TODOish: vvv uncomment vvv
+-- NOTE: vvv uncomment vvv
 --if pd.metadata.bundleID == 'wtf.rae.labsylle' then
 --	catalog = true
 --end

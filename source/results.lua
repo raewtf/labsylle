@@ -22,6 +22,10 @@ function results:init(...)
 		redraw = false
 	end
 
+	-- TODO: add metadata at the end
+	-- in quik-word, show list of words completed
+	-- in packs, show puzzles completed? idk
+
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
@@ -114,7 +118,7 @@ function results:init(...)
 		if vars.pack == 'speed' then
 			assets.cal:drawTextAligned('Time\'s Up!', 200, 11 - (vars.bump.value * 1.5), center)
 			if vars.variable == 0 then
-				assets.discoteca:drawTextAligned('You didn\'t make it past any rounds.', 200, 75 + (vars.bump.value * 4), center)
+				assets.discoteca:drawTextAligned('You didn\'t complete any rounds.', 200, 75 + (vars.bump.value * 4), center)
 				assets.discoteca:drawTextAligned('Did you forget to turn\nyour console off...?', 200, 101 + (vars.bump.value * 4), center)
 			else
 				assets.discoteca:drawTextAligned('You made it up past Round...', 200, 77 + (vars.bump.value * 4), center)
@@ -126,7 +130,7 @@ function results:init(...)
 			assets.disco:drawTextAligned(vars.pack.name or '', 200, 75 + (vars.bump.value * 4), center)
 			assets.discoteca:drawTextAligned((vars.pack.subtitle ~= nil and '(' .. vars.pack.subtitle .. ')' or ''), 200, 89 + (vars.bump.value * 4), center)
 			assets.discoteca:drawTextAligned((vars.pack.difficulty ~= nil and vars.pack.difficulty .. ' — ' or '') .. commalize(vars.pack.puzzles ~= nil and #vars.pack.puzzles or '0') .. ((vars.pack.puzzles ~= nil and #vars.pack.puzzles == 1) and ' puzzle' or ' puzzles'), 200, 103 + (vars.bump.value * 4), center)
-			assets.discoteca:drawTextAligned('You beat this pack in ' .. commalize(vars.variable) .. ' swaps.', 200, 129 + (vars.bump.value * 4), center)
+			assets.discoteca:drawTextAligned('You finished in ' .. commalize(vars.variable) .. ' swaps.', 200, 129 + (vars.bump.value * 4), center)
 			assets.discoteca:drawTextAligned(vars.sayings[vars.randsaying], 200, 143 + (vars.bump.value * 4), center)
 		end
 		gfx.drawRoundRect(80, 63 + (vars.bump.value * 4), 240, 106, 5)

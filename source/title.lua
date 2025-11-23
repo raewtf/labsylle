@@ -26,9 +26,6 @@ function title:init(...)
 		redraw = false
 	end
 
-	-- TODO: add control bar
-	-- TODO: re-open bonus paks menu
-
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
@@ -151,12 +148,11 @@ function title:init(...)
 		end,
 
 		AButtonDown = function()
+			playsound(assets.pop)
 			if vars.selection == 1 then
-				playsound(assets.pop)
 				pack = packs
 				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 2 then
-				playsound(assets.pop)
 				pd.inputHandlers.pop()
 				fademusic()
 				vars.gaming:resetnew(350, 1, -0.75)
@@ -164,15 +160,11 @@ function title:init(...)
 					scenemanager:switchscene(game, 'speed', 1, 0, nil, 0, {}, 1)
 				end
 			elseif vars.selection == 3 then
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
-				--pack = bonus
-				--scenemanager:transitionscene(packselect)
+				pack = bonus
+				scenemanager:transitionscene(packselect)
 			elseif vars.selection == 4 then
-				playsound(assets.pop)
 				scenemanager:transitionscene(options)
 			elseif vars.selection == 5 then
-				playsound(assets.pop)
 				scenemanager:transitionscene(credits)
 			end
 		end,
@@ -212,9 +204,6 @@ function title:init(...)
 		gfx.fillRoundRect(100 - tonumber(vars.selection == 4 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 4 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 4 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 4 and ((3 + vars.bump) * 2) or 0), 5)
 		gfx.fillRoundRect(203 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 5)
 		gfx.setColor(black)
-		gfx.setDitherPattern(0.75, bayer4)
-		gfx.fillRoundRect(203 - tonumber(vars.selection == 3 and 3 + vars.bump or 0), 165 - tonumber(vars.selection == 3 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 3 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 3 and ((3 + vars.bump) * 2) or 0), 5)
-		gfx.setColor(black)
 
 		if vars.selection == 1 then gfx.setLineWidth(4) end
 		gfx.drawRoundRect(100 - tonumber(vars.selection == 1 and 3 + vars.bump or 0), 110 - tonumber(vars.selection == 1 and 3 + vars.bump or 0), 200 + tonumber(vars.selection == 1 and ((3 + vars.bump) * 2) or 0), 50 + tonumber(vars.selection == 1 and ((3 + vars.bump) * 2) or 0), 5)
@@ -234,7 +223,7 @@ function title:init(...)
 
 		assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Let\'s Play!\n(Word Puzzle Paks)', 200, 120, center)
 		assets[vars.selection == 2 and 'disco' or 'discoteca']:drawTextAligned('Quik-Word', 148, 173, center)
-		assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Unavailable', 252, 173, center)
+		assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Bonus Paks', 252, 173, center)
 		assets[vars.selection == 4 and 'disco' or 'discoteca']:drawTextAligned('Options', 148, 208, center)
 		assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned('Credits', 252, 208, center)
 

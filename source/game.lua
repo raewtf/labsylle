@@ -29,7 +29,7 @@ function game:init(...)
 		redraw = false
 	end
 
-	-- TODO: support for shapes and colored shapes
+	-- TODO: smear as text leaves (maybe header too?)
 	-- TODO: "Perfect!" label when pack ~= 'speed' and optimum route
 	-- TOOD: add timer to quik-word timer when pack == 'speed' and optimum route
 	-- TODO: add save packettes for 'perfect' bool in each puzzle
@@ -48,7 +48,16 @@ function game:init(...)
 				scenemanager:transitionscene(title, false, 2)
 			end)
 		else
-			-- TODO: "quit" option that doesn't suspend puzzle progress
+			menu:addMenuItem('quit', function()
+				stopmusic()
+				save[vars.pack.id].puzzle = vars.puzzle
+				save[vars.pack.id].puzzleswaps = nil
+				save[vars.pack.id].heldpackswaps = vars.packswaps
+				save[vars.pack.id].word = nil
+				save[vars.pack.id].bombs = nil
+				vars.playing = false
+				scenemanager:transitionscene(packselect, vars.pack)
+			end)
 			menu:addMenuItem('suspend', function()
 				stopmusic()
 				save[vars.pack.id].puzzle = vars.puzzle
@@ -72,7 +81,6 @@ function game:init(...)
 	assets = {
 		disco = gfx.font.new('fonts/disco'),
 		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
-		doubledisco = gfx.font.new('fonts/doubledisco'),
 		swish = smp.new('audio/sfx/swish'),
 		block1 = smp.new('audio/sfx/block1'),
 		block2 = smp.new('audio/sfx/block2'),
@@ -191,7 +199,12 @@ function game:init(...)
 		assets.cal = gfx.font.new('fonts/cal')
 		assets.caldown = gfx.font.new('fonts/caldown')
 		assets.speedcountdown = smp.new('audio/sfx/speedcountdown')
-		assets.speedcountin = smp.new('audio/sfx/speedcountin')
+		assets.speedcountin1 = smp.new('audio/sfx/speedcountin1')
+		assets.speedcountin2 = smp.new('audio/sfx/speedcountin2')
+		assets.speedcountin3 = smp.new('audio/sfx/speedcountin3')
+		assets.speedcountin4 = smp.new('audio/sfx/speedcountin4')
+		assets.speedcountin5 = smp.new('audio/sfx/speedcountin5')
+		assets.speedcountin6 = smp.new('audio/sfx/speedcountin6')
 
 		local random = math.random(1, #quikwords)
 
@@ -214,16 +227,20 @@ function game:init(...)
 
 		vars.grace = 0
 	else
-		assets.mask = gfx.image.new('images/mask')
-		assets.bomb = gfx.image.new('images/bomb')
-		assets.ash = gfx.image.new('images/ash')
-		assets.fuse1 = smp.new('audio/sfx/fuse1')
-		assets.fuse2 = smp.new('audio/sfx/fuse2')
-		assets.fuse3 = smp.new('audio/sfx/fuse3')
-		assets.kerplode = smp.new('audio/sfx/kerplode')
+		assets.doubledisco = gfx.font.new('fonts/doubledisco')
 		assets.complete = smp.new('audio/sfx/complete')
 
-		assets.mask:setInverted(isdarkmode())
+		if string.find(vars.pack.id, 'shapes_') then
+			for i = 1, #vars.pack.shapes_used do
+				assets[vars.pack.shapes_used[i] .. '_line'] = gfx.image.new('images/shapes/line/' .. vars.pack.shapes_used[i])
+				assets[vars.pack.shapes_used[i] .. '_fill'] = gfx.image.new('images/shapes/fill/' .. vars.pack.shapes_used[i])
+			end
+			assets.stencil00 = gfx.image.new('images/stencil00')
+			assets.stencil25 = gfx.image.new('images/stencil25')
+			assets.stencil50 = gfx.image.new('images/stencil50')
+			assets.stencil75 = gfx.image.new('images/stencil75')
+			assets.stencil99 = gfx.image.new('images/stencil99')
+		end
 
 		vars.kerplode = pd.timer.new(1, 1, 1)
 		vars.kerplode.discardOnCompletion = false
@@ -248,18 +265,32 @@ function game:init(...)
 			local same = true
 			while same do
 				vars.word = shuffle(vars.word)
-				for i = 1, vars.tiles do
-					if vars.word[i] ~= vars.target[1][i] then
-						same = false
-						break
+				for i = 1, #vars.pack.puzzles[vars.puzzle].target do
+					for n = 1, vars.tiles do
+						if vars.word[n] ~= vars.target[i][n] then
+							same = false
+							break
+						end
 					end
 				end
 			end
 		end
 		vars.impostor = vars.pack.puzzles[vars.puzzle].impostor
+		if vars.impostor then
+			assets.mask = gfx.image.new('images/mask')
+			assets.mask:setInverted(isdarkmode())
+		end
 
-		if vars.pack.puzzles[vars.puzzle].bombs ~= nil and vars.bombs[1] == nil then
-			vars.bombs = table.deepcopy(vars.pack.puzzles[vars.puzzle].bombs)
+		if vars.pack.puzzles[vars.puzzle].bombs ~= nil then
+			if vars.bombs[1] == nil then
+				vars.bombs = table.deepcopy(vars.pack.puzzles[vars.puzzle].bombs)
+			end
+			assets.bomb = gfx.image.new('images/bomb')
+			assets.ash = gfx.image.new('images/ash')
+			assets.fuse1 = smp.new('audio/sfx/fuse1')
+			assets.fuse2 = smp.new('audio/sfx/fuse2')
+			assets.fuse3 = smp.new('audio/sfx/fuse3')
+			assets.kerplode = smp.new('audio/sfx/kerplode')
 		end
 
 		if vars.pack.puzzles[vars.puzzle].tilevis ~= nil then
@@ -295,7 +326,7 @@ function game:init(...)
 			gfx.drawLine(30, 34, 370, 34)
 			gfx.setColor(black)
 			gfx.setLineWidth(2)
-			assets.disco:drawText('↔️ Move  ' .. tostring(save.crank and '🎣' or 'Ⓐ/Ⓑ') .. '  Swap  ' .. tostring(save.autosubmit and '' or '⬆️ Submit'), 10, 38)
+			assets.disco:drawText('↔️ Move  ' .. tostring(save.crank and '🎣' or 'Ⓐ/Ⓑ') .. ' Swap  ' .. tostring(save.autosubmit and '' or '⬆️ Submit'), 10, 38)
 		end
 	gfx.unlockFocus()
 
@@ -565,7 +596,30 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 		assets.bomb:draw(x + 5, offsety + 5)
 		assets.disco:drawText(commalize(vars.bombs[bomb].swaps), x + 19, offsety + 3)
 	end
-	assets[vars.tilevis.font]:drawTextAligned(vars.word[i], x + (width / 2), offsety + (height / 2) + (bomb > 0 and 0 or -(assets[vars.tilevis.font]:getHeight() / 2.3)), center)
+	if vars.pack ~= 'speed' and string.find(vars.pack.id, 'shapes_') then
+		local shape1 = string.sub(vars.word[i], 1, 4)
+		local color1 = string.sub(vars.word[i], 5, 6)
+		local shape2 = string.sub(vars.word[i], 8, 11)
+		local color2 = string.sub(vars.word[i], 12, 13)
+		if shape1 ~= 'none' then
+			if color1 ~= '00' then
+				gfx.setStencilImage(assets['stencil'] .. color1)
+				assets[shape1 .. '_fill']:draw(x + 2, offsety + 2)
+				gfx.clearStencil()
+			end
+			assets[shape1 .. '_line']:draw(x + 2, offsety + 2)
+		end
+		if shape2 ~= 'none' then
+			if color2 ~= '00' then
+				gfx.setStencilImage(assets['stencil'] .. color2)
+				assets[shape2 .. '_fill']:draw(x + vars.tilevis.width - 27, offsety + 2, gfx.kImageFlippedX)
+				gfx.clearStencil()
+			end
+			assets[shape2 .. '_line']:draw(x + vars.tilevis.width - 27, offsety + 2, gfx.kImageFlippedX)
+		end
+	else
+		assets[vars.tilevis.font]:drawTextAligned(vars.word[i], x + (width / 2), offsety + (height / 2) + (bomb > 0 and 0 or -(assets[vars.tilevis.font]:getHeight() / 2.3)), center)
+	end
 	if isdarkmode() then gfx.setImageDrawMode(gfx.kDrawModeCopy) end
 end
 
@@ -720,24 +774,26 @@ function game:restart()
 end
 
 function game:check()
-	local sameword = true
+	local sameword = (#vars.target ~= nil and #vars.target or 1)
 	if vars.pack == 'speed' then
 		for i = 1, #vars.word do
 			if vars.word[i] ~= vars.target[i] then
-				sameword = false
+				sameword -= 1
+				break
 			end
 		end
 	else
 		for i = 1, #vars.target do
 			for n = 1, #vars.word do
 				if vars.word[n] ~= vars.target[i][n] then
-					sameword = false
+					sameword -= 1
+					break
 				end
 			end
 		end
 	end
 
-	return sameword
+	return (sameword > 0 and true or false)
 end
 
 function game:update()
@@ -796,8 +852,37 @@ function game:update()
 				fademusic(9000)
 			end
 			if vars.quikwold >= 10000 and quikword.value < 10000 then
-				-- TODO: split this sound up into individual components. yiiiikes
-				playsound(assets.speedcountin)
+				playsound(assets.speedcountin1)
+			end
+			if vars.quikwold >= 9000 and quikword.value < 9000 then
+				playsound(assets.speedcountin1)
+			end
+			if vars.quikwold >= 8000 and quikword.value < 8000 then
+				playsound(assets.speedcountin1)
+			end
+			if vars.quikwold >= 7000 and quikword.value < 7000 then
+				playsound(assets.speedcountin1)
+			end
+			if vars.quikwold >= 6000 and quikword.value < 6000 then
+				playsound(assets.speedcountin2)
+			end
+			if vars.quikwold >= 5000 and quikword.value < 5000 then
+				playsound(assets.speedcountin2)
+			end
+			if vars.quikwold >= 4000 and quikword.value < 4000 then
+				playsound(assets.speedcountin3)
+			end
+			if vars.quikwold >= 3000 and quikword.value < 3000 then
+				playsound(assets.speedcountin3)
+			end
+			if vars.quikwold >= 2000 and quikword.value < 2000 then
+				playsound(assets.speedcountin4)
+			end
+			if vars.quikwold >= 1000 and quikword.value < 1000 then
+				playsound(assets.speedcountin5)
+			end
+			if vars.quikwold > 0 and quikword.value <= 0 then
+				playsound(assets.speedcountin6)
 			end
 		end
 		vars.quikwold = quikword.value
@@ -809,7 +894,7 @@ function game:update()
 			return
 		end
 		if assets.text ~= nil and vars.texx.timeLeft ~= 0 then
-			gfx.sprite.addDirtyRect(0, 170 + vars.texx.value, 400, 120)
+			gfx.sprite.addDirtyRect(0, 120, 400, 120)
 		end
 		local xdone = false
 		local ydone = false

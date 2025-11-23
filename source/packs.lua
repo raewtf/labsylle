@@ -1,12 +1,8 @@
 -- TODO: make standard paks
 -- TODO: make tricky paks a bit tougher
--- TODO: move periodic elements to tricky
 -- TODO: remove tbds
-
 -- TODO: make shapes paks
-
 -- TODO: make maths paks
-
 
 packs = {
 	{
@@ -1418,7 +1414,7 @@ packs = {
 		}
 	}, -- food2
 	{
-		name = 'Wonders of the World',
+		name = 'World Sights',
 		id = 'tbd',
 		subtitle = 'Standard Pak #18',
 		difficulty = 'Tricksy',
@@ -1976,7 +1972,7 @@ packs = {
 		-- TBD
 	}, -- prehistoric
 	{
-		name = 'A Series of Tubes',
+		name = 'Series of Tubes',
 		id = 'tbd',
 		subtitle = 'Standard Pak #23',
 		difficulty = 'Difficult',
@@ -2237,10 +2233,121 @@ packs = {
 		-- TBD
 	}, -- photography
 	{
-		name = 'TBD',
-		id = 'tbd',
+		name = 'Periodic Table',
+		id = 'elements',
 		subtitle = 'Standard Pak #25',
 		difficulty = 'Difficult',
+		contains_impostors = true,
+		contains_bombs = false,
+		puzzles = {
+			{
+				target = {
+					{'so', 'di', 'um'}
+				}
+			},
+			{
+				target = {
+					{'lith', 'i', 'um'}
+				}
+			},
+			{
+				target = {
+					{'he', 'li', 'um'}
+				}
+			},
+			{
+				target = {
+					{'chem', 'is', 'try'}
+				}
+			},
+			{
+				target = {
+					{'mer', 'cu', 'ry'}
+				}
+			},
+			{
+				target = {
+					{'ox', 'y', 'gen'}
+				}
+			},
+			{
+				target = {
+					{'hy', 'dro', 'gen'}
+				}
+			},
+			{
+				target = {
+					{'plat', 'i', 'num'}
+				}
+			},
+			{
+				target = {
+					{'chro', 'mi', 'um'}
+				}
+			},
+			{
+				target = {
+					{'u', 'ra', 'ni', 'um'}
+				}
+			},
+			{
+				target = {
+					{'po', 'tas', 'si', 'um'}
+				}
+			},
+			{
+				target = {
+					{'ar', 'se', 'nic'}
+				}
+			},
+			{
+				target = {
+					{'non', 'met', 'al', 'lic'}
+				}
+			},
+			{
+				target = {
+					{'phos', 'pho', 'rus'}
+				}
+			},
+			{
+				target = {
+					{'man', 'ga', 'nese'}
+				}
+			},
+			{
+				target = {
+					{'plu', 'to', 'ni', 'um'}
+				}
+			},
+			{
+				target = {
+					{'yt', 'tri', 'um', 'a'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'ger', 'ma', 'ni', 'um'}
+				}
+			},
+			{
+				target = {
+					{'clas', 'si', 'fi', 'ca', 'tion'}
+				}
+			},
+			{
+				target = {
+					{'ne', 'o', 'dym', 'i', 'um'}
+				}
+			}
+		}
+	}, -- elements
+	{
+		name = 'TBD',
+		id = 'tbd',
+		subtitle = 'Standard Pak #26',
+		difficulty = 'Very Tough',
 		contains_impostors = false,
 		contains_bombs = false,
 		puzzles = {
@@ -2366,117 +2473,6 @@ packs = {
 		-- TBD
 		-- TBD
 	}, -- tbd
-	{
-		name = 'Periodic Elements',
-		id = 'elements',
-		subtitle = 'Standard Pak #26',
-		difficulty = 'Very Tough',
-		contains_impostors = true,
-		contains_bombs = false,
-		puzzles = {
-			{
-				target = {
-					{'so', 'di', 'um'}
-				}
-			},
-			{
-				target = {
-					{'lith', 'i', 'um'}
-				}
-			},
-			{
-				target = {
-					{'he', 'li', 'um'}
-				}
-			},
-			{
-				target = {
-					{'chem', 'is', 'try'}
-				}
-			},
-			{
-				target = {
-					{'mer', 'cu', 'ry'}
-				}
-			},
-			{
-				target = {
-					{'ox', 'y', 'gen'}
-				}
-			},
-			{
-				target = {
-					{'hy', 'dro', 'gen'}
-				}
-			},
-			{
-				target = {
-					{'plat', 'i', 'num'}
-				}
-			},
-			{
-				target = {
-					{'chro', 'mi', 'um'}
-				}
-			},
-			{
-				target = {
-					{'u', 'ra', 'ni', 'um'}
-				}
-			},
-			{
-				target = {
-					{'po', 'tas', 'si', 'um'}
-				}
-			},
-			{
-				target = {
-					{'ar', 'se', 'nic'}
-				}
-			},
-			{
-				target = {
-					{'non', 'met', 'al', 'lic'}
-				}
-			},
-			{
-				target = {
-					{'phos', 'pho', 'rus'}
-				}
-			},
-			{
-				target = {
-					{'man', 'ga', 'nese'}
-				}
-			},
-			{
-				target = {
-					{'plu', 'to', 'ni', 'um'}
-				}
-			},
-			{
-				target = {
-					{'yt', 'tri', 'um', 'a'}
-				},
-				impostor = true
-			},
-			{
-				target = {
-					{'ger', 'ma', 'ni', 'um'}
-				}
-			},
-			{
-				target = {
-					{'clas', 'si', 'fi', 'ca', 'tion'}
-				}
-			},
-			{
-				target = {
-					{'ne', 'o', 'dym', 'i', 'um'}
-				}
-			}
-		}
-	}, -- elements
 	{
 		name = 'Bones',
 		id = 'tbd',
@@ -3005,294 +3001,241 @@ bonus = {
 		id = 'shapes_simple',
 		subtitle = 'Shapes Pak #1',
 		difficulty = 'Easy',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
+		shapes_used = {'circ', 'squa', 'tria', 'rect'},
 		puzzles = {
 			{
 				target = {
-					{'none circ0', 'circ0 squa0', 'squa0 circ0', 'circ0 none'}
+					{'none00 circ00', 'circ00 squa00', 'squa00 circ00', 'circ00 none00'}
 				},
 				text = 'Welcome to the Shapes Paks!\nHere, you need to assemble the blocks such\nthat the shapes make a continuous chain.\nTry it out with this simple puzzle!'
 			},
 			{
 				target = {
-					{''}
+					{'none00 tria00', 'tria00 rect00', 'rect00 circ00', 'circ00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 rect00', 'rect00 squa00', 'squa00 tria00', 'tria00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
+					{'none00 rect00', 'rect00 circ00', 'circ00 squa00', 'squa00 none00', 'circ00 none00'}
+				},
+				impostor = true,
+				text = '\nRemember the rules about impostors\nthat don\'t fit in with the rest!'
 			},
 			{
 				target = {
-					{''}
+					{'none00 squa00', 'squa00 tria00', 'tria00 circ00', 'circ00 circ00', 'circ00 rect00', 'rect00 none'}
 				}
 			}
 		}
-		-- none circ0, circ0 squa0, squa0 circ0, circ0 none — explain how shapes pak works
-		-- none tria0, tria0 rect0, rect0 circ0, circ0 none
-		-- none circ0, circ0 rect0, rect0 squa0, squa0 tria0, tria0 none
-		-- none rect0, rect0 circ0, circ0 squa0, squa0 none0, (circ0 none) — explain how impostors work again just in case
-		-- none squa0, squa0 tria0, tria0 circ0, circ0 circ0, circ0 rect0, rect0 none
 	},
 	{
-		name = 'Spicing up the Shapes',
+		name = 'Spicier Shapes',
 		id = 'shapes_spice',
 		subtitle = 'Shapes Pak #2',
 		difficulty = 'Easy',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
+		shapes_used = {'circ', 'rect', 'diam', 'tria', 'oval', 'love', 'squa', 'star', 'ring', 'plus'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 rect00', 'rect00 diam00', 'diam00 tria00', 'tria00 circ00', 'circ00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 oval00', 'oval00 tria00', 'tria00 rect00', 'rect00 circ00', 'circ00 none00', 'oval00 rect00'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 love00', 'love00 squa00', 'squa00 tria00', 'tria00 star00', 'star00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 ring00', 'ring00 oval00', 'oval00 circ00', 'circ00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
+					{'none00 love00', 'love00 plus00', 'plus00 ring00', 'ring00 plus00', 'plus00 star00', 'star00 none00', 'plus00 plus00'}
+				},
+				impostor = true
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
 	},
 	{
-		name = 'More Shapes!',
-		id = 'shapes_more',
+		name = 'Take Sides',
+		id = 'shapes_sides',
 		subtitle = 'Shapes Pak #3',
 		difficulty = 'Easy',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
+		shapes_used = {'squa', 'pent', 'diam', 'hexa', 'sept', 'octa'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 squa00', 'squa00 pent00', 'pent00 squa00', 'squa00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 diam00', 'diam00 pent00', 'pent00 hexa00', 'hexa00 pent00', 'pent00 diam00', 'diam00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 pent00', 'pent00 hexa00', 'hexa00 sept00', 'sept00 hexa00', 'hexa00 pent00', 'pent00 none00', 'squa00 sept00'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 hexa00', 'hexa00 sept00', 'sept00 octa00', 'octa00 sept00', 'sept00 hexa00', 'hexa00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'none00 diam00', 'diam00 pent00', 'pent00 hexa00', 'hexa00 sept00', 'sept00 octa00', 'octa00 none00'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
 	},
 	{
 		name = 'Polygons Only',
 		id = 'shapes_polygons',
 		subtitle = 'Shapes Pak #4',
 		difficulty = 'Tricksy',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
+		shapes_used = {'squa', 'rect', 'diam', 'tria', 'zoid', 'star'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 squa00', 'squa00 rect00', 'rect00 diam00', 'diam00 squa00', 'squa00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 tria00', 'tria00 zoid00', 'zoid00 tria00', 'tria00 none00', 'zoid00 squa00'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 diam00', 'diam00 squa00', 'squa00 zoid00', 'zoid00 tria00', 'tria00 none', 'tria00 diam00'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 diam00', 'diam00 star00', 'star00 star00', 'star00 diam00', 'diam00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'none00 squa00', 'squa00 rect00', 'rect00 rect00', 'rect00 rect00', 'rect00 squa00', 'squa00 none00'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
 	},
 	{
-		name = 'Introduction to "Colors"',
+		name = 'Intro to "Colors"',
 		id = 'shapes_colors',
 		subtitle = 'Shapes Pak #5',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
 		contains_bombs = false,
+		shapes_used = {'circ', 'squa', 'diam', 'star', 'tria', 'rect', 'love', 'pent', 'hexa', 'sept', 'octa'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 squa99', 'squa99 circ00', 'circ00 none00'}
+				},
+				text = 'Hey, things are getting pretty colorful, no?\n...No?\nWell, just make sure you sort the shapes\nalong the ones with the matching shade.'
+			},
+			{
+				target = {
+					{'none00 diam99', 'diam99 star00', 'star00 diam99', 'diam99 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 tria00', 'tria00 diam50', 'diam50 squa99', 'squa99 rect50', 'rect50 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 love00', 'love00 love50', 'love50 love99', 'love99 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'none00 diam00', 'diam00 pent50', 'pent50 hexa99', 'hexa99 sept50', 'sept50 octa00', 'octa00 none00'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
 	},
 	{
-		name = 'Even More "Colors"!',
-		id = 'shapes_morecolors',
+		name = 'Card Stock',
+		id = 'shapes_cards',
 		subtitle = 'Shapes Pak #6',
 		difficulty = 'Tricksy',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
+		shapes_used = {'love', 'diam', 'club', 'spad'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 love50', 'love50 diam50', 'diam50 love50', 'love50 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 club99', 'club99 spad99', 'spad99 club99', 'club99 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 diam50', 'diam50 club99', 'club99 love50', 'love50 spad99', 'spad99 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
+					{'none00 club99', 'club99 spad99', 'spad99 club99', 'club99 diam50', 'diam50 none00', 'none00, diam50'}
+				},
+				impostor = true
 			},
 			{
 				target = {
-					{''}
-				}
-			}
-		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},
-	{
-		name = 'Shapes Aplenty',
-		id = 'shapes_aplenty',
-		subtitle = 'Shapes Pak #7',
-		difficulty = 'Tricksy',
-		contains_impostors = false,
-		contains_bombs = false,
-		puzzles = {
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'none00 spad99', 'spad99 love50', 'love50 diam99', 'diam99 diam99', 'diam99 club99', 'club99 none00'}
 				}
 			},
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
 	},
 	{
 		name = 'Wraparound',
 		id = 'shapes_wrap',
-		subtitle = 'Shapes Pak #8',
+		subtitle = 'Shapes Pak #7',
 		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
+		shapes_used = {''},
 		puzzles = {
 			{
 				target = {
-					{''}
-				}
+					{'circ00 squa00', 'squa00 tria00', 'tria00 circ00'},
+				},
+				text = 'This pack acts a little bit differently.\n\nHere, make sure the ends of each puzzle "wrap\naround", and meet up with each other.'
 			},
 			{
 				target = {
@@ -3324,10 +3267,11 @@ bonus = {
 	{
 		name = 'Mind the Gap',
 		id = 'shapes_gap',
-		subtitle = 'Shapes Pak #9',
+		subtitle = 'Shapes Pak #8',
 		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
+		shapes_used = {''},
 		puzzles = {
 			{
 				target = {
@@ -3362,12 +3306,51 @@ bonus = {
 		-- TBD
 	},
 	{
-		name = 'All Together Now!',
+		name = 'More "Colors"!',
+		id = 'shapes_morecolors',
+		subtitle = 'Shapes Pak #9',
+		difficulty = 'Difficult',
+		contains_impostors = true,
+		contains_bombs = false,
+		shapes_used = {''},
+		puzzles = {
+			{
+				target = {
+					{'none00 circ00', 'circ00 circ25', 'circ25 circ50', 'circ50 circ75', 'circ75 circ99', 'circ99 none00'}
+				}
+			},
+			{
+				target = {
+					{'none00 ring00', 'ring00 oval99', 'oval99 circ50', 'circ50 ring75', 'ring75 none00', 'ring00 oval75'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 hexa00', 'hexa00 love25', 'love25 star75', 'star75 ring00', 'ring00 none00', 'ring00 star75'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 tria00', 'tria00 zoid25', 'zoid25 squa50', 'squa50 rect75', 'rect75 none00'}
+				}
+			},
+			{
+				target = {
+					{'none00 rect50', 'rect50 squa75', 'squa75 oval50', 'oval50 ring25', 'ring25 circ75', 'circ75 none00'}
+				}
+			}
+		}
+	},
+	{
+		name = 'Together Now!',
 		id = 'shapes_all',
 		subtitle = 'Shapes Pak #10',
 		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
+		shapes_used = {''},
 		puzzles = {
 			{
 				target = {
@@ -3411,7 +3394,8 @@ bonus = {
 		puzzles = {
 			{
 				target = {
-					{'1', '+', '1', '=', '2'}
+					{'1', '+', '1', '=', '2'},
+					{'2', '=', '1', '+', '1'},
 				},
 				text = 'Welcome to the Math Paks!\nYour goal is to assemble the blocks to\ncreate a logical, correct equation.\nTry this easy one first!',
 				tilevis = {
@@ -6058,7 +6042,6 @@ quikwords = {
 	{'dis', 'or', 'gan', 'ized'},
 	{'dis', 'as', 'sem', 'ble'},
 	{'pep', 'per', 'o', 'ni'},
-	{'con', 'sum', 'ma', 'tion'},
 	{'re', 'fresh', 'ing', 'ly'},
 	{'di', 'min', 'u', 'tive'},
 	{'mat', 'ri', 'mo', 'ny'},

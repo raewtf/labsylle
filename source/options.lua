@@ -261,6 +261,16 @@ function options:init(...)
 				end
 			end
 			assets[vars.selection == 8 and 'disco' or 'discoteca']:drawTextAligned('Dark Mode: ' .. tostring(save.darkmode == 0 and 'Disabled' or save.darkmode == 1 and 'Enabled' or save.darkmode == 2 and 'Auto ' ..  (is24hourtime() and '(06:00/18:00)' or '(6a/6p)')), 200, 163, center)
+			gfx.setColor(gfx.kColorXOR)
+			if vars.selection == 1 then gfx.fillRect(82 - vars.bump, 55, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 2 then gfx.fillRect(82 - vars.bump, 69, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 3 then gfx.fillRect(82 - vars.bump, 83, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 4 then gfx.fillRect(82 - vars.bump, 107, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 5 then gfx.fillRect(82 - vars.bump, 121, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 6 then gfx.fillRect(82 - vars.bump, 135, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 7 then gfx.fillRect(82 - vars.bump, 149, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 8 then gfx.fillRect(82 - vars.bump, 163, 236 + (vars.bump * 2), 14) end
+			gfx.setColor(black)
 		elseif vars.page == 2 then
 			assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Bold Text: ' .. tostring(save.boldtext and 'Enabled' or 'Disabled'), 200, 55, center)
 			assets[vars.selection == 2 and 'disco' or 'discoteca']:drawTextAligned('Submit Words: ' .. tostring(save.autosubmit and 'Automatically' or 'Press Up'), 200, 69, center)
@@ -268,6 +278,14 @@ function options:init(...)
 			assets[vars.selection == 4 and 'disco' or 'discoteca']:drawTextAligned((vars.clearquikword == 1 and 'Clear Quik-Word' or vars.clearquikword == 2 and 'Are you sure?' or vars.clearquikword == 3 and 'Once more! Clear Quik-Word!?' or vars.clearquikword == 4 and 'Quik-Word cleared.'), 200, 107, center)
 			assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned((vars.clearpak == 1 and 'Clear Puzzle Paks' or vars.clearpak == 2 and 'Are you sure?' or vars.clearpak == 3 and 'Once more! Clear Puzzle Paks!?' or vars.clearpak == 4 and 'Puzzle Paks cleared.'), 200, 121, center)
 			assets[vars.selection == 6 and 'disco' or 'discoteca']:drawTextAligned((vars.clearall == 1 and 'Clear ALL Data' or vars.clearall == 2 and 'Are you sure?' or vars.clearall == 3 and 'Once more! Clear ALL data!?' or vars.clearall == 4 and 'Data cleared.'), 200, 135, center)
+			gfx.setColor(gfx.kColorXOR)
+			if vars.selection == 1 then gfx.fillRect(82 - vars.bump, 55, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 2 then gfx.fillRect(82 - vars.bump, 69, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 3 then gfx.fillRect(82 - vars.bump, 83, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 4 then gfx.fillRect(82 - vars.bump, 107, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 5 then gfx.fillRect(82 - vars.bump, 121, 236 + (vars.bump * 2), 14) end
+			if vars.selection == 6 then gfx.fillRect(82 - vars.bump, 135, 236 + (vars.bump * 2), 14) end
+			gfx.setColor(black)
 		end
 		gfx.drawRoundRect(80, 200, 240, 30, 5)
 		assets.disco:drawTextAligned('➕ Move  Ⓐ Toggle  Ⓑ Back', 200, 208, center)

@@ -25,8 +25,6 @@ function packselect:init(...)
 		redraw = false
 	end
 
-	-- TODO: add control bar
-
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
 		menu:removeAllMenuItems()
@@ -43,7 +41,7 @@ function packselect:init(...)
 		end)
 		if catalog then
 			menu:addMenuItem('pack boards', function()
-				-- TODOish: catalog leaderboard popup for given pack
+				-- NOTE: catalog leaderboard popup for given pack
 			end)
 		end
 	end
@@ -116,8 +114,7 @@ function packselect:init(...)
 		end,
 
 		BButtonDown = function()
-			-- TODO: this is bugged, and isn't working
-			if pack == packs then
+			if pack[1] == packs[1] then
 				scenemanager:transitionscene(title, false, 1)
 			else
 				scenemanager:transitionscene(title, false, 3)
@@ -155,18 +152,6 @@ function packselect:init(...)
 	else
 		pd.inputHandlers.push(vars.packselectHandlers)
 	end
-
-	newpack = {}
-	for i = 1, #pack do
-		if pack[i] ~= nil and pack[i].id ~= nil and pack[i].id ~= 'tbd' then
-			table.insert(newpack, pack[i])
-		end
-	end
-	pack = table.deepcopy(newpack)
-	for i = 1, #newpack do
-		newpack[i] = nil
-	end
-	newpack = nil
 
 	for i = 1, #pack do
 		if vars.return_pack == pack[i] then
