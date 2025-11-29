@@ -5,7 +5,6 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 local geo <const> = pd.geometry
 local smp <const> = pd.sound.sampleplayer
-local text <const> = gfx.getLocalizedText
 local sin <const> = math.sin
 local cos <const> = math.cos
 local rad <const> = math.rad
@@ -29,9 +28,9 @@ function game:init(...)
 		redraw = false
 	end
 
-	-- TODO: smear as text leaves (maybe header too?)
+	-- TODO: bombs can't rumble forever in redraw false mode
 	-- TODO: "Perfect!" label when pack ~= 'speed' and optimum route
-	-- TOOD: add timer to quik-word timer when pack == 'speed' and optimum route
+	-- TODO: add time to quik-word timer when pack == 'speed' and optimum route
 	-- TODO: add save packettes for 'perfect' bool in each puzzle
 	-- TODO: hint after (optimal * 2.5) wrong swaps. find the first wrong one, and indicate its proper position
 
@@ -42,7 +41,6 @@ function game:init(...)
 			menu:addMenuItem('quit', function()
 				stopmusic()
 				assets.speedcountdown:stop()
-				assets.speedcountin:stop()
 				quikword:pause()
 				vars.playing = false
 				scenemanager:transitionscene(title, false, 2)
@@ -212,6 +210,12 @@ function game:init(...)
 		vars.word = table.shallowcopy(quikwords[random])
 		vars.tiles = #vars.target
 
+		local word = ''
+		for i = 1, vars.tiles do
+			word = word .. vars.target[i]
+		end
+		table.insert(quikwords_completed, word)
+
 		vars.bigtext = ''
 
 		local same = true
@@ -326,7 +330,7 @@ function game:init(...)
 			gfx.drawLine(30, 34, 370, 34)
 			gfx.setColor(black)
 			gfx.setLineWidth(2)
-			assets.disco:drawText('↔️ Move  ' .. tostring(save.crank and '🎣' or 'Ⓐ/Ⓑ') .. ' Swap  ' .. tostring(save.autosubmit and '' or '⬆️ Submit'), 10, 38)
+			assets.disco:drawText('↔️ Move  ' .. tostring(save.crank and '🎣' or 'Ⓑ/Ⓐ') .. ' Swap  ' .. tostring(save.autosubmit and '' or '⬆️ Submit'), 10, 38)
 		end
 	gfx.unlockFocus()
 
@@ -541,13 +545,13 @@ function game:updateheader(time)
 
 		if save.time then
 			if vars.pack == 'speed' then
-				assets.discoteca:drawTextAligned('Best score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
+				assets.discoteca:drawTextAligned('Best score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute)) or (string.format("%02d:%02d", time.hour, time.minute))), 390, 18, right)
 			else
-				assets.discoteca:drawTextAligned(commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
+				assets.discoteca:drawTextAligned(commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute)) or (string.format("%02d:%02d", time.hour, time.minute))), 390, 18, right)
 			end
 		else
 			if vars.pack ~= 'speed' then
-				assets.discoteca:drawTextAligned(commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (is24hourtime() and (string.format("%02d:%02d", time.hour, time.minute)) or (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute))), 390, 18, right)
+				assets.discoteca:drawTextAligned(commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((time.hour % 12) == 0 and 12 or (time.hour % 12)), time.minute)) or (string.format("%02d:%02d", time.hour, time.minute))), 390, 18, right)
 			end
 		end
 	gfx.unlockFocus()
@@ -774,7 +778,7 @@ function game:restart()
 end
 
 function game:check()
-	local sameword = (#vars.target ~= nil and #vars.target or 1)
+	local sameword = (vars.pack == 'speed' and 1 or #vars.target)
 	if vars.pack == 'speed' then
 		for i = 1, #vars.word do
 			if vars.word[i] ~= vars.target[i] then
@@ -792,7 +796,6 @@ function game:check()
 			end
 		end
 	end
-
 	return (sameword > 0 and true or false)
 end
 

@@ -1,48 +1,66 @@
--- Setting up consts
-local pd <const> = playdate
-local gfx <const> = pd.graphics
-local smp <const> = pd.sound.sampleplayer
-local text <const> = gfx.getLocalizedText
-local black <const> = gfx.kColorBlack
-local white <const> = gfx.kColorWhite
-local bayer4 <const> = gfx.image.kDitherTypeBayer4x4
-local center <const> = kTextAlignment.center
-local right <const> = kTextAlignment.right
+local pd
+local gfx
+local bayer4
+local center
+local right
 
-class('options').extends(gfx.sprite) -- Create the scene's class
-function options:init(...)
-	options.super.init(self)
-	local args = {...} -- Arguments passed in through the scene management will arrive here
-	-- Should this scene redraw the sprites constantly?
-	if save.menubg then
-		gfx.sprite.setAlwaysRedraw(true)
-		redraw = true
-	else
-		gfx.sprite.setAlwaysRedraw(false)
-		redraw = false
+if platform == 'peedee' then
+	pd = playdate
+	gfx = pd.graphics
+	bayer4 = gfx.image.kDitherTypeBayer4x4
+	center = kTextAlignment.center
+	right = kTextAlignment.right
+
+	class('options').extends(gfx.sprite)
+	function options:init(...)
+		options.super.init(self)
+		local args = {...} -- Arguments passed in through the scene management will arrive here
+
+		if save.menubg then setredraw(true) else setredraw(false) end
+
+		function pd.gameWillPause()
+			local menu = pd.getSystemMenu()
+			menu:removeAllMenuItems()
+		end
+
+		self:initialize(args)
+		gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
+			self:draw()
+		end)
+
+		self:add()
 	end
+elseif platform == 'love' then
+	gfx = love.graphics
+	center = 'center'
+	right = 'right'
 
-	function pd.gameWillPause()
-		local menu = pd.getSystemMenu()
-		menu:removeAllMenuItems()
+	options = {}
+	function options:enter(current, ...)
+		love.window.setTitle('Labsylle — Options')
+		local args = {...} -- Arguments passed in through the scene management will arrive here
+
+		self:initialize(args)
 	end
+end
 
+function options:initialize(args)
 	assets = {
-		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
-		forest_preview = gfx.image.new('images/forest_preview'),
-		mountains_preview = gfx.image.new('images/mountains_preview'),
-		frame_preview = gfx.image.new('images/frame_preview'),
-		blocks_preview = gfx.image.new('images/blocks_preview'),
-		city_preview = gfx.image.new('images/city_preview'),
-		cal = gfx.font.new('fonts/cal'),
-		swish = smp.new('audio/sfx/swish'),
-		block1 = smp.new('audio/sfx/block1'),
-		block2 = smp.new('audio/sfx/block2'),
-		block3 = smp.new('audio/sfx/block3'),
-		block4 = smp.new('audio/sfx/block4'),
-		block5 = smp.new('audio/sfx/block5'),
-		pop = smp.new('audio/sfx/pop'),
+		disco = newfont('fonts/disco'),
+		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
+		cal = newfont('fonts/cal'),
+		forest_preview = newimage('images/forest_preview'),
+		mountains_preview = newimage('images/mountains_preview'),
+		frame_preview = newimage('images/frame_preview'),
+		blocks_preview = newimage('images/blocks_preview'),
+		city_preview = newimage('images/city_preview'),
+		swish = newsound('audio/sfx/swish'),
+		block1 = newsound('audio/sfx/block1'),
+		block2 = newsound('audio/sfx/block2'),
+		block3 = newsound('audio/sfx/block3'),
+		block4 = newsound('audio/sfx/block4'),
+		block5 = newsound('audio/sfx/block5'),
+		pop = newsound('audio/sfx/pop'),
 	}
 
 	vars = {
@@ -54,274 +72,264 @@ function options:init(...)
 		clearquikword = 1,
 		clearpak = 1,
 		clearall = 1,
+		handler = 'options'
 	}
-	vars.optionsHandlers = {
-		upButtonDown = function()
-			if vars.keytimer ~= nil then vars.keytimer:remove() end
-			local function keytimercallback()
-				if vars.selection > 1 then
-					vars.selection -= 1
-					playsound(assets.swish)
-					gfx.sprite.redrawBackground()
-					vars.clearquikword = 1
-					vars.clearpak = 1
-					vars.clearall = 1
-				else
-					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-					vars.bump = -3
-				end
-			end
-			vars.keytimer = pd.timer.keyRepeatTimer(keytimercallback)
-		end,
-
-		upButtonUp = function()
-			if vars.keytimer ~= nil then vars.keytimer:remove() end
-		end,
-
-		downButtonDown = function()
-			if vars.keytimer ~= nil then vars.keytimer:remove() end
-			local function keytimercallback()
-				if vars.selection < #vars['selections' .. vars.page] then
-					vars.selection += 1
-					playsound(assets.swish)
-					gfx.sprite.redrawBackground()
-					vars.clearquikword = 1
-					vars.clearpak = 1
-					vars.clearall = 1
-				else
-					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-					vars.bump = -3
-				end
-			end
-			vars.keytimer = pd.timer.keyRepeatTimer(keytimercallback)
-		end,
-
-		downButtonUp = function()
-			if vars.keytimer ~= nil then vars.keytimer:remove() end
-		end,
-
-		leftButtonDown = function()
-			if vars.page > 1 then
-				vars.page -= 1
-				playsound(assets.swish)
-				vars.selection = 1
-				gfx.sprite.redrawBackground()
-				vars.clearquikword = 1
-				vars.clearpak = 1
-				vars.clearall = 1
-			else
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
-			end
-		end,
-
-		rightButtonDown = function()
-			if vars.page < 2 then
-				vars.page += 1
-				playsound(assets.swish)
-				vars.selection = 1
-				gfx.sprite.redrawBackground()
-				vars.clearquikword = 1
-				vars.clearpak = 1
-				vars.clearall = 1
-			else
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
-			end
-		end,
-
-		BButtonDown = function()
-			playsound(assets.pop)
-			scenemanager:transitionscene(title, false, 4)
-		end,
-
-		AButtonDown = function()
-			if vars['selections' .. vars.page][vars.selection] == 'music' then
-				save.music = not save.music
-				if save.music then
-					newmusic('audio/music/title', true)
-				else
-					stopmusic()
-				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'sfx' then
-				save.sfx = not save.sfx
-			elseif vars['selections' .. vars.page][vars.selection] == 'crank' then
-				save.crank = not save.crank
-			elseif vars['selections' .. vars.page][vars.selection] == 'time' then
-				save.time = not save.time
-			elseif vars['selections' .. vars.page][vars.selection] == 'hours' then
-				save.hours += 1
-				if save.hours > 2 then
-					save.hours = 0
-				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'menubg' then
-				save.menubg = not save.menubg
-				if save.menubg then
-					create_bg()
-					gfx.sprite.setAlwaysRedraw(true)
-					redraw = true
-				else
-					remove_bg()
-					gfx.sprite.setAlwaysRedraw(false)
-					redraw = false
-				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'background' then
-				save.background += 1
-				if save.background > 5 then
-					save.background = 0
-				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'darkmode' then
-				save.darkmode += 1
-				if save.darkmode > 2 then
-					save.darkmode = 0
-				end
-				pd.display.setInverted(isdarkmode())
-			elseif vars['selections' .. vars.page][vars.selection] == 'boldtext' then
-				save.boldtext = not save.boldtext
-				assets.discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca')
-			elseif vars['selections' .. vars.page][vars.selection] == 'autosubmit' then
-				save.autosubmit = not save.autosubmit
-			elseif vars['selections' .. vars.page][vars.selection] == 'showcontrols' then
-				save.showcontrols = not save.showcontrols
-			elseif vars['selections' .. vars.page][vars.selection] == 'clearquikword' then
-				if vars.clearquikword < 4 then
-					vars.clearquikword += 1
-				end
-				if vars.clearquikword == 4 then
-					save.quikwordbest = 0
-				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'clearpak' then
-				if vars.clearpak < 4 then
-					vars.clearpak += 1
-				end
-				if vars.clearpak == 4 then
-					resetsave(true, true)
-				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'clearall' then
-				if vars.clearall < 4 then
-					vars.clearall += 1
-				end
-				if vars.clearall == 4 then
-					resetsave()
-				end
-			end
-			playsound(assets.pop)
-			gfx.sprite.redrawBackground()
-		end,
-	}
-	if scenemanager.transitioning then
-		vars.handlerdelay = pd.timer.performAfterDelay(scenemanager.transitiontime, function()
-			pd.inputHandlers.push(vars.optionsHandlers)
-		end)
-	else
-		pd.inputHandlers.push(vars.optionsHandlers)
-	end
 
 	create_bg()
-
-	gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
-		draw_bg()
-		gfx.setColor(white)
-		gfx.setDitherPattern(0.15, bayer4)
-		gfx.fillRoundRect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
-		gfx.fillRoundRect(80, 200, 240, 30, 5)
-		gfx.setColor(black)
-		gfx.setDitherPattern(0.75, bayer4)
-		gfx.fillRect(0, 0, 60, 240)
-		gfx.fillRect(340, 0, 60, 240)
-		gfx.setColor(black)
-		assets.cal:drawTextAligned('Options', 200, 3, center)
-		gfx.drawRoundRect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
-		if vars.page == 1 then
-			assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Music: ' .. tostring(save.music and 'Enabled' or 'Disabled'), 200, 55, center)
-			assets[vars.selection == 2 and 'disco' or 'discoteca']:drawTextAligned('SFX: ' .. tostring(save.sfx and 'Enabled' or 'Disabled'), 200, 69, center)
-			assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('Control Scheme: ' .. tostring(save.crank and 'Crank' or 'Buttons'), 200, 83, center)
-			assets[vars.selection == 4 and 'disco' or 'discoteca']:drawTextAligned('In-Game Clock: ' .. tostring(save.time and 'Enabled' or 'Disabled'), 200, 107, center)
-			assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned('Clock Display: ' .. tostring(save.hours == 0 and 'System' or save.hours == 1 and '12-Hour' or save.hours == 2 and '24-Hour'), 200, 121, center)
-			assets[vars.selection == 6 and 'disco' or 'discoteca']:drawTextAligned('Menu BG: ' .. tostring(save.menubg and 'Falling Blocks' or 'Disabled'), 200, 135, center)
-			assets[vars.selection == 7 and 'disco' or 'discoteca']:drawTextAligned('In-Game BG: ' .. tostring(save.background == 0 and 'Disabled' or save.background == 1 and 'Forest' or save.background == 2 and 'Mountains' or save.background == 3 and 'Ornate Frame' or save.background == 4 and 'Falling Blocks' or save.background == 5 and 'City Nights'), 200, 149, center)
-			if vars.selection == 7 then
-				gfx.setColor(white)
-				gfx.fillRect(146, 90, 108, 59)
-				gfx.setColor(black)
-				gfx.fillRect(148, 92, 104, 55)
-				gfx.setColor(white)
-				gfx.fillRect(150, 94, 100, 51)
-				gfx.setColor(black)
-				if save.background == 1 then
-					assets.forest_preview:draw(150, 94)
-				elseif save.background == 2 then
-					assets.mountains_preview:draw(150, 94)
-				elseif save.background == 3 then
-					assets.frame_preview:draw(150, 94)
-				elseif save.background == 4 then
-					assets.blocks_preview:draw(150, 94)
-				elseif save.background == 5 then
-					assets.city_preview:draw(150, 94)
-				end
-			end
-			assets[vars.selection == 8 and 'disco' or 'discoteca']:drawTextAligned('Dark Mode: ' .. tostring(save.darkmode == 0 and 'Disabled' or save.darkmode == 1 and 'Enabled' or save.darkmode == 2 and 'Auto ' ..  (is24hourtime() and '(06:00/18:00)' or '(6a/6p)')), 200, 163, center)
-			gfx.setColor(gfx.kColorXOR)
-			if vars.selection == 1 then gfx.fillRect(82 - vars.bump, 55, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 2 then gfx.fillRect(82 - vars.bump, 69, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 3 then gfx.fillRect(82 - vars.bump, 83, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 4 then gfx.fillRect(82 - vars.bump, 107, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 5 then gfx.fillRect(82 - vars.bump, 121, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 6 then gfx.fillRect(82 - vars.bump, 135, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 7 then gfx.fillRect(82 - vars.bump, 149, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 8 then gfx.fillRect(82 - vars.bump, 163, 236 + (vars.bump * 2), 14) end
-			gfx.setColor(black)
-		elseif vars.page == 2 then
-			assets[vars.selection == 1 and 'disco' or 'discoteca']:drawTextAligned('Bold Text: ' .. tostring(save.boldtext and 'Enabled' or 'Disabled'), 200, 55, center)
-			assets[vars.selection == 2 and 'disco' or 'discoteca']:drawTextAligned('Submit Words: ' .. tostring(save.autosubmit and 'Automatically' or 'Press Up'), 200, 69, center)
-			assets[vars.selection == 3 and 'disco' or 'discoteca']:drawTextAligned('In-Game Control Hints: ' .. tostring(save.showcontrols and 'Enabled' or 'Disabled'), 200, 83, center)
-			assets[vars.selection == 4 and 'disco' or 'discoteca']:drawTextAligned((vars.clearquikword == 1 and 'Clear Quik-Word' or vars.clearquikword == 2 and 'Are you sure?' or vars.clearquikword == 3 and 'Once more! Clear Quik-Word!?' or vars.clearquikword == 4 and 'Quik-Word cleared.'), 200, 107, center)
-			assets[vars.selection == 5 and 'disco' or 'discoteca']:drawTextAligned((vars.clearpak == 1 and 'Clear Puzzle Paks' or vars.clearpak == 2 and 'Are you sure?' or vars.clearpak == 3 and 'Once more! Clear Puzzle Paks!?' or vars.clearpak == 4 and 'Puzzle Paks cleared.'), 200, 121, center)
-			assets[vars.selection == 6 and 'disco' or 'discoteca']:drawTextAligned((vars.clearall == 1 and 'Clear ALL Data' or vars.clearall == 2 and 'Are you sure?' or vars.clearall == 3 and 'Once more! Clear ALL data!?' or vars.clearall == 4 and 'Data cleared.'), 200, 135, center)
-			gfx.setColor(gfx.kColorXOR)
-			if vars.selection == 1 then gfx.fillRect(82 - vars.bump, 55, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 2 then gfx.fillRect(82 - vars.bump, 69, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 3 then gfx.fillRect(82 - vars.bump, 83, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 4 then gfx.fillRect(82 - vars.bump, 107, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 5 then gfx.fillRect(82 - vars.bump, 121, 236 + (vars.bump * 2), 14) end
-			if vars.selection == 6 then gfx.fillRect(82 - vars.bump, 135, 236 + (vars.bump * 2), 14) end
-			gfx.setColor(black)
-		end
-		gfx.drawRoundRect(80, 200, 240, 30, 5)
-		assets.disco:drawTextAligned('➕ Move  Ⓐ Toggle  Ⓑ Back', 200, 208, center)
-		assets.discoteca:drawText('v' .. pd.metadata.version, 65, 5)
-		assets.discoteca:drawTextAligned(commalize(pd.metadata.buildNumber), 335, 5, right)
-	end)
-
-	self:add()
 end
 
 function options:update()
-	local ticks = pd.getCrankTicks(4)
-	if ticks ~= 0 and not scenemanager.transitioning then
-		vars.selection += ticks
-		if vars.selection > #vars['selections' .. vars.page] then
-			vars.selection = #vars['selections' .. vars.page]
-			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-			vars.bump = -3
-		elseif vars.selection < 1 then
-			vars.selection = 1
-			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-			vars.bump = -3
-		else
-			playsound(assets.swish)
-			gfx.sprite.redrawBackground()
+	if platform == 'peedee' then
+		if pd.buttonJustPressed('up') then
+			self:keypressed('up')
+		elseif pd.buttonJustPressed('down') then
+			self:keypressed('down')
+		elseif pd.buttonJustPressed('left') then
+			self:keypressed('left')
+		elseif pd.buttonJustPressed('right') then
+			self:keypressed('right')
+		elseif pd.buttonJustPressed('b') then
+			self:keypressed('b')
+		elseif pd.buttonJustPressed('a') then
+			self:keypressed('a')
+		end
+
+		local ticks = pd.getCrankTicks(4)
+		if ticks ~= 0 and not transitioning then
+			vars.selection = vars.selection + ticks
+			if vars.selection > #vars['selections' .. vars.page] then
+				vars.selection = #vars['selections' .. vars.page]
+				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				vars.bump = -3
+			elseif vars.selection < 1 then
+				vars.selection = 1
+				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				vars.bump = -3
+			else
+				playsound(assets.swish)
+				gfx.sprite.redrawBackground()
+			end
 		end
 	end
 
-	vars.bump -= vars.bump * 0.4
+	vars.bump = vars.bump - (vars.bump * 0.4)
 	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
 		vars.bump = 0
 	end
 
-	if not redraw then
+	if platform == 'peedee' and not redraw then
 		if vars.bump ~= 0 then
 			gfx.sprite.redrawBackground()
 		end
 	end
 end
+
+function options:draw()
+	draw_bg()
+
+	setcolor('white', 0.15)
+	fillrect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
+	fillrect(80, 200, 240, 30, 5)
+	setcolor('black', 0.75)
+	fillrect(0, 0, 60, 240)
+	fillrect(340, 0, 60, 240)
+	setcolor()
+	drawtext(assets.cal, 'Options', 200, 3, center)
+	drawrect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
+	if vars.page == 1 then
+		drawtext(assets[vars.selection == 1 and 'disco' or 'discoteca'], 'Music: ' .. tostring(save.music and 'Enabled' or 'Disabled'), 200, 55, center)
+		drawtext(assets[vars.selection == 2 and 'disco' or 'discoteca'], 'SFX: ' .. tostring(save.sfx and 'Enabled' or 'Disabled'), 200, 69, center)
+		if platform == 'peedee' then
+			drawtext(assets[vars.selection == 3 and 'disco' or 'discoteca'], 'Control Scheme: ' .. tostring(save.crank and 'Crank' or 'Buttons'), 200, 83, center)
+		elseif platform == 'love' then
+			drawtext(assets[vars.selection == 3 and 'disco' or 'discoteca'], 'Remap Keyboard', 200, 83, center)
+		end
+		drawtext(assets[vars.selection == 4 and 'disco' or 'discoteca'], 'In-Game Clock: ' .. tostring(save.time and 'Enabled' or 'Disabled'), 200, 107, center)
+		drawtext(assets[vars.selection == 5 and 'disco' or 'discoteca'], 'Clock Display: ' .. tostring(save.hours and '12-Hour' or '24-Hour'), 200, 121, center)
+		drawtext(assets[vars.selection == 6 and 'disco' or 'discoteca'], 'Menu BG: ' .. tostring(save.menubg and 'Falling Blocks' or 'Disabled'), 200, 135, center)
+		drawtext(assets[vars.selection == 7 and 'disco' or 'discoteca'], 'In-Game BG: ' .. tostring(save.background == 0 and 'Disabled' or save.background == 1 and 'Forest' or save.background == 2 and 'Mountains' or save.background == 3 and 'Ornate Frame' or save.background == 4 and 'Falling Blocks' or save.background == 5 and 'City Nights'), 200, 149, center)
+		if vars.selection == 7 then
+			setcolor('white')
+			fillrect(146, 90, 108, 59)
+			setcolor()
+			fillrect(148, 92, 104, 55)
+			setcolor('white')
+			fillrect(150, 94, 100, 51)
+			if save.background == 1 then
+				drawimage(assets.forest_preview, 150, 94)
+			elseif save.background == 2 then
+				drawimage(assets.mountains_preview, 150, 94)
+			elseif save.background == 3 then
+				drawimage(assets.frame_preview, 150, 94)
+			elseif save.background == 4 then
+				drawimage(assets.blocks_preview, 150, 94)
+			elseif save.background == 5 then
+				drawimage(assets.city_preview, 150, 94)
+			end
+			setcolor()
+		end
+		drawtext(assets[vars.selection == 8 and 'disco' or 'discoteca'], 'Dark Mode: ' .. tostring(save.darkmode == 0 and 'Disabled' or save.darkmode == 1 and 'Enabled' or save.darkmode == 2 and 'Auto ' ..  (save.hours and '(6a/6p)' or '(06:00/18:00)')), 200, 163, center)
+		setcolor('black', 0.5)
+		if vars.selection == 1 then drawrect(85 - vars.bump, 53, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 2 then drawrect(85 - vars.bump, 67, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 3 then drawrect(85 - vars.bump, 81, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 4 then drawrect(85 - vars.bump, 105, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 5 then drawrect(85 - vars.bump, 119, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 6 then drawrect(85 - vars.bump, 133, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 7 then drawrect(85 - vars.bump, 147, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 8 then drawrect(85 - vars.bump, 161, 230 + (vars.bump * 2), 18) end
+		setcolor()
+	elseif vars.page == 2 then
+		drawtext(assets[vars.selection == 1 and 'disco' or 'discoteca'], 'Bold Text: ' .. tostring(save.boldtext and 'Enabled' or 'Disabled'), 200, 55, center)
+		drawtext(assets[vars.selection == 2 and 'disco' or 'discoteca'], 'Submit Words: ' .. tostring(save.autosubmit and 'Automatically' or 'Press Up'), 200, 69, center)
+		drawtext(assets[vars.selection == 3 and 'disco' or 'discoteca'], 'In-Game Control Hints: ' .. tostring(save.showcontrols and 'Enabled' or 'Disabled'), 200, 83, center)
+		drawtext(assets[vars.selection == 4 and 'disco' or 'discoteca'], (vars.clearquikword == 1 and 'Clear Quik-Word' or vars.clearquikword == 2 and 'Are you sure?' or vars.clearquikword == 3 and 'Once more! Clear Quik-Word!?' or vars.clearquikword == 4 and 'Quik-Word cleared.'), 200, 107, center)
+		drawtext(assets[vars.selection == 5 and 'disco' or 'discoteca'], (vars.clearpak == 1 and 'Clear Puzzle Paks' or vars.clearpak == 2 and 'Are you sure?' or vars.clearpak == 3 and 'Once more! Clear Puzzle Paks!?' or vars.clearpak == 4 and 'Puzzle Paks cleared.'), 200, 121, center)
+		drawtext(assets[vars.selection == 6 and 'disco' or 'discoteca'], (vars.clearall == 1 and 'Clear ALL Data' or vars.clearall == 2 and 'Are you sure?' or vars.clearall == 3 and 'Once more! Clear ALL data!?' or vars.clearall == 4 and 'Data cleared.'), 200, 135, center)
+		setcolor('black', 0.5)
+		if vars.selection == 1 then drawrect(85 - vars.bump, 53, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 2 then drawrect(85 - vars.bump, 67, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 3 then drawrect(85 - vars.bump, 81, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 4 then drawrect(85 - vars.bump, 105, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 5 then drawrect(85 - vars.bump, 119, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 6 then drawrect(85 - vars.bump, 133, 230 + (vars.bump * 2), 18) end
+		setcolor()
+	end
+	drawrect(80, 200, 240, 30, 5)
+	drawtext(assets.disco, '➕/🎣 Move  Ⓑ Back  Ⓐ Toggle', 200, 208, center)
+	drawtext(assets.discoteca, 'v' .. version, 65, 5)
+	if platform == 'peedee' then drawtext(assets.discoteca, commalize(pd.metadata.buildNumber), 335, 5, right) end
+
+	drawontop()
+end
+
+function options:keypressed(button)
+	if vars.handler ~= 'options' then return end
+	if button == (platform == 'peedee' and 'up' or platform == 'love' and save.up) then
+		if vars.selection > 1 then
+			vars.selection = vars.selection - 1
+			playsound(assets.swish)
+			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			vars.clearquikword = 1
+			vars.clearpak = 1
+			vars.clearall = 1
+		else
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		end
+	elseif button == (platform == 'peedee' and 'down' or platform == 'love' and save.down) then
+		if vars.selection < #vars['selections' .. vars.page] then
+			vars.selection = vars.selection + 1
+			playsound(assets.swish)
+			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			vars.clearquikword = 1
+			vars.clearpak = 1
+			vars.clearall = 1
+		else
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		end
+	elseif button == (platform == 'peedee' and 'left' or platform == 'love' and save.left) then
+		if vars.page > 1 then
+			vars.page = vars.page - 1
+			playsound(assets.swish)
+			vars.selection = 1
+			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			vars.clearquikword = 1
+			vars.clearpak = 1
+			vars.clearall = 1
+		else
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		end
+	elseif button == (platform == 'peedee' and 'right' or platform == 'love' and save.right) then
+		if vars.page < 2 then
+			vars.page = vars.page + 1
+			playsound(assets.swish)
+			vars.selection = 1
+			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			vars.clearquikword = 1
+			vars.clearpak = 1
+			vars.clearall = 1
+		else
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		end
+	elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
+		playsound(assets.pop)
+		scenemanager:transitionscene(title, false, 4)
+	elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
+		if vars['selections' .. vars.page][vars.selection] == 'music' then
+			save.music = not save.music
+			if save.music then
+				newmusic('audio/music/title', true)
+			else
+				stopmusic()
+			end
+		elseif vars['selections' .. vars.page][vars.selection] == 'sfx' then
+			save.sfx = not save.sfx
+		elseif vars['selections' .. vars.page][vars.selection] == 'crank' then
+			if platform == 'peedee' then
+				save.crank = not save.crank
+			else
+				-- TODO: keyboard remap
+			end
+		elseif vars['selections' .. vars.page][vars.selection] == 'time' then
+			save.time = not save.time
+		elseif vars['selections' .. vars.page][vars.selection] == 'hours' then
+			save.hours = not save.hours
+		elseif vars['selections' .. vars.page][vars.selection] == 'menubg' then
+			save.menubg = not save.menubg
+			if save.menubg then
+				create_bg()
+				setredraw(true)
+			else
+				remove_bg()
+				setredraw(false)
+			end
+		elseif vars['selections' .. vars.page][vars.selection] == 'background' then
+			save.background = save.background + 1
+			if save.background > 5 then
+				save.background = 0
+			end
+		elseif vars['selections' .. vars.page][vars.selection] == 'darkmode' then
+			save.darkmode = save.darkmode + 1
+			if save.darkmode > 2 then
+				save.darkmode = 0
+			end
+			setinverted(isdarkmode())
+		elseif vars['selections' .. vars.page][vars.selection] == 'boldtext' then
+			save.boldtext = not save.boldtext
+			assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca')
+		elseif vars['selections' .. vars.page][vars.selection] == 'autosubmit' then
+			save.autosubmit = not save.autosubmit
+		elseif vars['selections' .. vars.page][vars.selection] == 'showcontrols' then
+			save.showcontrols = not save.showcontrols
+		elseif vars['selections' .. vars.page][vars.selection] == 'clearquikword' then
+			if vars.clearquikword < 4 then
+				vars.clearquikword = vars.clearquikword + 1
+			end
+			if vars.clearquikword == 4 then
+				save.quikwordbest = 0
+			end
+		elseif vars['selections' .. vars.page][vars.selection] == 'clearpak' then
+			if vars.clearpak < 4 then
+				vars.clearpak = vars.clearpak + 1
+			end
+			if vars.clearpak == 4 then
+				resetsave(true, true)
+			end
+		elseif vars['selections' .. vars.page][vars.selection] == 'clearall' then
+			if vars.clearall < 4 then
+				vars.clearall = vars.clearall + 1
+			end
+			if vars.clearall == 4 then
+				resetsave()
+			end
+		end
+		playsound(assets.pop)
+		if platform == 'peedee' then gfx.sprite.redrawBackground() end
+	end
+end
+
+if platform == 'love' then return options end

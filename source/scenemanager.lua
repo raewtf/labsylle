@@ -1,78 +1,91 @@
-local pd <const> = playdate
-local gfx <const> = pd.graphics
-local floor <const> = math.floor
-local bayer2 <const> = gfx.image.kDitherTypeBayer2x2
+loadingimages = {
+	loading4 = newimage('images/loading/loading4'),
+	loading3 = newimage('images/loading/loading3'),
+	loading2 = newimage('images/loading/loading2'),
+	loading1 = newimage('images/loading/loading1'),
+	loading0 = newimage('images/loading/loading0'),
+	loading4d = newimage('images/loading/loading4d'),
+	loading3d = newimage('images/loading/loading3d'),
+	loading2d = newimage('images/loading/loading2d'),
+	loading1d = newimage('images/loading/loading1d'),
+	loading0d = newimage('images/loading/loading0d')
+}
 
-class('scenemanager').extends()
+transitiontime = 300
+transitioning = false
+transition = {}
 
-function scenemanager:init()
-    self.transitiontime = 300
-    self.transitioning = false
+local pd
+local gfx
+local floor = math.floor
 
-	self.loading4 = gfx.image.new('images/system/launchImage')
-	self.loading4d = self.loading4:invertedImage()
+if platform == 'peedee' then
+	pd = playdate
+	gfx = pd.graphics
 
-	self.loading3 = self.loading4:fadedImage(0.75, bayer2)
-	self.loading2 = self.loading4:fadedImage(0.50, bayer2)
-	self.loading1 = self.loading4:fadedImage(0.25, bayer2)
+	class('scenemanager').extends()
 
-	self.loading3d = self.loading4d:fadedImage(0.75, bayer2)
-	self.loading2d = self.loading4d:fadedImage(0.50, bayer2)
-	self.loading1d = self.loading4d:fadedImage(0.25, bayer2)
+	function scenemanager:init()
+		self.sprite = gfx.sprite.new()
+		self.sprite:setZIndex(26000)
+		self.sprite:setCenter(0, 0)
+		self.sprite:moveTo(0, 0)
+		self.sprite:setIgnoresDrawOffset(true)
+	end
+elseif platform == 'love' then
+	gfx = love.graphics
 
-	self.loading0 = gfx.image.new(400, 240, gfx.kColorClear)
-	self.loading0d = gfx.image.new(400, 240, gfx.kColorClear)
+	class = require 'libraries/class'
+	if not table.unpack then
+		table.unpack = unpack
+	end
 
-	self.sprite = gfx.sprite.new()
-	self.sprite:setZIndex(26000)
-	self.sprite:setCenter(0, 0)
-	self.sprite:moveTo(0, 0)
-	self.sprite:setIgnoresDrawOffset(true)
+	scenemanager = class{
+		init = function(self)
+		end
+	}
 end
 
 function scenemanager:switchscene(scene, ...)
-	if self.transitioning then return end
+	if transitioning then return end
     self.newscene = scene
     self.sceneargs = {...}
-    -- Pop any rogue input handlers, leaving the default one.
-    local inputsize = #playdate.inputHandlers - 1
-    for i = 1, inputsize do
-        pd.inputHandlers.pop()
-    end
     self:loadnewscene()
-    self.transitioning = false
+    transitioning = false
 end
 
 -- This function will transition the scene with an animated effect.
 function scenemanager:transitionscene(scene, ...)
-	if self.transitioning then return end -- If there's already a scene transition, go away.
-	self.transitioning = true -- Set this to true
+	if transitioning then return end -- If there's already a scene transition, go away.
+	transitioning = true -- Set this to true
 	self.newscene = scene
 	self.sceneargs = {...}
-	-- Pop any rogue input handlers, leaving the default one.
-	local inputsize = #playdate.inputHandlers - 1
-	for i = 1, inputsize do
-		pd.inputHandlers.pop()
-	end
-	if vars ~= nil and vars.keytimer ~= nil then vars.keytimer:remove() end
-	self.sprite:add()
-	self.timer = pd.timer.new(self.transitiontime, 0, 4.99, pd.easingFunctions.outQuart)
-	self.timer.updateCallback = function(timer)
-		self.sprite:setImage(self['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
-	end
-	-- After the first timer ends...
-	self.timer.timerEndedCallback = function()
-		self:loadnewscene()
+	if vars ~= nil then vars.handler = '' end
+	if platform == 'peedee' then
 		self.sprite:add()
-		self.timer = pd.timer.new(self.transitiontime, 4.99, 0, pd.easingFunctions.inQuart)
-		self.timer.updateCallback = function(timer)
-			self.sprite:setImage(self['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
+	end
+	newtimer('transition', transitiontime, 0, 4.99, 'outQuart', function()
+		self:loadnewscene()
+		if platform == 'peedee' then
+			self.sprite:add()
 		end
-		self.timer.timerEndedCallback = function()
+		newtimer('transition', transitiontime, 4.99, 0, 'inQuart', function()
 			-- After this timer's over, remove the transition and the sprites.
-			self.transitioning = false
-			self.sprite:setImage(self.empty)
-			self.sprite:remove()
+			transitioning = false
+			if platform == 'peedee' then
+				self.sprite:setImage(loadingimages.loading0)
+				self.sprite:remove()
+			end
+		end, transition)
+		if platform == 'peedee' then
+			vars.transition.updateCallback = function(timer)
+				self.sprite:setImage(loadingimages['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
+			end
+		end
+	end, transition)
+	if platform == 'peedee' then
+		vars.transition.updateCallback = function(timer)
+			self.sprite:setImage(loadingimages['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
 		end
 	end
 end
@@ -80,17 +93,30 @@ end
 
 function scenemanager:loadnewscene()
     self:cleanupscene()
-    self.newscene(table.unpack(self.sceneargs))
+	savegame()
+	if platform == 'peedee' then
+    	self.newscene(table.unpack(self.sceneargs))
+	elseif platform == 'love' then
+		gamestate.switch(self.newscene, table.unpack(self.sceneargs))
+	end
 end
 
 function scenemanager:cleanupscene()
-    gfx.sprite:removeAll()
-    if sprites ~= nil then
-        for i = 1, #sprites do
-            sprites[i] = nil
-        end
-    end
-    sprites = {}
+	quit = 0
+	if platform == 'peedee' then
+		gfx.sprite:removeAll()
+		local alltimers = pd.timer.allTimers()
+		for _, timer in ipairs(alltimers) do
+			if timer.value ~= quikword.value then
+				timer:remove()
+				timer = nil
+			end
+		end
+		gfx.setDrawOffset(0, 0) -- Lastly, reset the drawing offset. just in case.
+	elseif platform == 'love' then
+		-- TODO: don't clear quikword
+		timer.clear()
+	end
     if assets ~= nil then
         for i = 1, #assets do
             assets[i] = nil
@@ -103,18 +129,7 @@ function scenemanager:cleanupscene()
         end
     end
     vars = nil -- and nil all the variables.
-    self:removealltimers() -- Remove every timer,
-	--remove_bg()
     collectgarbage('collect') -- and collect the garbage.
-    gfx.setDrawOffset(0, 0) -- Lastly, reset the drawing offset. just in case.
 end
 
-function scenemanager:removealltimers()
-    local alltimers = pd.timer.allTimers()
-    for _, timer in ipairs(alltimers) do
-		if timer.value ~= quikword.value then
-			timer:remove()
-			timer = nil
-		end
-    end
-end
+if platform == 'love' then return scenemanager end

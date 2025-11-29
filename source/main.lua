@@ -1,64 +1,148 @@
--- Importing things
-import 'CoreLibs/math'
-import 'CoreLibs/timer'
-import 'CoreLibs/crank'
-import 'CoreLibs/object'
-import 'CoreLibs/sprites'
-import 'CoreLibs/graphics'
-import 'CoreLibs/animation'
-import 'scenemanager'
-import 'packs'
-scenemanager = scenemanager()
-
--- Setting up basic SDK params
-local pd <const> = playdate
-local gfx <const> = pd.graphics
-local smp <const> = pd.sound.sampleplayer
-local fle <const> = pd.sound.fileplayer
-local text <const> = gfx.getLocalizedText
-local random <const> = math.random
-local floor <const> = math.floor
-local ceil <const> = math.ceil
-
-pd.display.setRefreshRate(30)
-gfx.setBackgroundColor(gfx.kColorWhite)
-gfx.setLineWidth(2)
-gfx.setStrokeLocation(gfx.kStrokeInside)
-
--- NOTE: add achievements
--- NOTE: daily seeded quik-word?
+-- TODO: add achievements on peedee
+-- TODO: daily seeded quik-word?
+-- TODO: write manual
+-- TODO: statistics menu
+	-- Total words found (exclude shapes and math)
+	-- Paks completed (how many times is "complete" found in the save table?)
+	-- Quik-Word games played
+	-- Highest Quik-Word round
+	-- Quik-Words found
+	-- Time spent playing
+	-- Time spent in Quik-Word
+	-- Time spent in paks
 -- TODO: solver/optimum swaps finder function, that returns a number
--- TODO: submit to catalog
+
+-- Build target. 'peedee' or 'love'
+platform = 'peedee'
+local fps = 30
+
+local pd
+local gfx
+local black
+local white
+local gamepad
+local scale
+local fullscreen
+
+music = nil
+quit = 0
+
+local random = math.random
+local floor = math.floor
+local ceil = math.ceil
+
+if platform == 'peedee' then
+	import 'CoreLibs/math'
+	import 'CoreLibs/timer'
+	import 'CoreLibs/crank'
+	import 'CoreLibs/object'
+	import 'CoreLibs/sprites'
+	import 'CoreLibs/graphics'
+	import 'CoreLibs/animation'
+	import 'wrappers_peedee'
+
+	import 'scenemanager'
+	scenemanager = scenemanager()
+
+	import 'packs' -- Puzzle paks
+
+	import 'title'
+
+	pd = playdate
+	gfx = pd.graphics
+	black = gfx.kColorBlack
+	white = gfx.kColorWhite
+
+	version = pd.metadata.version
+
+	pd.display.setRefreshRate(fps)
+	gfx.setBackgroundColor(gfx.kColorWhite)
+	gfx.setStrokeLocation(gfx.kStrokeInside)
+
+	catalog = false
+	if pd.metadata.bundleID == 'wtf.rae.labsylle' then
+		catalog = true
+	end
+elseif platform == 'love' then
+	json = require 'libraries/json'
+	timer = require 'libraries/timer'
+	easings = require 'libraries/easing'
+	gamestate = require 'libraries/gamestate'
+	require 'wrappers_love'
+
+	scenemanager = require 'scenemanager'
+
+	packs, bonus, quikword = require 'packs'
+
+	title = require 'title'
+
+	gfx = love.graphics
+	black = love.math.colorFromBytes(0, 0, 0, 1)
+	white = love.math.colorFromBytes(1, 1, 1, 1)
+	gamepad = false
+	fullscreen = false
+
+	version = '1.0.0b2'
+
+	gfx.setLineStyle('rough')
+	gfx.setLineJoin('miter')
+	gfx.setDefaultFilter('nearest', 'nearest')
+	love.keyboard.setKeyRepeat(false)
+
+	icon = love.image.newImageData('images/system/icon.png')
+end
 
 pack = nil
 redraw = false
 
-catalog = false
--- NOTE: vvv uncomment vvv
---if pd.metadata.bundleID == 'wtf.rae.labsylle' then
---	catalog = true
---end
+gfx.setLineWidth(2)
 
 bgblocks = {}
-bgblock_large = gfx.imagetable.new('images/bgblock_large')
-bgblock_small = gfx.imagetable.new('images/bgblock_small')
+bgblock_large = newimagetable('bgblock_large', 'images/bgblock_large', 30, 30, 360)
+bgblock_small = newimagetable('bgblock_small', 'images/bgblock_small', 18, 18, 360)
 
-quikword = pd.timer.new(1, 60000, 60000)
-quikword.discardOnCompletion = false
+quikwordtimer(1, 60000, 60000, nil)
+quikwords_completed = {'Quik-Words Seen:'}
 
 -- Save check
 function savecheck()
-    save = pd.datastore.read()
+	if platform == 'peedee' then
+    	save = pd.datastore.read()
+	elseif platform == 'love' then
+		if love.filesystem.read('data.json') ~= nil then
+			save = json.decode(love.filesystem.read('data.json'))
+		end
+	end
+
     if save == nil then save = {} end
+
+	if platform == 'peedee' then
+		if save.crank == nil then save.crank = true end
+	elseif platform == 'love' then
+		save.scale = save.scale or 1
+		if save.gamepad == nil then save.gamepad = false end
+
+		save.up = save.up or 'up'
+		save.down = save.down or 'down'
+		save.left = save.left or 'left'
+		save.right = save.right or 'right'
+		save.primary = save.primary or 'z'
+		save.secondary = save.secondary or 'x'
+
+		if save.clean_scaling == nil then save.clean_scaling = true end
+		if save.rumble == nil then save.rumble = true end
+	end
 
 	if save.music == nil then save.music = true end
 	if save.sfx == nil then save.sfx = true end
 
-	if save.crank == nil then save.crank = true end
-
 	if save.time == nil then save.time = true end
 	if save.menubg == nil then save.menubg = true end
-	save.hours = save.hours or 0
+
+	save.hours = save.hours or true
+
+	-- Fix for old save.hours logic
+	if tonumber(save.hours) == save.hours then save.hours = (save.hours == 1 and true or save.hours == 2 and false) or true end
 
 	save.quikwordbest = save.quikwordbest or 0
 
@@ -74,10 +158,25 @@ function resetsave(keepoptions, keepquikword)
 	newsave = {}
 
 	if keepoptions then
+		if platform == 'peedee' then
+			newsave.crank = save.crank
+		elseif platform == 'love' then
+			newsave.scale = save.scale
+			newsave.gamepad = save.gamepad
+
+			newsave.up = save.up
+			newsave.down = save.down
+			newsave.left = save.left
+			newsave.right = save.right
+			newsave.primary = save.primary
+			newsave.secondary = save.secondary
+
+			newsave.clean_scaling = save.clean_scaling
+			newsave.rumble = save.rumble
+		end
+
 		newsave.music = save.music
 		newsave.sfx = save.sfx
-
-		newsave.crank = save.crank
 
 		newsave.time = save.time
 		newsave.menubg = save.menubg
@@ -90,14 +189,29 @@ function resetsave(keepoptions, keepquikword)
 		newsave.autosubmit = save.autosubmit
 		newsave.showcontrols = save.showcontrols
 	else
+		if platform == 'peedee' then
+			newsave.crank = true
+		elseif platform == 'love' then
+			newsave.scale = 1
+			newsave.gamepad = false
+
+			save.up = 'up'
+			save.down = 'down'
+			save.left = 'left'
+			save.right = 'right'
+			save.primary = 'z'
+			save.secondary = 'x'
+
+			save.clean_scaling = true
+			save.rumble = true
+		end
+
 		newsave.music = true
 		newsave.sfx = true
 
-		newsave.crank = true
-
 		newsave.time = true
 		newsave.menubg = true
-		newsave.hours = 0
+		newsave.hours = true
 
 		newsave.background = 0
 		newsave.darkmode = 0
@@ -116,21 +230,22 @@ function resetsave(keepoptions, keepquikword)
 	save = newsave
 	newsave = nil
 
+	savegame()
+
 	newmusic('audio/music/title', true)
 	create_bg()
-	gfx.sprite.setAlwaysRedraw(true)
-	redraw = true
-	pd.display.setInverted(isdarkmode())
-	assets.discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca')
+	setredraw(true)
+	setinverted(isdarkmode())
+	assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca')
 end
 
--- ... now we run that!
-savecheck()
+if platform == 'peedee' then
+	savecheck()
+end
 
-local lasthour = pd.getTime().hour
+local lasthour = gettime().hour
 
--- When the game closes...
-function pd.gameWillTerminate()
+function suspend()
 	if vars.pack ~= nil and vars.pack ~= 'speed' then
 		save[vars.pack.id].puzzle = vars.puzzle
 		save[vars.pack.id].puzzleswaps = vars.swaps
@@ -140,57 +255,6 @@ function pd.gameWillTerminate()
 			save[vars.pack.id].bombs = vars.bombs
 		end
 	end
-    pd.datastore.write(save)
-end
-
-function pd.deviceWillSleep()
-	if vars.pack ~= nil and vars.pack ~= 'speed' then
-		save[vars.pack.id].puzzle = vars.puzzle
-		save[vars.pack.id].puzzleswaps = vars.swaps
-		save[vars.pack.id].heldpackswaps = vars.packswaps
-		save[vars.pack.id].word = vars.word
-		if vars.bombs ~= nil and vars.bombs[1] ~= nil then
-			save[vars.pack.id].bombs = vars.bombs
-		end
-	end
-    pd.datastore.write(save)
-end
-
--- Setting up music
-music = nil
-
--- Fades the music out, and trashes it when finished. Should be called alongside a scene change, only if the music is expected to change. Delay can set the delay (in seconds) of the fade
-function fademusic(delay)
-    delay = delay or 400
-    if music ~= nil then
-        music:setVolume(0, 0, delay/1000, function()
-            music:stop()
-            music = nil
-        end)
-    end
-end
-
-function stopmusic()
-    if music ~= nil then
-        music:stop()
-        music = nil
-    end
-end
-
--- New music track. This should be called in a scene's init, only if there's no track leading into it. File is a path to an audio file in the PDX. Loop, if true, will loop the audio file. Range will set the loop's starting range.
-function newmusic(file, loop, range)
-    if save.music and music == nil then -- If a music file isn't actively playing...then go ahead and set a new one.
-        music = fle.new(file)
-        if loop then -- If set to loop, then ... loop it!
-            music:setLoopRange(range or 0)
-            music:play(0)
-        else
-            music:play()
-            music:setFinishCallback(function()
-                music = nil
-            end)
-        end
-    end
 end
 
 -- This function returns the inputted number, with the ordinal suffix tacked on at the end (as a string)
@@ -241,24 +305,24 @@ end
 function draw_bg(game)
 	if bgblocks[1] == nil or (not game and not save.menubg) then return end
 	for i = 1, 10 do
-		bgblocks[i].y += (bgblocks[i].fallspeed / 20)
+		bgblocks[i].y = bgblocks[i].y + (bgblocks[i].fallspeed / 20)
 		if bgblocks[i].y >= 260 then
 			bgblocks[i].y = -40
 		end
-		bgblocks[i].rotation += bgblocks[i].rotspeed
+		bgblocks[i].rotation = bgblocks[i].rotation + bgblocks[i].rotspeed
 		if bgblocks[i].rotation >= 360 then
 			bgblocks[i].rotation = 1
 		end
-		_G['bgblock_' .. bgblocks[i].size][math.floor(bgblocks[i].rotation)]:draw(bgblocks[i].x, bgblocks[i].y)
+		drawimagetable('bgblock_' .. bgblocks[i].size, floor(bgblocks[i].rotation), bgblocks[i].x, bgblocks[i].y)
 	end
-	gfx.setColor(gfx.kColorWhite)
+	setcolor('white')
 	if game then
-		gfx.setDitherPattern(0.25, gfx.image.kDitherTypeBayer2x2)
+		setcolor('white', 0.25)
 	else
-		gfx.setDitherPattern(0.5, gfx.image.kDitherTypeBayer2x2)
+		setcolor('white', 0.5)
 	end
-	gfx.fillRect(0, 0, 400, 240)
-	gfx.setColor(gfx.kColorBlack)
+	fillrect(0, 0, 400, 240)
+	setcolor()
 end
 
 function remove_bg()
@@ -271,7 +335,7 @@ function remove_bg()
 end
 
 function isdarkmode()
-	local hour = pd.getTime().hour
+	local hour = gettime().hour
 	if save.darkmode == 0 then
 		return false
 	elseif save.darkmode == 1 then
@@ -280,46 +344,6 @@ function isdarkmode()
 		return true
 	else
 		return false
-	end
-end
-
-pd.display.setInverted(isdarkmode())
-
-function playsound(sound)
-	if save.sfx then
-		sound:stop()
-		sound:play()
-	end
-end
-
--- Create a pool of up to five sound effects, randomly playing one of 'em. Import PD sound objects
-function randomizesfx(sfx1, sfx2, sfx3, sfx4, sfx5, rate)
-	if save.sfx then
-		local sfc = 0
-		if sfx1 ~= nil then sfc += 1 end
-		if sfx2 ~= nil then sfc += 1 end
-		if sfx3 ~= nil then sfc += 1 end
-		if sfx4 ~= nil then sfc += 1 end
-		if sfx5 ~= nil then sfc += 1 end
-		local rand = math.random(1, sfc)
-		if rand == 1 then
-			sfx1:setRate(rate or 1)
-			playsound(sfx1)
-		elseif rand == 2 then
-			sfx2:setRate(rate or 1)
-			playsound(sfx2)
-		elseif rand == 3 then
-			sfx3:setRate(rate or 1)
-			playsound(sfx3)
-		elseif rand == 4 then
-			sfx4:setRate(rate or 1)
-			playsound(sfx4)
-		elseif rand == 5 then
-			sfx5:setRate(rate or 1)
-			playsound(sfx5)
-		end
-	else
-		return
 	end
 end
 
@@ -332,61 +356,184 @@ function shuffle(tbl)
   	return tbl
 end
 
-function is24hourtime()
-	if save.hours == 0 then
-		return pd.shouldDisplay24HourTime()
-	elseif save.hours == 1 then
-		return false
-	elseif save.hours == 2 then
-		return true
+if platform == 'peedee' then
+	function pd.gameWillTerminate()
+		suspend()
+		savegame()
 	end
-end
 
-function pd.timer:resetnew(duration, startValue, endValue, easingFunction)
-    self.duration = duration
-    if startValue ~= nil then
-        self._startValue = startValue
-        self.originalValues.startValue = startValue
-        self._endValue = endValue or 0
-        self.originalValues.endValue = endValue or 0
-        self._easingFunction = easingFunction or pd.easingFunctions.linear
-        self.originalValues.easingFunction = easingFunction or pd.easingFunctions.linear
-        self._currentTime = 0
-        self.value = self._startValue
-    end
-    self._lastTime = nil
-    self.active = true
-    self.hasReversed = false
-    self.reverses = false
-    self.repeats = false
-    self.remainingDelay = self.delay
-    self._calledOnRepeat = nil
-    self.discardOnCompletion = false
-    self.paused = false
-    self.timerEndedCallback = self.timerEndedCallback
-end
+	function pd.deviceWillSleep()
+		suspend()
+		savegame()
+	end
 
-import 'title'
-scenemanager:switchscene(title, true)
+	scenemanager:switchscene(title, true)
 
-function pd.update()
-    -- Catch-all stuff ...
-    gfx.sprite.update()
-    pd.timer.updateTimers()
+	function pd.update()
+		-- Catch-all stuff ...
+		gfx.sprite.update()
+		pd.timer.updateTimers()
 
-	-- Automatic dark mode
-	local hour = pd.getTime().hour
-	if save.darkmode == 2 then
-		if lasthour < 18 and hour >= 18 then
-			pd.display.setInverted(true)
-			lasthour = hour
-		elseif lasthour < 6 and hour >= 6 then
-			pd.display.setInverted(false)
-			lasthour = hour
+		-- Automatic dark mode
+		local hour = gettime().hour
+		if save.darkmode == 2 then
+			if lasthour < 18 and hour >= 18 then
+				setinverted(true)
+				lasthour = hour
+			elseif lasthour < 6 and hour >= 6 then
+				setinverted(false)
+				lasthour = hour
+			end
+		else
+			if lasthour ~= hour then
+				lasthour = hour
+			end
 		end
-	else
-		if lasthour ~= hour then
-			lasthour = hour
+	end
+
+	function drawontop()
+		--noop
+	end
+elseif platform == 'love' then
+	function love.quit()
+		suspend()
+		savegame()
+	end
+
+	function rescale(newscale)
+		scale = newscale
+		love.window.setMode(400 * newscale, 240 * newscale, {resizable = true, minwidth = 400 * newscale, minheight = 240 * newscale})
+	end
+
+	function love.keypressed(key)
+		gamepad = false
+		save.gamepad = gamepad
+		if key == 'escape' and vars ~= nil then
+			quit = quit + 1
+			vars.quit_timer = timer.after(2, function() quit = 0 end)
+			if quit == 2 then
+				love.event.quit()
+			end
 		end
+		if key == 'f11' then
+			fullscreen = not fullscreen
+			love.window.setFullscreen(fullscreen)
+		end
+	end
+
+	function love.gamepadpressed(joystick, button)
+		if vars.handler ~= "remap" then
+			current_joystick = joystick
+			local key
+			if button == 'start' then
+				key = 'escape'
+			elseif button == 'dpup' then
+				key = save.up
+			elseif button == 'dpdown' then
+				key = save.down
+			elseif button == 'dpleft' then
+				key = save.left
+			elseif button == 'dpright' then
+				key = save.right
+			elseif button == 'a' then
+				key = save.primary
+			elseif button == 'b' then
+				key = save.secondary
+			end
+			gamepad = true
+			save.gamepad = gamepad
+			love.keypressed(key)
+		end
+	end
+
+	function love.focus(f)
+		if f then
+			love.mouse.setVisible(false)
+		else
+			love.mouse.setVisible(true)
+		end
+	end
+
+	function love.resize(w, h)
+		local fw
+		local fh
+		if save.clean_scaling then
+			fw = floor(w / 400)
+			fh = floor(h / 240)
+		else
+			fw = w / 400
+			fh = h / 240
+		end
+		if fw < fh and fw >= save.scale then
+			scale = fw
+		elseif fh < fw and fh >= save.scale then
+			scale = fh
+		elseif fw == fh and fw >= save.scale then
+			scale = fw
+		end
+	end
+
+	function love.load()
+		savecheck()
+		love.window.setIcon(icon)
+
+		min_dt = 1 / fps
+		next_time = love.timer.getTime()
+
+		rescale(save.scale)
+		gamestate.registerEvents()
+		scenemanager:switchscene(title, true)
+	end
+
+	function love.update(dt)
+		next_time = next_time + min_dt
+
+		if vars ~= nil and not vars.paused then
+			timer.update(dt)
+			timer.update(dt, transition)
+		end
+
+		if music ~= nil then
+			music:setVolume(volume[1])
+			if not music:isPlaying() then music = nil end
+		end
+	end
+
+	function love.draw()
+		gfx.clear(0.5, 0.5, 0.5, 1)
+		gfx.setColor(1, 1, 1, 1)
+
+		local lbw = false
+		local lbh = false
+
+		local ww, wh, flags = love.window.getMode()
+		if ww > 400 * scale then lbw = true end
+		if wh > 240 * scale then lbh = true end
+
+		if lbw then gfx.translate(((floor(ww / 2) * 2) - (400 * scale)) / 2, 0) end
+		if lbh then gfx.translate(0, ((floor(wh / 2) * 2) - (240 * scale)) / 2) end
+
+		gfx.setScissor(((lbw and (((floor(ww / 2) * 2) - (400 * scale)) / 2)) or 0), ((lbh and (((floor(wh / 2) * 2) - (240 * scale)) / 2)) or 0), 400 * scale, 240 * scale)
+
+		gfx.clear(1, 1, 1, 1)
+
+		gfx.scale(scale)
+	end
+
+	function drawontop()
+		if vars.transition ~= nil and value('transition') > 0 then
+			setcolor('white', (-value('transition') + 5))
+			drawimage(loadingimages.loading4, 0, 0)
+		end
+		setcolor()
+
+		gfx.setScissor()
+
+		local cur_time = love.timer.getTime()
+		if next_time <= cur_time then
+			next_time = cur_time
+			return
+		end
+		love.timer.sleep(next_time - cur_time)
 	end
 end

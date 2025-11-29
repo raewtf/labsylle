@@ -1,0 +1,217 @@
+local pd = playdate
+local gfx = pd.graphics
+local smp = pd.sound.sampleplayer
+
+function savegame()
+	pd.datastore.write(save)
+end
+
+function newimage(image)
+	return gfx.image.new(image)
+end
+
+function drawimage(image, x, y)
+	image:draw(x, y)
+end
+
+function newimagetable(name, table, width, height, cells)
+	return gfx.imagetable.new(table)
+end
+
+function drawimagetable(name, index, x, y)
+	_G[name]:drawImage(index, x, y)
+end
+
+function newtimer(name, duration, startvalue, endvalue, easing, callback)
+	if vars ~= nil then
+		vars[name] = pd.timer.new(duration, startvalue, endvalue, easing ~= nil and pd.easingFunctions[easing] or pd.easingFunctions.linear)
+		vars[name].discardOnCompletion = false
+		vars[name].timerEndedCallback = callback or nil
+	end
+end
+
+function afterdelay(name, duration, callback)
+	if vars ~= nil then
+		vars[name] = pd.timer.performAfterDelay(duration, callback)
+	end
+end
+
+function value(name)
+	return vars[name].value
+end
+
+function resettimer(name, duration, startvalue, endvalue, easing, callback)
+	if name == 'quikword' then
+		self = quikword
+	else
+		self = vars[name]
+	end
+	self.duration = duration
+	if startvalue ~= nil then
+		self._startValue = startvalue
+		self.originalValues.startValue = startvalue
+		self._endValue = endvalue or 0
+		self.originalValues.endValue = endvalue or 0
+		self._easingFunction = easing ~= nil and pd.easingFunctions[easing] or pd.easingFunctions.linear
+		self.originalValues.easingFunction = easing ~= nil and pd.easingFunctions[easing] or pd.easingFunctions.linear
+		self._currentTime = 0
+		self.value = self._startValue
+	end
+	self._lastTime = nil
+	self.active = true
+	self.hasReversed = false
+	self.reverses = false
+	self.repeats = false
+	self.remainingDelay = self.delay
+	self._calledOnRepeat = nil
+	self.discardOnCompletion = false
+	self.paused = false
+	self.timerEndedCallback = callback or self.timerEndedCallback
+end
+
+function quikwordtimer(duration, startvalue, endvalue, callback)
+	quikword = pd.timer.new(duration, startvalue, endvalue, pd.easingFunctions.linear)
+	quikword.discardOnCompletion = false
+	quikword.timerEndedCallback = callback or nil
+end
+
+function resetquikword(duration, startvalue, endvalue, callback)
+	resettimer('quikword', duration, startvalue, endvalue, 'linear', callback)
+end
+
+function newfont(font)
+	return gfx.font.new(font)
+end
+
+function drawtext(font, text, x, y, alignment)
+	if alignment ~= nil then
+		font:drawTextAligned(text, x, y, alignment)
+	else
+		font:drawText(text, x, y)
+	end
+end
+
+function textwidth(font, text)
+	return font:getTextWidth(text)
+end
+
+function newsound(sound)
+	return smp.new(sound)
+end
+
+-- Plays a sound (stopping the previous instance if already playing). Import peedee sound object
+function playsound(sound)
+	if save.sfx then
+		sound:stop()
+		sound:play()
+	end
+end
+
+-- Create a pool of up to five sound effects, randomly playing one of 'em. Import peedee sound objects
+function randomizesfx(sfx1, sfx2, sfx3, sfx4, sfx5, rate)
+	if save.sfx then
+		local sfc = 0
+		if sfx1 ~= nil then sfc += 1 end
+		if sfx2 ~= nil then sfc += 1 end
+		if sfx3 ~= nil then sfc += 1 end
+		if sfx4 ~= nil then sfc += 1 end
+		if sfx5 ~= nil then sfc += 1 end
+		local rand = math.random(1, sfc)
+		if rand == 1 then
+			sfx1:setRate(rate or 1)
+			playsound(sfx1)
+		elseif rand == 2 then
+			sfx2:setRate(rate or 1)
+			playsound(sfx2)
+		elseif rand == 3 then
+			sfx3:setRate(rate or 1)
+			playsound(sfx3)
+		elseif rand == 4 then
+			sfx4:setRate(rate or 1)
+			playsound(sfx4)
+		elseif rand == 5 then
+			sfx5:setRate(rate or 1)
+			playsound(sfx5)
+		end
+	end
+end
+
+-- Fades the music out, and trashes it when finished. Should be called alongside a scene change, only if the music is expected to change. Delay can set the delay (in seconds) of the fade
+function fademusic(delay)
+	delay = delay or 400
+	if music ~= nil then
+		music:setVolume(0, 0, delay / 1000, function()
+			music:stop()
+			music = nil
+		end)
+	end
+end
+
+function stopmusic()
+	if music ~= nil then
+		music:stop()
+		music = nil
+	end
+end
+
+-- New music track. This should be called in a scene's init, only if there's no track leading into it. File is a path to an audio file in the PDX. Loop, if true, will loop the audio file. Range will set the loop's starting range.
+function newmusic(file, loop, range)
+	if save.music and music == nil then -- If a music file isn't actively playing...then go ahead and set a new one.
+		music = pd.sound.fileplayer.new(file)
+		if loop then
+			music:setLoopRange(range or 0)
+			music:play(0)
+		else
+			music:play()
+			music:setFinishCallback(function()
+				music = nil
+			end)
+		end
+	end
+end
+
+function setcolor(color, alpha)
+	color = color or 'black'
+	alpha = alpha or 0
+	if color == 'black' then
+		gfx.setColor(gfx.kColorBlack)
+	elseif color == 'white' then
+		gfx.setColor(gfx.kColorWhite)
+	elseif color == 'clear' then
+		gfx.setColor(gfx.kColorClear)
+	end
+	if alpha ~= 0 and color ~= 'clear' then
+		gfx.setDitherPattern(alpha, gfx.image.kDitherTypeBayer4x4)
+	end
+end
+
+function drawrect(x, y, w, h, r)
+	r = r or 0
+	if r > 0 then
+		gfx.drawRoundRect(x, y, w, h, r)
+	else
+		gfx.drawRect(x, y, w, h)
+	end
+end
+
+function fillrect(x, y, w, h, r)
+	r = r or 0
+	if r > 0 then
+		gfx.fillRoundRect(x, y, w, h, r)
+	else
+		gfx.fillRect(x, y, w, h)
+	end
+end
+
+function gettime()
+	return pd.getTime()
+end
+
+function setinverted(dark)
+	pd.display.setInverted(dark)
+end
+
+function setredraw(new)
+	gfx.sprite.setAlwaysRedraw(new)
+	redraw = new
+end

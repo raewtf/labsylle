@@ -2,7 +2,6 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 local smp <const> = pd.sound.sampleplayer
-local text <const> = gfx.getLocalizedText
 local black <const> = gfx.kColorBlack
 local white <const> = gfx.kColorWhite
 local bayer4 <const> = gfx.image.kDitherTypeBayer4x4
@@ -21,10 +20,6 @@ function results:init(...)
 		gfx.sprite.setAlwaysRedraw(false)
 		redraw = false
 	end
-
-	-- TODO: add metadata at the end
-	-- in quik-word, show list of words completed
-	-- in packs, show puzzles completed? idk
 
 	function pd.gameWillPause()
 		local menu = pd.getSystemMenu()
@@ -82,6 +77,8 @@ function results:init(...)
 		if catalog then
 			pd.scoreboards.addScore('speed', vars.variable)
 		end
+		vars.scroll = 0
+		vars.scroll_max = -(25 + (14 * #quikwords_completed))
 	else
 		assets.packcomplete = smp.new('audio/sfx/packcomplete')
 		playsound(assets.packcomplete)
@@ -102,6 +99,8 @@ function results:init(...)
 	create_bg()
 
 	gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
+		local scroll = false
+		if vars.pack == 'speed' and vars.variable ~= 0 then scroll = true end
 		draw_bg()
 		gfx.setColor(white)
 		gfx.setDitherPattern(-((vars.fade.value - 0.75) * 4) + 1, bayer4)
@@ -109,7 +108,7 @@ function results:init(...)
 		gfx.setColor(white)
 		gfx.setDitherPattern(0.15, bayer4)
 		gfx.fillRoundRect(80, 63 + (vars.bump.value * 4), 240, 106, 5)
-		gfx.fillRoundRect(100, 190 + (vars.bump.value * 2), 200, 30, 5)
+		gfx.fillRoundRect(scroll and 80 or 100, 190 + (vars.bump.value * 2), scroll and 240 or 200, 30, 5)
 		gfx.setColor(black)
 		gfx.setDitherPattern(vars.fade.value, bayer4)
 		gfx.fillRect(0, 0, 45, 240)
@@ -117,14 +116,20 @@ function results:init(...)
 		gfx.setColor(black)
 		if vars.pack == 'speed' then
 			assets.cal:drawTextAligned('Time\'s Up!', 200, 11 - (vars.bump.value * 1.5), center)
+			gfx.setClipRect(80, 63 + (vars.bump.value * 4), 240, 106)
 			if vars.variable == 0 then
-				assets.discoteca:drawTextAligned('You didn\'t complete any rounds.', 200, 75 + (vars.bump.value * 4), center)
-				assets.discoteca:drawTextAligned('Did you forget to turn\nyour console off...?', 200, 101 + (vars.bump.value * 4), center)
+				assets.discoteca:drawTextAligned('You didn\'t beat any rounds.', 200, 75 + (vars.bump.value * 4) + vars.scroll, center)
+				assets.discoteca:drawTextAligned('Did you forget to turn\nyour console off...?', 200, 101 + (vars.bump.value * 4) + vars.scroll, center)
 			else
-				assets.discoteca:drawTextAligned('You made it up past Round...', 200, 77 + (vars.bump.value * 4), center)
-				assets.cal:drawTextAligned(commalize(vars.variable) .. '!', 200, 94 + (vars.bump.value * 4), center)
+				assets.discoteca:drawTextAligned('You made it up past Round...', 200, 77 + (vars.bump.value * 4) + vars.scroll, center)
+				assets.cal:drawTextAligned(commalize(vars.variable) .. '!', 200, 94 + (vars.bump.value * 4) + vars.scroll, center)
 			end
-			assets.discoteca:drawTextAligned(tostring(vars.best and 'That\'s a new best score!' or 'Your current best is ' .. save.quikwordbest .. tostring(save.quikwordbest == 1 and ' round.' or ' rounds.')), 200, 143 + (vars.bump.value * 4), center)
+			assets.discoteca:drawTextAligned(tostring(vars.best and 'That\'s a new best!' or 'Your best is ' .. save.quikwordbest .. tostring(save.quikwordbest == 1 and ' round.' or ' rounds.')), 200, 143 + (vars.bump.value * 4) + vars.scroll, center)
+			gfx.drawLine(140, 168 + (vars.bump.value * 4) + vars.scroll, 260, 168 + (vars.bump.value * 4) + vars.scroll)
+			for i = 1, #quikwords_completed do
+				assets[i == 1 and 'disco' or 'discoteca']:drawTextAligned(quikwords_completed[i], 200, 166 + (14 * i) + (vars.bump.value * 4) + vars.scroll, center)
+			end
+			gfx.clearClipRect()
 		else
 			assets.cal:drawTextAligned('Pack Complete!', 200, 11 - (vars.bump.value * 1.5), center)
 			assets.disco:drawTextAligned(vars.pack.name or '', 200, 75 + (vars.bump.value * 4), center)
@@ -134,8 +139,12 @@ function results:init(...)
 			assets.discoteca:drawTextAligned(vars.sayings[vars.randsaying], 200, 143 + (vars.bump.value * 4), center)
 		end
 		gfx.drawRoundRect(80, 63 + (vars.bump.value * 4), 240, 106, 5)
-		gfx.drawRoundRect(100, 190 + (vars.bump.value * 2), 200, 30, 5)
-		assets.disco:drawTextAligned('Ⓑ Back     Ⓐ Retry', 200, 198 + (vars.bump.value * 2), center)
+		gfx.drawRoundRect(scroll and 80 or 100, 190 + (vars.bump.value * 2), scroll and 240 or 200, 30, 5)
+		if scroll then
+			assets.disco:drawTextAligned('↕️/🎣 Scroll  Ⓑ Back  Ⓐ Retry', 200, 198 + (vars.bump.value * 2), center)
+		else
+			assets.disco:drawTextAligned('Ⓑ Back     Ⓐ Retry', 200, 198 + (vars.bump.value * 2), center)
+		end
 	end)
 
 	self:add()
@@ -144,5 +153,19 @@ end
 function results:update()
 	if vars.bump.timeLeft ~= 0 or vars.fade.timeLeft ~= 0 then
 		gfx.sprite.redrawBackground()
+	elseif vars.scroll ~= nil and vars.variable ~= 0 then
+		if pd.buttonIsPressed('up') then
+			vars.scroll += 2
+		end
+		if pd.buttonIsPressed('down') then
+			vars.scroll -= 2
+		end
+		vars.scroll += pd.getCrankChange()
+		if vars.scroll > 0 then vars.scroll = 0 end
+		if vars.scroll < vars.scroll_max then vars.scroll = vars.scroll_max end
+		if vars.lastscroll ~= vars.scroll then
+			gfx.sprite.addDirtyRect(80, 63 + (vars.bump.value * 4), 240, 106)
+		end
+		vars.lastscroll = vars.scroll
 	end
 end

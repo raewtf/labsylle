@@ -1,6 +1,5 @@
 -- TODO: make standard paks
 -- TODO: make tricky paks a bit tougher
--- TODO: remove tbds
 -- TODO: make shapes paks
 -- TODO: make maths paks
 
@@ -544,7 +543,7 @@ packs = {
 		}
 	}, -- places
 	{
-		name = 'School Supplies',
+		name = 'Supplies',
 		id = 'supplies',
 		subtitle = 'Standard Pak #8',
 		difficulty = 'Easy',
@@ -603,7 +602,7 @@ packs = {
 			}
 		}
 	}, -- supplies
-	{
+	--[[{
 		name = 'TBD',
 		id = 'tbd',
 		subtitle = 'Standard Pak #9',
@@ -672,7 +671,7 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- tbd
+	},]] -- tbd
 	{
 		name = 'Fun & Games',
 		id = 'games',
@@ -909,7 +908,7 @@ packs = {
 			}
 		}
 	}, -- shapes
-	{
+	--[[{
 		name = 'Animals II',
 		id = 'tbd',
 		subtitle = 'Standard Pak #13',
@@ -1008,7 +1007,7 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- animals2
+	},]] -- tbd
 	{
 		name = 'Automotive',
 		id = 'cars',
@@ -1413,7 +1412,7 @@ packs = {
 			}
 		}
 	}, -- food2
-	{
+	--[[{
 		name = 'World Sights',
 		id = 'tbd',
 		subtitle = 'Standard Pak #18',
@@ -1512,7 +1511,7 @@ packs = {
 		-- leaning tower of pisa (zza)
 		-- great pyramid of giza
 		-- TBD
-	}, -- worldwonders
+	},]] -- tbd
 	{
 		name = 'Television',
 		id = 'television',
@@ -1601,7 +1600,7 @@ packs = {
 			}
 		}
 	}, -- television
-	{
+	--[[{
 		name = 'Musical II',
 		id = 'tbd',
 		subtitle = 'Standard Pak #20',
@@ -1700,7 +1699,7 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, --musical2
+	},]] -- tbd
 	{
 		name = 'Technology',
 		id = 'tech',
@@ -1841,7 +1840,7 @@ packs = {
 			}
 		}
 	}, -- tech
-	{
+	--[[{
 		name = 'Prehistoric',
 		id = 'tbd',
 		subtitle = 'Standard Pak #22',
@@ -1970,8 +1969,8 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- prehistoric
-	{
+	},]] -- tbd
+	--[[{
 		name = 'Series of Tubes',
 		id = 'tbd',
 		subtitle = 'Standard Pak #23',
@@ -2101,8 +2100,8 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- internet
-	{
+	},]] -- tbd
+	--[[{
 		name = 'Photography',
 		id = 'tbd',
 		subtitle = 'Standard Pak #24',
@@ -2231,7 +2230,7 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- photography
+	},]] -- tbd
 	{
 		name = 'Periodic Table',
 		id = 'elements',
@@ -2343,7 +2342,7 @@ packs = {
 			}
 		}
 	}, -- elements
-	{
+	--[[{
 		name = 'TBD',
 		id = 'tbd',
 		subtitle = 'Standard Pak #26',
@@ -2472,8 +2471,8 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- tbd
-	{
+	},]] -- tbd
+	--[[{
 		name = 'Bones',
 		id = 'tbd',
 		subtitle = 'Standard Pak #27',
@@ -2602,8 +2601,8 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- bones
-	{
+	},]] -- tbd
+	--[[{
 		name = 'Scientific Names',
 		id = 'tbd',
 		subtitle = 'Standard Pak #28',
@@ -2732,8 +2731,8 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- latinnames
-	{
+	},]] -- tbd
+	--[[{
 		name = 'TBD',
 		id = 'tbd',
 		subtitle = 'Standard Pak #29',
@@ -2862,8 +2861,8 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- tbd
-	{
+	},]] -- tbd
+	--[[{
 		name = 'TBD',
 		id = 'tbd',
 		subtitle = 'Standard Pak #30',
@@ -2992,7 +2991,7 @@ packs = {
 		-- TBD
 		-- TBD
 		-- TBD
-	} -- tbd
+	}]] -- tbd
 }
 
 bonus = {
@@ -3034,7 +3033,7 @@ bonus = {
 				}
 			}
 		}
-	},
+	}, -- shapes_simple
 	{
 		name = 'Spicier Shapes',
 		id = 'shapes_spice',
@@ -3069,10 +3068,13 @@ bonus = {
 				target = {
 					{'none00 love00', 'love00 plus00', 'plus00 ring00', 'ring00 plus00', 'plus00 star00', 'star00 none00', 'plus00 plus00'}
 				},
-				impostor = true
+				impostor = true,
+				tilevis = {
+					parallax = 20
+				}
 			}
 		}
-	},
+	}, -- shapes_spice
 	{
 		name = 'Take Sides',
 		id = 'shapes_sides',
@@ -3096,7 +3098,10 @@ bonus = {
 				target = {
 					{'none00 pent00', 'pent00 hexa00', 'hexa00 sept00', 'sept00 hexa00', 'hexa00 pent00', 'pent00 none00', 'squa00 sept00'}
 				},
-				impostor = true
+				impostor = true,
+				tilevis = {
+					parallax = 20
+				}
 			},
 			{
 				target = {
@@ -3109,7 +3114,7 @@ bonus = {
 				}
 			}
 		}
-	},
+	}, -- shapes_sides
 	{
 		name = 'Polygons Only',
 		id = 'shapes_polygons',
@@ -3147,7 +3152,7 @@ bonus = {
 				}
 			}
 		}
-	},
+	}, -- shapes_polygons
 	{
 		name = 'Intro to "Colors"',
 		id = 'shapes_colors',
@@ -3184,7 +3189,7 @@ bonus = {
 				}
 			}
 		}
-	},
+	}, -- shapes_colors
 	{
 		name = 'Card Stock',
 		id = 'shapes_cards',
@@ -3221,10 +3226,10 @@ bonus = {
 				}
 			},
 		}
-	},
+	}, -- shapes_cards
 	{
-		name = 'Wraparound',
-		id = 'shapes_wrap',
+		name = '',
+		id = 'shapes_tbd',
 		subtitle = 'Shapes Pak #7',
 		difficulty = 'Difficult',
 		contains_impostors = false,
@@ -3233,9 +3238,8 @@ bonus = {
 		puzzles = {
 			{
 				target = {
-					{'circ00 squa00', 'squa00 tria00', 'tria00 circ00'},
-				},
-				text = 'This pack acts a little bit differently.\n\nHere, make sure the ends of each puzzle "wrap\naround", and meet up with each other.'
+					{''}
+				}
 			},
 			{
 				target = {
@@ -3263,7 +3267,7 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
+	}, -- shapes_tbd
 	{
 		name = 'Mind the Gap',
 		id = 'shapes_gap',
@@ -3271,16 +3275,17 @@ bonus = {
 		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
-		shapes_used = {''},
+		shapes_used = {'circ', 'squa', 'tria', 'star'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 squa00', 'squa00 none00', 'none00 tria00', 'tria00 squa00', 'squa00 none00'},
+					{'none00 tria00', 'tria00 squa00', 'squa00 none00', 'none00 circ00', 'circ00 squa00', 'squa00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 star00', 'star00 none00', 'none00 star00', 'star00 none00', 'none00 star00', 'star00 none00'},
 				}
 			},
 			{
@@ -3299,12 +3304,10 @@ bonus = {
 				}
 			}
 		}
+		-- circ99 circ75 circ50 circ25 circ00 none
 		-- TBD
 		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},
+	}, -- shapes_gap
 	{
 		name = 'More "Colors"!',
 		id = 'shapes_morecolors',
@@ -3312,7 +3315,7 @@ bonus = {
 		difficulty = 'Difficult',
 		contains_impostors = true,
 		contains_bombs = false,
-		shapes_used = {''},
+		shapes_used = {'circ', 'ring', 'oval', 'hexa', 'love', 'star', 'tria', 'zoid', 'squa', 'rect'},
 		puzzles = {
 			{
 				target = {
@@ -3342,7 +3345,7 @@ bonus = {
 				}
 			}
 		}
-	},
+	}, -- shapes_morecolors
 	{
 		name = 'Together Now!',
 		id = 'shapes_all',
@@ -3383,8 +3386,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	}, -- shapes_all
+	--[[{
 		name = 'Basic Addition',
 		id = 'math_add',
 		subtitle = 'Math Pak #1',
@@ -3404,7 +3407,13 @@ bonus = {
 			},
 			{
 				target = {
-					{''}
+					{'3', '+', '4', '=', '7'},
+					{'4', '+', '3', '=', '7'},
+					{'7', '=', '3', '+', '4'},
+					{'7', '=', '4', '+', '3'}
+				},
+				tilevis = {
+					font = 'doubledisco'
 				}
 			},
 			{
@@ -3427,8 +3436,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	},]] -- math_add
+	--[[{
 		name = 'Basic Subtraction',
 		id = 'math_subtract',
 		subtitle = 'Math Pak #2',
@@ -3467,8 +3476,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	},]] -- math_subtract
+	--[[{
 		name = 'Basic Multiplication',
 		id = 'math_multiply',
 		subtitle = 'Math Pak #3',
@@ -3507,8 +3516,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	},]] -- math_multiply
+	--[[{
 		name = 'Basic Division',
 		id = 'math_divide',
 		subtitle = 'Math Pak #4',
@@ -3547,8 +3556,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	},]] -- math_divide
+	--[[{
 		name = 'Decimal Addition',
 		id = 'math_decimaladd',
 		subtitle = 'Math Pak #5',
@@ -3587,8 +3596,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	},]] -- math_decimaladd
+	--[[{
 		name = 'Fractional Division',
 		id = 'math_fractiondivide',
 		subtitle = 'Math Pak #6',
@@ -3627,10 +3636,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
-		name = '',
-		id = '',
+	},]] -- math_fractiondivide
+	--[[{
+		name = 'TBD',
+		id = 'math_tbd',
 		subtitle = 'Math Pak #7',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3667,10 +3676,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
-		name = '',
-		id = '',
+	},]] -- math_tbd
+	--[[{
+		name = 'TBD',
+		id = 'math_tbd',
 		subtitle = 'Math Pak #8',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3707,8 +3716,8 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
+	},]] -- math_tbd
+	--[[{
 		name = 'Algebraic',
 		id = 'math_algebra',
 		subtitle = 'Math Pak #9',
@@ -3747,10 +3756,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},
-	{
-		name = 'Polynomials',
-		id = 'math_polynomials',
+	},]] -- math_algebra
+	--[[{
+		name = 'TBD',
+		id = 'math_tbd',
 		subtitle = 'Math Pak #10',
 		difficulty = 'Very Tough',
 		contains_impostors = false,
@@ -3787,7 +3796,7 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}
+	}]] -- math_tbd
 }
 
 quikwords = {

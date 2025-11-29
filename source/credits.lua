@@ -1,43 +1,67 @@
--- Setting up consts
-local pd <const> = playdate
-local gfx <const> = pd.graphics
-local smp <const> = pd.sound.sampleplayer
-local text <const> = gfx.getLocalizedText
-local black <const> = gfx.kColorBlack
-local white <const> = gfx.kColorWhite
-local bayer4 <const> = gfx.image.kDitherTypeBayer4x4
-local center <const> = kTextAlignment.center
-local right <const> = kTextAlignment.right
+local pd
+local gfx
+local black
+local white
+local bayer4
+local center
+local right
 
-class('credits').extends(gfx.sprite) -- Create the scene's class
-function credits:init(...)
-	credits.super.init(self)
-	local args = {...} -- Arguments passed in through the scene management will arrive here
-	-- Should this scene redraw the sprites constantly?
-	if save.menubg then
-		gfx.sprite.setAlwaysRedraw(true)
-		redraw = true
-	else
-		gfx.sprite.setAlwaysRedraw(false)
-		redraw = false
+if platform == 'peedee' then
+	pd = playdate
+	gfx = pd.graphics
+	black = gfx.kColorBlack
+	white = gfx.kColorWhite
+	bayer4 = gfx.image.kDitherTypeBayer4x4
+	center = kTextAlignment.center
+	right = kTextAlignment.right
+
+	class('credits').extends(gfx.sprite)
+	function credits:init(...)
+		credits.super.init(self)
+		local args = {...} -- Arguments passed in through the scene management will arrive here
+
+		if save.menubg then setredraw(true) else setredraw(false) end
+
+		function pd.gameWillPause()
+			local menu = pd.getSystemMenu()
+			menu:removeAllMenuItems()
+		end
+
+		self:initialize(args)
+		gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
+			self:draw()
+		end)
+
+		self:add()
 	end
+elseif platform == 'love' then
+	gfx = love.graphics
+	black = love.math.colorFromBytes(0, 0, 0, 1)
+	white = love.math.colorFromBytes(1, 1, 1, 1)
+	center = 'center'
+	right = 'right'
 
-	function pd.gameWillPause()
-		local menu = pd.getSystemMenu()
-		menu:removeAllMenuItems()
+	credits = {}
+	function credits:enter(current, ...)
+		love.window.setTitle('Labsylle — Credits')
+		local args = {...} -- Arguments passed in through the scene management will arrive here
+
+		self:initialize(args)
 	end
+end
 
+function credits:initialize(args)
 	assets = {
-		disco = gfx.font.new('fonts/disco'),
-		discoteca = gfx.font.new(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
-		cal = gfx.font.new('fonts/cal'),
-		swish = smp.new('audio/sfx/swish'),
-		block1 = smp.new('audio/sfx/block1'),
-		block2 = smp.new('audio/sfx/block2'),
-		block3 = smp.new('audio/sfx/block3'),
-		block4 = smp.new('audio/sfx/block4'),
-		block5 = smp.new('audio/sfx/block5'),
-		pop = smp.new('audio/sfx/pop'),
+		disco = newfont('fonts/disco'),
+		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
+		cal = newfont('fonts/cal'),
+		swish = newsound('audio/sfx/swish'),
+		block1 = newsound('audio/sfx/block1'),
+		block2 = newsound('audio/sfx/block2'),
+		block3 = newsound('audio/sfx/block3'),
+		block4 = newsound('audio/sfx/block4'),
+		block5 = newsound('audio/sfx/block5'),
+		pop = newsound('audio/sfx/pop'),
 	}
 
 	vars = {
@@ -45,78 +69,82 @@ function credits:init(...)
 		bump = 0,
 		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, & Voxy'}, {thing = 'Quik-Word List', name = 'Gaute Solheim'}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
 		credits2 = {{thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = '& Toad'}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
+		handler = '',
+		credits3 = {{thing = 'todo', name = 'write löve stuff'}},
+		handler = 'credits'
 	}
-	vars.creditsHandlers = {
-		leftButtonDown = function()
-			if vars.page > 1 then
-				vars.page -= 1
-				playsound(assets.swish)
-				gfx.sprite.redrawBackground()
-			else
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
-			end
-		end,
-
-		rightButtonDown = function()
-			if vars.page < 2 then
-				vars.page += 1
-				playsound(assets.swish)
-				gfx.sprite.redrawBackground()
-			else
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
-			end
-		end,
-
-		BButtonDown = function()
-			playsound(assets.pop)
-			scenemanager:transitionscene(title, false, 5)
-		end,
-	}
-	if scenemanager.transitioning then
-		vars.handlerdelay = pd.timer.performAfterDelay(scenemanager.transitiontime, function()
-			pd.inputHandlers.push(vars.creditsHandlers)
-		end)
-	else
-		pd.inputHandlers.push(vars.creditsHandlers)
-	end
 
 	create_bg()
-
-	gfx.sprite.setBackgroundDrawingCallback(function(x, y, width, height)
-		draw_bg()
-		gfx.setColor(white)
-		gfx.setDitherPattern(0.15, bayer4)
-		gfx.fillRoundRect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
-		gfx.fillRoundRect(100, 200, 200, 30, 5)
-		gfx.setColor(black)
-		gfx.setDitherPattern(0.75, bayer4)
-		gfx.fillRect(0, 0, 60, 240)
-		gfx.fillRect(340, 0, 60, 240)
-		gfx.setColor(black)
-		assets.cal:drawTextAligned('Credits', 200, 3, center)
-		for i = 1, #vars['credits' .. vars.page] do
-			assets.discoteca:drawText(vars['credits' .. vars.page][i].thing, 90, 39 + (14 * i))
-			assets.disco:drawTextAligned(vars['credits' .. vars.page][i].name, 310, 39 + (14 * i), right)
-		end
-		gfx.drawRoundRect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
-		gfx.drawRoundRect(100, 200, 200, 30, 5)
-		assets.disco:drawTextAligned('↔️ Move     Ⓑ Back', 200, 208, center)
-	end)
-
-	self:add()
 end
 
 function credits:update()
-	vars.bump -= vars.bump * 0.4
+	if platform == 'peedee' then
+		if pd.buttonJustPressed('left') then
+			self:keypressed('left')
+		elseif pd.buttonJustPressed('right') then
+			self:keypressed('right')
+		elseif pd.buttonJustPressed('b') then
+			self:keypressed('b')
+		end
+	end
+
+	vars.bump = vars.bump - (vars.bump * 0.4)
 	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
 		vars.bump = 0
 	end
 
-	if not redraw then
+	if platform == 'peedee' and not redraw then
 		if vars.bump ~= 0 then
 			gfx.sprite.redrawBackground()
 		end
 	end
 end
+
+function credits:draw()
+	draw_bg()
+	setcolor('white', 0.15)
+	fillrect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
+	fillrect(100, 200, 200, 30, 5)
+	setcolor('black', 0.75)
+	fillrect(0, 0, 60, 240)
+	fillrect(340, 0, 60, 240)
+	setcolor()
+	drawtext(assets.cal, 'Credits', 200, 3, center)
+	for i = 1, #vars['credits' .. vars.page] do
+		drawtext(assets.discoteca, vars['credits' .. vars.page][i].thing, 90, 39 + (14 * i))
+		drawtext(assets.disco, vars['credits' .. vars.page][i].name, 310, 39 + (14 * i), right)
+	end
+	drawrect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
+	drawrect(100, 200, 200, 30, 5)
+	drawtext(assets.disco, '↔️ Move     Ⓑ Back', 200, 208, center)
+
+	drawontop()
+end
+
+function credits:keypressed(button)
+	if vars.handler ~= 'credits' then return end
+	if button == (platform == 'peedee' and 'left' or platform == 'love' and save.left) then
+		if vars.page > 1 then
+			vars.page = vars.page - 1
+			playsound(assets.swish)
+			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+		else
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		end
+	elseif button == (platform == 'peedee' and 'right' or platform == 'love' and save.right) then
+		if vars.page < (platform == 'peedee' and 2 or platform == 'love' and 3) then
+			vars.page = vars.page + 1
+			playsound(assets.swish)
+			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+		else
+			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			vars.bump = -3
+		end
+	elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
+		playsound(assets.pop)
+		scenemanager:transitionscene(title, false, 5)
+	end
+end
+
+if platform == 'love' then return credits end
