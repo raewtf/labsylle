@@ -1,15 +1,15 @@
 local pd
 local gfx
-local bayer4
 local center
 local right
+
+-- TODO: add way to delete pack progress that works on PC and peedee
 
 if platform == 'peedee' then
 	import 'game'
 
 	pd = playdate
 	gfx = pd.graphics
-	bayer4 = gfx.image.kDitherTypeBayer4x4
 	center = kTextAlignment.center
 	right = kTextAlignment.right
 
@@ -28,7 +28,7 @@ if platform == 'peedee' then
 					table.remove(save[pack[vars.selection].id], 1)
 				end
 				save[pack[vars.selection].id] = nil
-				assets['packtext' .. vars.selection]:clear(clear)
+				assets['packtext' .. vars.selection]:clear(gfx.kColorClear)
 				gfx.lockFocus(assets['packtext' .. vars.selection])
 					packselect:drawpacktext(vars.selection)
 				gfx.unlockFocus()
@@ -49,7 +49,7 @@ if platform == 'peedee' then
 		self:add()
 	end
 elseif platform == 'love' then
-	-- game = require 'game'
+	game = require 'game'
 
 	gfx = love.graphics
 	center = 'center'
@@ -66,8 +66,8 @@ end
 
 function packselect:initialize(args)
 	assets = {
-		disco = newfont('fonts/disco'),
-		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
+		disco = newfont('fonts/disco', '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-'),
+		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓'),
 		mask = newimage('images/mask'),
 		bomb = newimage('images/bomb'),
 		swish = newsound('audio/sfx/swish'),
@@ -97,14 +97,21 @@ function packselect:initialize(args)
 			vars.selection = i
 		end
 		if platform == 'peedee' then
-			assets['packtext' .. i] = gfx.image.new(360, 50)
+			assets['packtext' .. i] = newimage(360, 50)
 			gfx.lockFocus(assets['packtext' .. i])
 				packselect:drawpacktext(i)
 			gfx.unlockFocus()
 		elseif platform == 'love' then
 			assets['packtext' .. i] = gfx.newCanvas(360, 50)
 			gfx.setCanvas(assets['packtext' .. i])
+				gfx.push()
+				local sx, sy, sw, sh = gfx.getScissor()
+				gfx.setScissor()
+				gfx.origin()
+				gfx.clear()
 				packselect:drawpacktext(i)
+				gfx.setScissor(sx, sy, sw, sh)
+				gfx.pop()
 			gfx.setCanvas()
 		end
 	end
@@ -125,6 +132,7 @@ function packselect:drawpack(i)
 	if vars.selection == i then gfx.setLineWidth(2) end
 	setcolor('white')
 	drawimage(assets['packtext' .. i], 0, -55 + (55 * i) + vars.scroll)
+	setcolor()
 end
 
 function packselect:drawpacktext(i)
@@ -137,12 +145,14 @@ function packselect:drawpacktext(i)
 	end
 	drawtext(assets.discoteca, (pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'), 20, 35)
 	local len = textwidth(assets.discoteca, (pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' puzzle' or ' puzzles'))
+	setcolor('white')
 	if pack[i].contains_impostors then
 		drawimage(assets.mask, 22 + len, 37)
 	end
 	if pack[i].contains_bombs then
 		drawimage(assets.bomb, 23 + (pack[i].contains_impostors and 38 or 0) + len, 37)
 	end
+	setcolor()
 	if save[pack[i].id] ~= nil then
 		if save[pack[i].id].status ~= nil then
 			if save[pack[i].id].status == 'in_progress' then
@@ -270,16 +280,19 @@ function packselect:draw()
 end
 
 function packselect:keypressed(button)
+	if vars.handler ~= 'packselect' then return end
 	if button == (platform == 'peedee' and 'up' or platform == 'love' and save.up) then
 		if vars.selection > 1 then
 			vars.selection = vars.selection - 1
 			packselect:scroll(true)
 			playsound(assets.swish)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			rumble(0.3, 0.3, 0.025)
 		else
 			vars.scroll = vars.scroll + 10
 			vars.sellerp = vars.sellerp - 1
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'down' or platform == 'love' and save.down) then
 		if vars.selection < #pack then
@@ -287,10 +300,12 @@ function packselect:keypressed(button)
 			packselect:scroll(true)
 			playsound(assets.swish)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			rumble(0.3, 0.3, 0.025)
 		else
 			vars.scroll = vars.scroll - 10
 			vars.sellerp = vars.sellerp + 1
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 		if pack[1] == packs[1] then
@@ -299,6 +314,7 @@ function packselect:keypressed(button)
 			scenemanager:transitionscene(title, false, 3)
 		end
 		playsound(assets.pop)
+		rumble(0.3, 0.3, 0.025)
 	elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
 		if pack[vars.selection].puzzles ~= nil and #pack[vars.selection].puzzles > 0 then
 			fademusic()
@@ -315,9 +331,11 @@ function packselect:keypressed(button)
 					scenemanager:switchscene(game, pack[vars.selection], 1)
 				end
 			end)
+			rumble(0.3, 0.3, 0.025)
 		else
 			vars.bump = -3
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+			rumble(0.1, 0.1, 0.025)
 		end
 	end
 end

@@ -1,16 +1,3 @@
-loadingimages = {
-	loading4 = newimage('images/loading/loading4'),
-	loading3 = newimage('images/loading/loading3'),
-	loading2 = newimage('images/loading/loading2'),
-	loading1 = newimage('images/loading/loading1'),
-	loading0 = newimage('images/loading/loading0'),
-	loading4d = newimage('images/loading/loading4d'),
-	loading3d = newimage('images/loading/loading3d'),
-	loading2d = newimage('images/loading/loading2d'),
-	loading1d = newimage('images/loading/loading1d'),
-	loading0d = newimage('images/loading/loading0d')
-}
-
 transitiontime = 300
 transitioning = false
 transition = {}
@@ -114,21 +101,20 @@ function scenemanager:cleanupscene()
 		end
 		gfx.setDrawOffset(0, 0) -- Lastly, reset the drawing offset. just in case.
 	elseif platform == 'love' then
-		-- TODO: don't clear quikword
 		timer.clear()
 	end
     if assets ~= nil then
         for i = 1, #assets do
             assets[i] = nil
         end
-        assets = nil -- Nil all the assets,
     end
+    assets = {} -- Nil all the assets,
     if vars ~= nil then
         for i = 1, #vars do
             vars[i] = nil
         end
     end
-    vars = nil -- and nil all the variables.
+    vars = {} -- and nil all the variables.
     collectgarbage('collect') -- and collect the garbage.
 end
 

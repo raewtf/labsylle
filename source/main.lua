@@ -1,7 +1,7 @@
--- TODO: add achievements on peedee
--- TODO: daily seeded quik-word?
+-- NOTE: add achievements on peedee
+-- NOTE: daily seeded quik-word?
 -- TODO: write manual
--- TODO: statistics menu
+-- NOTE: statistics menu
 	-- Total words found (exclude shapes and math)
 	-- Paks completed (how many times is "complete" found in the save table?)
 	-- Quik-Word games played
@@ -10,10 +10,13 @@
 	-- Time spent playing
 	-- Time spent in Quik-Word
 	-- Time spent in paks
--- TODO: solver/optimum swaps finder function, that returns a number
+-- NOTE: solver/optimum swaps finder function, that returns a number
+-- TODO: randomization that remains consistent between love/peedee
+-- TODO: optimize a biiit on peedee
+-- TODO: invert screen when dark mode is on, in love
 
 -- Build target. 'peedee' or 'love'
-platform = 'peedee'
+platform = 'love'
 local fps = 30
 
 local pd
@@ -23,8 +26,11 @@ local white
 local gamepad
 local scale
 local fullscreen
+local disco
+local center
 
 music = nil
+volume = 1
 quit = 0
 
 local random = math.random
@@ -72,14 +78,13 @@ elseif platform == 'love' then
 
 	scenemanager = require 'scenemanager'
 
-	packs, bonus, quikword = require 'packs'
+	packs, bonus, quikword = require 'packs' ()
 
 	title = require 'title'
 
 	gfx = love.graphics
 	black = love.math.colorFromBytes(0, 0, 0, 1)
 	white = love.math.colorFromBytes(1, 1, 1, 1)
-	gamepad = false
 	fullscreen = false
 
 	version = '1.0.0b2'
@@ -90,10 +95,26 @@ elseif platform == 'love' then
 	love.keyboard.setKeyRepeat(false)
 
 	icon = love.image.newImageData('images/system/icon.png')
+	disco = newfont('fonts/disco', '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-')
+	center = 'center'
 end
 
 pack = nil
 redraw = false
+
+-- loading images for scene transitions
+loadingimages = {
+	loading4 = newimage('images/loading/loading4'),
+	loading3 = newimage('images/loading/loading3'),
+	loading2 = newimage('images/loading/loading2'),
+	loading1 = newimage('images/loading/loading1'),
+	loading0 = newimage('images/loading/loading0'),
+	loading4d = newimage('images/loading/loading4d'),
+	loading3d = newimage('images/loading/loading3d'),
+	loading2d = newimage('images/loading/loading2d'),
+	loading1d = newimage('images/loading/loading1d'),
+	loading0d = newimage('images/loading/loading0d')
+}
 
 gfx.setLineWidth(2)
 
@@ -102,6 +123,8 @@ bgblock_large = newimagetable('bgblock_large', 'images/bgblock_large', 30, 30, 3
 bgblock_small = newimagetable('bgblock_small', 'images/bgblock_small', 18, 18, 360)
 
 quikwordtimer(1, 60000, 60000, nil)
+quikwordgroup = {}
+quikwordpaused = true
 quikwords_completed = {'Quik-Words Seen:'}
 
 -- Save check
@@ -121,13 +144,16 @@ function savecheck()
 	elseif platform == 'love' then
 		save.scale = save.scale or 1
 		if save.gamepad == nil then save.gamepad = false end
+		gamepad = save.gamepad
 
 		save.up = save.up or 'up'
 		save.down = save.down or 'down'
 		save.left = save.left or 'left'
 		save.right = save.right or 'right'
-		save.primary = save.primary or 'z'
-		save.secondary = save.secondary or 'x'
+		save.primary = save.primary or 'a'
+		save.secondary = save.secondary or 'b'
+
+		save.color = save.color or 1
 
 		if save.clean_scaling == nil then save.clean_scaling = true end
 		if save.rumble == nil then save.rumble = true end
@@ -171,6 +197,8 @@ function resetsave(keepoptions, keepquikword)
 			newsave.primary = save.primary
 			newsave.secondary = save.secondary
 
+			newsave.color = save.color
+
 			newsave.clean_scaling = save.clean_scaling
 			newsave.rumble = save.rumble
 		end
@@ -201,6 +229,8 @@ function resetsave(keepoptions, keepquikword)
 			save.right = 'right'
 			save.primary = 'z'
 			save.secondary = 'x'
+
+			save.color = 1
 
 			save.clean_scaling = true
 			save.rumble = true
@@ -236,7 +266,7 @@ function resetsave(keepoptions, keepquikword)
 	create_bg()
 	setredraw(true)
 	setinverted(isdarkmode())
-	assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca')
+	assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓')
 end
 
 if platform == 'peedee' then
@@ -305,13 +335,15 @@ end
 function draw_bg(game)
 	if bgblocks[1] == nil or (not game and not save.menubg) then return end
 	for i = 1, 10 do
-		bgblocks[i].y = bgblocks[i].y + (bgblocks[i].fallspeed / 20)
-		if bgblocks[i].y >= 260 then
-			bgblocks[i].y = -40
-		end
-		bgblocks[i].rotation = bgblocks[i].rotation + bgblocks[i].rotspeed
-		if bgblocks[i].rotation >= 360 then
-			bgblocks[i].rotation = 1
+		if not vars.paused then
+			bgblocks[i].y = bgblocks[i].y + (bgblocks[i].fallspeed / 20)
+			if bgblocks[i].y >= 260 then
+				bgblocks[i].y = -40
+			end
+			bgblocks[i].rotation = bgblocks[i].rotation + bgblocks[i].rotspeed
+			if bgblocks[i].rotation >= 360 then
+				bgblocks[i].rotation = 1
+			end
 		end
 		drawimagetable('bgblock_' .. bgblocks[i].size, floor(bgblocks[i].rotation), bgblocks[i].x, bgblocks[i].y)
 	end
@@ -347,15 +379,6 @@ function isdarkmode()
 	end
 end
 
--- Shuffly code from https://gist.github.com/Uradamus/10323382
-function shuffle(tbl)
-  	for i = #tbl, 2, -1 do
-		local j = math.random(i)
-		tbl[i], tbl[j] = tbl[j], tbl[i]
-    end
-  	return tbl
-end
-
 if platform == 'peedee' then
 	function pd.gameWillTerminate()
 		suspend()
@@ -367,12 +390,18 @@ if platform == 'peedee' then
 		savegame()
 	end
 
+	function rumble()
+		-- noop
+	end
+
 	scenemanager:switchscene(title, true)
 
 	function pd.update()
 		-- Catch-all stuff ...
 		gfx.sprite.update()
 		pd.timer.updateTimers()
+
+		pd.drawFPS(0, 0)
 
 		-- Automatic dark mode
 		local hour = gettime().hour
@@ -406,13 +435,29 @@ elseif platform == 'love' then
 	end
 
 	function love.keypressed(key)
-		gamepad = false
 		save.gamepad = gamepad
+		gamepad = false
 		if key == 'escape' and vars ~= nil then
-			quit = quit + 1
-			vars.quit_timer = timer.after(2, function() quit = 0 end)
-			if quit == 2 then
-				love.event.quit()
+			if vars.playing ~= nil then
+				if vars.paused then
+					game:unpause()
+				else
+					game:pause()
+				end
+			elseif vars.handler == 'remap' then
+				options:restorebuttons()
+				playsound(assets.pop)
+				vars.remap_step = 1
+				vars.handler = 'options'
+				savegame()
+			else
+				quit = quit + 1
+				afterdelay('quittimer', 2000, function()
+					quit = 0
+				end)
+				if quit == 2 then
+					love.event.quit()
+				end
 			end
 		end
 		if key == 'f11' then
@@ -441,8 +486,13 @@ elseif platform == 'love' then
 				key = save.secondary
 			end
 			gamepad = true
-			save.gamepad = gamepad
 			love.keypressed(key)
+		end
+	end
+
+	function rumble(left, right, duration)
+		if save.rumble and save.gamepad and current_joystick:isVibrationSupported() then
+			current_joystick:setVibration(left, right, duration)
 		end
 	end
 
@@ -481,26 +531,27 @@ elseif platform == 'love' then
 		next_time = love.timer.getTime()
 
 		rescale(save.scale)
-		gamestate.registerEvents()
 		scenemanager:switchscene(title, true)
+		gamestate.registerEvents()
 	end
 
 	function love.update(dt)
 		next_time = next_time + min_dt
 
 		if vars ~= nil and not vars.paused then
-			timer.update(dt)
 			timer.update(dt, transition)
+			timer.update(dt)
+			timer.update(dt, quikwordgroup)
 		end
 
 		if music ~= nil then
-			music:setVolume(volume[1])
+			music:setVolume(volume)
 			if not music:isPlaying() then music = nil end
 		end
 	end
 
 	function love.draw()
-		gfx.clear(0.5, 0.5, 0.5, 1)
+		gfx.clear(0, 0, 0, 1)
 		gfx.setColor(1, 1, 1, 1)
 
 		local lbw = false
@@ -521,13 +572,42 @@ elseif platform == 'love' then
 	end
 
 	function drawontop()
+		if quit > 0 then
+			setcolor('white')
+			fillrect(0, 0, 400, 25)
+			setcolor()
+			drawline(0, 25, 400, 25)
+			drawtext(disco, save.gamepad and 'Press Start again to quit. See ya later!' or 'Press ESC again to quit. See ya later!', 200, 5, 'center')
+		end
+
 		if vars.transition ~= nil and value('transition') > 0 then
 			setcolor('white', (-value('transition') + 5))
-			drawimage(loadingimages.loading4, 0, 0)
+			drawimage(loadingimages['loading4' .. tostring(isdarkmode() and 'd' or '')], 0, 0)
 		end
 		setcolor()
 
 		gfx.setScissor()
+
+		if save.color == 2 then
+			gfx.setColor(0.53, 0.5, 0.48, 0.5)
+			fillrect(0, 0, 400, 240)
+			setcolor()
+		elseif save.color == 3 then
+			gfx.setColor(0.2, 0.5, 0.1, 1)
+			gfx.setBlendMode('screen', 'premultiplied')
+			fillrect(0, 0, 400, 240)
+			gfx.setColor(0.5, 0.85, 0.2, 1)
+			gfx.setBlendMode('multiply', 'premultiplied')
+			fillrect(0, 0, 400, 240)
+			gfx.setBlendMode('alpha', 'alphamultiply')
+			setcolor()
+		elseif save.color == 4 then
+			gfx.setColor(0.9, 0.5, 0, 1)
+			gfx.setBlendMode('screen', 'premultiplied')
+			fillrect(0, 0, 400, 240)
+			gfx.setBlendMode('alpha', 'alphamultiply')
+			setcolor()
+		end
 
 		local cur_time = love.timer.getTime()
 		if next_time <= cur_time then

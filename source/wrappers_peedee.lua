@@ -6,12 +6,20 @@ function savegame()
 	pd.datastore.write(save)
 end
 
-function newimage(image)
-	return gfx.image.new(image)
+function newimage(image, y)
+	if y ~= nil then
+		return gfx.image.new(image, y)
+	else
+		return gfx.image.new(image)
+	end
 end
 
-function drawimage(image, x, y)
-	image:draw(x, y)
+function drawimage(image, x, y, flip)
+	local flipp
+	if flip == 'flipx' then
+		flipp = gfx.kImageFlippedX
+	end
+	image:draw(x, y, flip)
 end
 
 function newimagetable(name, table, width, height, cells)
@@ -23,21 +31,29 @@ function drawimagetable(name, index, x, y)
 end
 
 function newtimer(name, duration, startvalue, endvalue, easing, callback)
-	if vars ~= nil then
-		vars[name] = pd.timer.new(duration, startvalue, endvalue, easing ~= nil and pd.easingFunctions[easing] or pd.easingFunctions.linear)
-		vars[name].discardOnCompletion = false
-		vars[name].timerEndedCallback = callback or nil
-	end
+	vars[name] = pd.timer.new(duration, startvalue, endvalue, easing ~= nil and pd.easingFunctions[easing] or pd.easingFunctions.linear)
+	vars[name].discardOnCompletion = false
+	vars[name].timerEndedCallback = callback or nil
 end
 
-function afterdelay(name, duration, callback)
-	if vars ~= nil then
-		vars[name] = pd.timer.performAfterDelay(duration, callback)
+function timerendedcallback(name, callback)
+	vars[name].timerEndedCallback = callback or nil
+end
+
+function timeleft(name)
+	if vars[name] ~= nil then
+		return vars[name].timeLeft
+	else
+		return 0
 	end
 end
 
 function value(name)
-	return vars[name].value
+	if vars[name] ~= nil then
+		return vars[name].value
+	else
+		return 0
+	end
 end
 
 function resettimer(name, duration, startvalue, endvalue, easing, callback)
@@ -69,14 +85,53 @@ function resettimer(name, duration, startvalue, endvalue, easing, callback)
 	self.timerEndedCallback = callback or self.timerEndedCallback
 end
 
+function loopingtimer(name, duration, startvalue, endvalue, easing, callback)
+	newtimer(name, duration, startvalue, endvalue, easing, callback)
+	if vars[name] ~= nil then
+		vars[name].repeats = true
+	end
+end
+
+function delaytimer(name, delay, duration, startvalue, endvalue, easing, callback)
+	newtimer(name, duration, startvalue, endvalue, easing, callback)
+	if vars[name] ~= nil then
+		vars[name].delay = delay
+	end
+end
+
+function afterdelay(name, duration, callback)
+	if vars ~= nil then
+		vars[name] = pd.timer.performAfterDelay(duration, callback)
+	end
+end
+
 function quikwordtimer(duration, startvalue, endvalue, callback)
 	quikword = pd.timer.new(duration, startvalue, endvalue, pd.easingFunctions.linear)
 	quikword.discardOnCompletion = false
 	quikword.timerEndedCallback = callback or nil
+	quikwordpaused = false
 end
 
 function resetquikword(duration, startvalue, endvalue, callback)
 	resettimer('quikword', duration, startvalue, endvalue, 'linear', callback)
+end
+
+function pausequikword()
+	quikword:pause()
+	quikwordpaused = true
+end
+
+function startquikword()
+	quikword:start()
+	quikwordpaused = false
+end
+
+function quikwordtimeleft()
+	return quikword.timeLeft
+end
+
+function quikwordvalue()
+	return quikword.value
 end
 
 function newfont(font)
@@ -179,8 +234,12 @@ function setcolor(color, alpha)
 		gfx.setColor(gfx.kColorWhite)
 	elseif color == 'clear' then
 		gfx.setColor(gfx.kColorClear)
+		return
+	elseif color == 'image' then
+		gfx.setColor(gfx.kColorBlack)
+		return
 	end
-	if alpha ~= 0 and color ~= 'clear' then
+	if alpha ~= 0 then
 		gfx.setDitherPattern(alpha, gfx.image.kDitherTypeBayer4x4)
 	end
 end
@@ -201,6 +260,18 @@ function fillrect(x, y, w, h, r)
 	else
 		gfx.fillRect(x, y, w, h)
 	end
+end
+
+function drawline(x1, y1, x2, y2)
+	gfx.drawLine(x1, y1, x2, y2)
+end
+
+function drawcircle(x, y, radius)
+	gfx.drawCircleAtPoint(x, y, radius)
+end
+
+function fillcircle(x, y, radius)
+	gfx.fillCircleAtPoint(x, y, radius)
 end
 
 function gettime()

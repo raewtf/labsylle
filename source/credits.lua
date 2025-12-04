@@ -2,7 +2,6 @@ local pd
 local gfx
 local black
 local white
-local bayer4
 local center
 local right
 
@@ -11,7 +10,6 @@ if platform == 'peedee' then
 	gfx = pd.graphics
 	black = gfx.kColorBlack
 	white = gfx.kColorWhite
-	bayer4 = gfx.image.kDitherTypeBayer4x4
 	center = kTextAlignment.center
 	right = kTextAlignment.right
 
@@ -52,9 +50,9 @@ end
 
 function credits:initialize(args)
 	assets = {
-		disco = newfont('fonts/disco'),
-		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
-		cal = newfont('fonts/cal'),
+		disco = newfont('fonts/disco', '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-'),
+		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓'),
+		cal = newfont('fonts/cal', '0123456789 !ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz❓'),
 		swish = newsound('audio/sfx/swish'),
 		block1 = newsound('audio/sfx/block1'),
 		block2 = newsound('audio/sfx/block2'),
@@ -70,7 +68,7 @@ function credits:initialize(args)
 		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, & Voxy'}, {thing = 'Quik-Word List', name = 'Gaute Solheim'}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
 		credits2 = {{thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = '& Toad'}, {thing = '', name = ''}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
 		handler = '',
-		credits3 = {{thing = 'todo', name = 'write löve stuff'}},
+		credits3 = {{thing = 'Knife library', name = 'airstruck'}, {thing = 'HUMP library', name = 'Matthias Richter'}, {thing = 'Tween easings', name = 'Yuichi Tateno &'}, {thing = '', name = 'Emmanuel Oga'}, {thing = 'JSON Parser', name = 'rxi'}, {thing = '', name = ''}, {thing = 'PC Playtesters:', name = ''}},
 		handler = 'credits'
 	}
 
@@ -116,7 +114,8 @@ function credits:draw()
 	end
 	drawrect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
 	drawrect(100, 200, 200, 30, 5)
-	drawtext(assets.disco, '↔️ Move     Ⓑ Back', 200, 208, center)
+	setcolor('white')
+	drawtext(assets.disco, '➖ Move     ' .. ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. ' Back', 200, 208, center)
 
 	drawontop()
 end
@@ -128,22 +127,27 @@ function credits:keypressed(button)
 			vars.page = vars.page - 1
 			playsound(assets.swish)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			rumble(0.3, 0.3, 0.025)
 		else
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 			vars.bump = -3
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'right' or platform == 'love' and save.right) then
 		if vars.page < (platform == 'peedee' and 2 or platform == 'love' and 3) then
 			vars.page = vars.page + 1
 			playsound(assets.swish)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
+			rumble(0.3, 0.3, 0.025)
 		else
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 			vars.bump = -3
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 		playsound(assets.pop)
 		scenemanager:transitionscene(title, false, 5)
+		rumble(0.3, 0.3, 0.025)
 	end
 end
 

@@ -235,7 +235,17 @@ function Timer.clear (group)
         group = defaultGroup
     end
     for i = 1, #group do
-        group[i] = nil
+		-- rae patch: this used to be group[i] = nil,
+		-- but this was causing issues when switching
+		-- scenes (not transitioning), where the first
+		-- newly-created timer wouldn't get initialized.
+		-- replacing this with :remove() lets that first
+		-- timer start existing, and everything in vars
+		-- (including the old timers) gets nil'd in the
+		-- scene cleanup function anyway. hooray!!!!!!!
+		if group[i] ~= nil then
+        	group[i]:remove()
+		end
     end
 end
 

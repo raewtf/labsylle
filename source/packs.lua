@@ -22,13 +22,13 @@ packs = {
 				target = {
 					{'won', 'der', 'ful', 'ly'}
 				},
-				text = 'Great work! Let\'s try another one. Your aim is to\nperform as few swaps as you can — your count\nis up in the top-right. If you make a mistake,\nyou can "retry puzzle" from the Slide menu.'
+				text = 'Great work! Let\'s try another one. Your aim is to\nperform as few swaps as you can — your count\nis up in the top-right. If you make a mistake,\nyou can pause and select "retry puzzle".'
 			},
 			{
 				target = {
 					{'be', 'wil', 'der', 'ing', 'ly'}
 				},
-				text = 'Try one more standard puzzle!\nIf you ever wanna take a break, you\ncan "suspend" from the Slide menu, and\ncome back to the puzzle in progress later.'
+				text = 'Try one more standard puzzle!\nIf you ever wanna take a break, you\ncan pause and select "suspend", and\ncome back to the puzzle in progress later.'
 			},
 			{
 				target = {
@@ -54,7 +54,7 @@ packs = {
 						intensity = 0
 					},
 				},
-				text = 'Some syllable blocks also have a short temper.\nIf you swap them too many times, then\nthey\'ll KERPLODE!! ...Meaning you\'ll have\nto restart the level over again.'
+				text = 'Some syllable blocks also have a short temper.\nIf you swap them too many times, then\nthey\'ll KERPLODE!! ...Meaning you\'ll have\nto restart the level from scratch.'
 			},
 			{
 				target = {
@@ -6320,4 +6320,4 @@ quikwords = {
 	{'in', 'quis', 'i', 'tor'}
 }
 
-return packs, bonus, quikwords
+return function() return packs, bonus, quikwords end

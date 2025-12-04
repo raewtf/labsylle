@@ -8,6 +8,7 @@ if platform == 'peedee' then
 	import 'packselect'
 	import 'options'
 	import 'credits'
+	import 'game'
 
 	pd = playdate
 	gfx = pd.graphics
@@ -38,6 +39,7 @@ elseif platform == 'love' then
 	packselect = require 'packselect'
 	options = require 'options'
 	credits = require 'credits'
+	game = require 'game'
 
 	gfx = love.graphics
 	center = 'center'
@@ -54,8 +56,8 @@ end
 
 function title:initialize(args)
 	assets = {
-		disco = newfont('fonts/disco'),
-		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca'),
+		disco = newfont('fonts/disco', '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-'),
+		discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓'),
 		logo = newimage('images/logo'),
 		launch = newimage('images/system/launchImage'),
 		swish = newsound('audio/sfx/swish'),
@@ -67,8 +69,8 @@ function title:initialize(args)
 		pop = newsound('audio/sfx/pop'),
 	}
 
-	if isdarkmode() then
-		assets.launch:setInverted(true)
+	if platform == 'peedee' then
+		assets.launch:setInverted(isdarkmode())
 	end
 
 	vars = {
@@ -172,6 +174,7 @@ function title:draw()
 	drawrect(203 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 200 - tonumber(vars.selection == 5 and 3 + vars.bump or 0), 97 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 30 + tonumber(vars.selection == 5 and ((3 + vars.bump) * 2) or 0), 5)
 	if vars.selection == 5 then gfx.setLineWidth(2) end
 
+	setcolor('white')
 	drawtext(assets[vars.selection == 1 and 'disco' or 'discoteca'], 'Let\'s Play!\n(Word Puzzle Paks)', 200, 120, center)
 	drawtext(assets[vars.selection == 2 and 'disco' or 'discoteca'], 'Quik-Word', 148, 173, center)
 	drawtext(assets[vars.selection == 3 and 'disco' or 'discoteca'], 'Bonus Paks', 252, 173, center)
@@ -193,6 +196,7 @@ function title:keypressed(button)
 	if button == (platform == 'peedee' and 'up' or platform == 'love' and save.up) then
 		if vars.selection ~= 1 then
 			playsound(assets.swish)
+			rumble(0.3, 0.3, 0.025)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
 		end
 		if vars.selection == 2 then
@@ -206,10 +210,12 @@ function title:keypressed(button)
 		else
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 			vars.bump = -3
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'down' or platform == 'love' and save.down) then
 		if vars.selection < 4 then
 			playsound(assets.swish)
+			rumble(0.3, 0.3, 0.025)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
 		end
 		if vars.selection == 1 then
@@ -225,10 +231,12 @@ function title:keypressed(button)
 		else
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 			vars.bump = -3
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'left' or platform == 'love' and save.left) then
 		if vars.selection == 3 or vars.selection == 5 then
 			playsound(assets.swish)
+			rumble(0.3, 0.3, 0.025)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
 		end
 		vars.dir = false
@@ -239,11 +247,13 @@ function title:keypressed(button)
 		else
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 			vars.bump = -3
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'right' or platform == 'love' and save.right) then
 		vars['selectionoffset' .. vars.selection] = 0
 		if vars.selection % 2 == 0 then
 			playsound(assets.swish)
+			rumble(0.3, 0.3, 0.025)
 			if platform == 'peedee' then gfx.sprite.redrawBackground() end
 		end
 		vars.dir = true
@@ -254,9 +264,11 @@ function title:keypressed(button)
 		else
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 			vars.bump = -3
+			rumble(0.1, 0.1, 0.025)
 		end
 	elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
 		playsound(assets.pop)
+		rumble(0.3, 0.3, 0.025)
 		vars.handler = ''
 		if vars.selection == 1 then
 			pack = packs
