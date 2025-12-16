@@ -3,6 +3,6 @@ author=rae
 description=A cool word puzzle game, all about the "building blocks" of the English language.
 bundleID=wtf.rae.labsylle
 version=1.0.0b2
-buildNumber=2547
+buildNumber=2614
 imagePath=images/system
 launchSound=audio/sfx/bubble1

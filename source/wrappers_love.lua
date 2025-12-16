@@ -107,14 +107,21 @@ function delaytimer(name, delay, duration, startvalue, endvalue, easing, callbac
 	if vars ~= nil then
 		vars[name .. 'value'] = startvalue
 		vars[name .. 'delay'] = timer.after(delay / 1000, function()
-			newtimer(name, duration, startvalue, endvalue, easing, callback, group)
+			if vars[name .. 'value'] ~= nil then
+				newtimer(name, duration, startvalue, endvalue, easing, callback, group)
+			end
 		end)
 	end
 end
 
 function afterdelay(name, duration, callback)
 	if vars ~= nil then
-		vars[name] = timer.after(duration / 1000, callback)
+		vars[name .. 'gate'] = true
+		vars[name] = timer.after(duration / 1000, function()
+			if vars[name .. 'gate'] ~= nil then
+				callback()
+			end
+		end)
 	end
 end
 
@@ -294,10 +301,6 @@ end
 
 function gettime()
 	return os.date('*t')
-end
-
-function setinverted(dark)
-	-- TODO: setinverted
 end
 
 function setredraw()

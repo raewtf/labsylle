@@ -278,10 +278,6 @@ function gettime()
 	return pd.getTime()
 end
 
-function setinverted(dark)
-	pd.display.setInverted(dark)
-end
-
 function setredraw(new)
 	gfx.sprite.setAlwaysRedraw(new)
 	redraw = new

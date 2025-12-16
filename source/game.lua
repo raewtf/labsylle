@@ -7,9 +7,6 @@ local gfx
 local center
 local right
 
--- TODO: pause menu, on PC
--- TODO: bombs can't rumble forever in redraw false mode, on peedee
-
 -- NOTE: "Perfect!" label when pack ~= 'speed' and optimum route
 -- NOTE: add time to quik-word timer when pack == 'speed' and optimum route
 -- NOTE: add save packettes for 'perfect' bool in each puzzle
@@ -45,8 +42,8 @@ if platform == 'peedee' then
 					self:quit(true)
 				end)
 				if not vars.finished and vars.playing then
-					menu:addMenuItem('retry puzzle', function()
-						game:restart()
+					menu:addMenuItem('retry', function()
+						self:restart()
 					end)
 				end
 			end
@@ -96,6 +93,7 @@ function game:initialize(args)
 		snap2 = newsound('audio/sfx/snap2'),
 		snap3 = newsound('audio/sfx/snap3'),
 		scribble = newsound('audio/sfx/scribble'),
+		pop = newsound('audio/sfx/pop'),
 	}
 
 	vars = {
@@ -123,6 +121,10 @@ function game:initialize(args)
 		crank = 0,
 		boomp = 0,
 		handler = '',
+		paused = false,
+		pauseselection = 1,
+		pauseselections = {},
+		bump = 0,
 	}
 
 	loopingtimer('rattle', 100, -1, 1, 'inOutElastic')
@@ -138,21 +140,11 @@ function game:initialize(args)
 		assets.background = newimage('images/city' .. (platform == 'love' and '_full' or ''))
 	end
 
-	-- from https://www.reddit.com/r/love2d/comments/ee8n0j/comment/fcaouw5/
-	if platform == 'love' then
-		-- TODO: find new, better invert function
-		assets.invert = gfx.newShader[[
-			vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords) {
-				vec4 col = texture2D( texture, texture_coords );
-				return vec4(col.r, col.g, col.b, col.a);
-			}
-		]]
-	end
-
 	if vars.pack == 'speed' then
 		assets.cal = newfont('fonts/cal', '0123456789 !ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz❓')
 		assets.caldown = newfont('fonts/caldown', '123!GO❓')
-		assets.speedcountdown = newsound('audio/sfx/speedcountdown')
+		assets.speedcountdown1 = newsound('audio/sfx/speedcountdown1')
+		assets.speedcountdown2 = newsound('audio/sfx/speedcountdown2')
 		assets.speedcountin1 = newsound('audio/sfx/speedcountin1')
 		assets.speedcountin2 = newsound('audio/sfx/speedcountin2')
 		assets.speedcountin3 = newsound('audio/sfx/speedcountin3')
@@ -190,7 +182,7 @@ function game:initialize(args)
 		assets.doubledisco = newfont('fonts/doubledisco', '0123456789 %+-<=>x❓')
 		assets.complete = newsound('audio/sfx/complete')
 
-		if string.find(vars.pack.id, 'shapes_') then
+		if string.find(vars.pack.id, 'shapes') then
 			for i = 1, #vars.pack.shapes_used do
 				assets[vars.pack.shapes_used[i] .. '_line'] = newimage('images/shapes/line/' .. vars.pack.shapes_used[i])
 				assets[vars.pack.shapes_used[i] .. '_fill'] = newimage('images/shapes/fill/' .. vars.pack.shapes_used[i])
@@ -248,11 +240,7 @@ function game:initialize(args)
 		end
 		vars.impostor = vars.pack.puzzles[vars.puzzle].impostor
 		if vars.impostor then
-			if isdarkmode() then
-				assets.mask = newimage('images/mask_dark')
-			else
-				assets.mask = newimage('images/mask')
-			end
+			assets.mask = newimage('images/mask')
 		end
 
 		if vars.pack.puzzles[vars.puzzle].bombs ~= nil then
@@ -297,7 +285,7 @@ function game:initialize(args)
 		if vars.pack == 'speed' then
 			drawtext(assets.disco, 'Quik-Word — Round ' .. commalize(vars.puzzle), 390, 5, right)
 			if not save.time then
-				drawtext(assets.discoteca, 'Best score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds'), 390, 18, right)
+				drawtext(assets.discoteca, 'Best Score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' Round' or ' Rounds'), 390, 18, right)
 			end
 		else
 			drawtext(assets.disco, vars.pack.name, 10, 5)
@@ -371,15 +359,17 @@ function game:initialize(args)
 			if vars.pack == 'speed' then
 				if vars.puzzle == 1 then
 					afterdelay('countdown3', 1000, function()
-						playsound(assets.speedcountdown)
+						playsound(assets.speedcountdown1)
 						vars.bigtext = '3'
 						if platform == 'peedee' then gfx.sprite.redrawBackground() end
 					end)
 					afterdelay('countdown2', 2000, function()
+						playsound(assets.speedcountdown1)
 						vars.bigtext = '2'
 						if platform == 'peedee' then gfx.sprite.redrawBackground() end
 					end)
 					afterdelay('countdown1', 3000, function()
+						playsound(assets.speedcountdown1)
 						vars.bigtext = '1'
 						if platform == 'peedee' then gfx.sprite.redrawBackground() end
 					end)
@@ -391,6 +381,7 @@ function game:initialize(args)
 				afterdelay('countdowngo', tonumber(vars.puzzle == 1 and 4000 or 0), function()
 					if not vars.finished then
 						if vars.puzzle == 1 then
+							playsound(assets.speedcountdown2)
 							vars.bigtext = 'GO!'
 							if platform == 'peedee' then gfx.sprite.redrawBackground() end
 							resetquikword(60000, 60000, 0, function()
@@ -435,6 +426,17 @@ function game:pause()
 		vars.oldhandler = vars.handler
 		vars.handler = 'paused'
 	end
+	if vars.pack == 'speed' then
+		vars.pauseselections = {'resume', 'quit'}
+	else
+		vars.pauseselections = {'resume'}
+		if not vars.finished and vars.playing then
+			table.insert(vars.pauseselections, 'retry')
+		end
+		table.insert(vars.pauseselections, 'suspend')
+		table.insert(vars.pauseselections, 'quit')
+	end
+	vars.pauseselection = 1
 end
 
 function game:unpause()
@@ -446,9 +448,9 @@ function game:unpause()
 end
 
 function game:quit(suspend)
+	self:unpause()
 	if vars.pack == 'speed' then
 		stopmusic()
-		assets.speedcountdown:stop()
 		pausequikword()
 		vars.playing = false
 		scenemanager:transitionscene(title, false, 2)
@@ -507,13 +509,13 @@ function game:updateheader(time)
 
 		if save.time then
 			if vars.pack == 'speed' then
-				drawtext(assets.discoteca, 'Best score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' round' or ' rounds') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
+				drawtext(assets.discoteca, 'Best Score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' Round' or ' Rounds') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
 			else
-				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
+				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' Pack Swap' or ' Pack Swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
 			end
 		else
 			if vars.pack ~= 'speed' then
-				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' pack swap' or ' pack swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
+				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' Pack Swap' or ' Pack Swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
 			end
 		end
 	if platform == 'peedee' then
@@ -527,8 +529,6 @@ function game:updateheader(time)
 end
 
 function game:drawblock(i, x, y, offsety, width, height, radius)
-	local darkwhite = (isdarkmode() and 'black' or 'white')
-	local darkblack = (isdarkmode() and 'white' or 'black')
 	local bomb = 0
 	for n = 1, #vars.bombs do
 		if vars.word[i] == vars.bombs[n].key then
@@ -540,31 +540,24 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 			drawimage(assets.ash, x, y + vars.tilevis.height - 17)
 			setcolor('black', value('kerplode') / 2)
 			fillcircle(x + (vars.tilevis.width / 2), y + (vars.tilevis.height / 3), (vars.tilevis.height / 2) + (value('kerplode') * 15))
-			setcolor(darkblack)
+			setcolor()
 			return
 		else
 			x = x + (value('rattle') * vars.bombs[bomb].intensity)
 		end
 	end
-	if isdarkmode() then
-		if platform == 'peedee' then
-			gfx.setImageDrawMode(gfx.kDrawModeInverted)
-		elseif platform == 'love' then
-			gfx.setShader(assets.invert)
-		end
-	end
-	setcolor(darkblack)
+	setcolor()
 	fillrect(x, y, width, height, radius)
-	setcolor(darkwhite)
+	setcolor('white')
 	fillrect(x, offsety, width, height - 1, radius + 2)
-	setcolor(darkblack)
+	setcolor()
 	drawrect(x, offsety, width, height, radius)
 	if i == vars.tiles and vars.impostor then
-		setcolor(darkblack, 0.75)
+		setcolor('black', 0.75)
 		fillrect(x, offsety, width, height, radius)
 	end
 	if bomb > 0 then
-		setcolor(darkblack, 1 - (vars.bombs[bomb].intensity / 12))
+		setcolor('black', 1 - (vars.bombs[bomb].intensity / 12))
 		fillrect(x, offsety, width, height, radius)
 	end
 	if bomb > 0 then
@@ -574,7 +567,7 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 		drawtext(assets.disco, commalize(vars.bombs[bomb].swaps), x + 19, offsety + 3)
 	end
 	setcolor()
-	if vars.pack ~= 'speed' and string.find(vars.pack.id, 'shapes_') then
+	if vars.pack ~= 'speed' and string.find(vars.pack.id, 'shapes') then
 		local shape1 = string.sub(vars.word[i], 1, 4)
 		local color1 = string.sub(vars.word[i], 5, 6)
 		local shape2 = string.sub(vars.word[i], 8, 11)
@@ -615,13 +608,6 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 		end
 	else
 		drawtext(assets[vars.tilevis.font], vars.word[i], x + (width / 2), offsety + (height / 2) + (bomb > 0 and 0 or -(assets[vars.tilevis.font]:getHeight() / 2.3)), center)
-	end
-	if isdarkmode() then
-		if platform == 'peedee' then
-			gfx.setImageDrawMode(gfx.kDrawModeCopy)
-		elseif platform == 'love' then
-			gfx.setShader()
-		end
 	end
 end
 
@@ -789,6 +775,7 @@ end
 
 function game:restart()
 	if not vars.finished and vars.playing then
+		self:unpause()
 		vars.handler = ''
 		resettimer('cursor', 300, value('cursor'), 1, 'inOutSine')
 		playsound(assets.scribble)
@@ -944,6 +931,11 @@ function game:update()
 		vars.quikwold = quikwordvalue()
 	end
 
+	vars.bump = vars.bump - (vars.bump * 0.4)
+	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
+		vars.bump = 0
+	end
+
 	if platform == 'peedee' and save.background ~= 4 then
 		if timeleft('headerx') ~= 0 or (vars.kerplode ~= nil and timeleft('kerplode') ~= 0) then
 			gfx.sprite.redrawBackground()
@@ -958,7 +950,13 @@ function game:update()
 			if timeleft('tileoffsetx' .. i) ~= 0 then xdone = true end
 			if timeleft('tileoffsety' .. i) ~= 0 then ydone = true end
 		end
-		if xdone or ydone or timeleft('tileoffsetx' .. vars.tiles) ~= 0 or timeleft('cursor') ~= 0 or vars.sellerp ~= vars.selection or vars.crank ~= 0 then
+		local bomb = false
+		for n = 1, #vars.bombs do
+			if vars.bombs[n].intensity > 0 then
+				bomb = true
+			end
+		end
+		if xdone or ydone or timeleft('tileoffsetx' .. vars.tiles) ~= 0 or timeleft('cursor') ~= 0 or vars.sellerp ~= vars.selection or vars.crank ~= 0 or bomb then
 			gfx.sprite.addDirtyRect(0, 60 + (assets.text ~= nil and -14 or 20) + (save.showcontrols and 7 or 0), 400, 110)
 		end
 	end
@@ -1008,7 +1006,7 @@ function game:draw()
 		local tilex = ccenter + (combi * (vars.tiles - 1)) + value('tileoffsetx' .. vars.tiles) + parallax + vars.tilevis.impostor_gap
 		fillrect(tilex - 5, tiley - 30, vars.tilevis.width + 10, vars.tilevis.height + 40, 5)
 		setcolor('white')
-		drawimage(assets.mask, (tilex + (vars.tilevis.width / 2) + 1) - 18, (tiley - 20) - 6, 0.5, 0)
+		drawimage(assets.mask, (tilex + (vars.tilevis.width / 2) + 1) - 19, (tiley - 20) - 2)
 	end
 
 	setcolor('black', 0.75)
@@ -1061,6 +1059,29 @@ function game:draw()
 		end
 	end
 
+	if vars.paused then
+		setcolor('black', 0.5)
+		fillrect(0, 0, 400, 240)
+		setcolor('white')
+		fillrect(75 - vars.bump, 50 - vars.bump, 250 + (vars.bump * 2), 140 + (vars.bump * 2), 10)
+		setcolor()
+		drawrect(75 - vars.bump, 50 - vars.bump, 250 + (vars.bump * 2), 140 + (vars.bump * 2), 8)
+
+		for i = 1, #vars.pauseselections do
+			local text = ''
+			if vars.pauseselections[i] == 'resume' then
+				text = 'Resume'
+			elseif vars.pauseselections[i] == 'suspend' then
+				text = 'Suspend'
+			elseif vars.pauseselections[i] == 'retry' then
+				text = 'Retry'
+			elseif vars.pauseselections[i] == 'quit' then
+				text = 'Quit'
+			end
+			drawtext(assets[vars.pauseselection == i and 'disco' or 'discoteca'], text, 200, 90 - (10 * (#vars.pauseselections - 1)) + (20 * i), center)
+		end
+	end
+
 	drawontop()
 end
 
@@ -1106,16 +1127,61 @@ function game:keypressed(button)
 			end
 		elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 			if not save.crank then
-				vars.crank = vars.crank + 180
+				if save.flip then
+					vars.crank = vars.crank - 180
+				else
+					vars.crank = vars.crank + 180
+				end
 				game:swap()
 			end
 		elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
 			if not save.crank then
-				vars.crank = vars.crank - 180
+				if save.flip then
+					vars.crank = vars.crank + 180
+				else
+					vars.crank = vars.crank - 180
+				end
 				game:swap()
 			end
 		end
 	elseif vars.handler == 'paused' then
+		if button == (platform == 'peedee' and 'up' or platform == 'love' and save.up) then
+			if vars.pauseselection > 1 then
+				vars.pauseselection = vars.pauseselection - 1
+				playsound(assets.swish)
+				rumble(0.3, 0.3, 0.025)
+			else
+				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				vars.bump = -3
+				rumble(0.1, 0.1, 0.025)
+			end
+		elseif button == (platform == 'peedee' and 'down' or platform == 'love' and save.down) then
+			if vars.pauseselection < #vars.pauseselections then
+				vars.pauseselection = vars.pauseselection + 1
+				playsound(assets.swish)
+				rumble(0.3, 0.3, 0.025)
+			else
+				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+				vars.bump = -3
+				rumble(0.1, 0.1, 0.025)
+			end
+		elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
+			rumble(0.3, 0.3, 0.025)
+			self:unpause()
+			playsound(assets.pop)
+		elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
+			rumble(0.3, 0.3, 0.025)
+			playsound(assets.pop)
+			if vars.pauseselections[vars.pauseselection] == 'resume' then
+				self:unpause()
+			elseif vars.pauseselections[vars.pauseselection] == 'suspend' then
+				self:quit(true)
+			elseif vars.pauseselections[vars.pauseselection] == 'retry' then
+				self:restart()
+			elseif vars.pauseselections[vars.pauseselection] == 'quit' then
+				self:quit(false)
+			end
+		end
 	end
 end
 

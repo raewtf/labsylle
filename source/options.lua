@@ -64,7 +64,7 @@ function options:initialize(args)
 	}
 
 	vars = {
-		selections1 = {'music', 'sfx', 'crank', 'time', 'hours', 'menubg', 'background', 'darkmode', 'boldtext'},
+		selections1 = {'music', 'sfx', 'crank', 'flip', 'time', 'hours', 'menubg', 'background', 'boldtext'},
 		selection = 1,
 		page = 1,
 		bump = 0,
@@ -170,31 +170,31 @@ function options:draw()
 		elseif platform == 'love' then
 			drawtext(assets[vars.selection == 3 and 'disco' or 'discoteca'], 'Remap Keyboard', 200, 82, center)
 		end
-		drawtext(assets[vars.selection == 4 and 'disco' or 'discoteca'], 'In-Game Clock: ' .. tostring(save.time and 'Enabled' or 'Disabled'), 200, 96, center)
-		drawtext(assets[vars.selection == 5 and 'disco' or 'discoteca'], 'Clock Display: ' .. tostring(save.hours and '12-Hour' or '24-Hour'), 200, 110, center)
-		drawtext(assets[vars.selection == 6 and 'disco' or 'discoteca'], 'Menu BG: ' .. tostring(save.menubg and 'Falling Blocks' or 'Disabled'), 200, 124, center)
-		drawtext(assets[vars.selection == 7 and 'disco' or 'discoteca'], 'In-Game BG: ' .. tostring(save.background == 0 and 'Disabled' or save.background == 1 and 'Forest' or save.background == 2 and 'Mountains' or save.background == 3 and 'Ornate Frame' or save.background == 4 and 'Falling Blocks' or save.background == 5 and 'City Nights'), 200, 138, center)
-		if vars.selection == 7 then
+		drawtext(assets[vars.selection == 4 and 'disco' or 'discoteca'], 'Flip Rotation: ' .. tostring(save.flip and 'Enabled' or 'Disabled'), 200, 96, center)
+		drawtext(assets[vars.selection == 5 and 'disco' or 'discoteca'], 'In-Game Clock: ' .. tostring(save.time and 'Enabled' or 'Disabled'), 200, 110, center)
+		drawtext(assets[vars.selection == 6 and 'disco' or 'discoteca'], 'Clock Display: ' .. tostring(save.hours and '12-Hour' or '24-Hour'), 200, 124, center)
+		drawtext(assets[vars.selection == 7 and 'disco' or 'discoteca'], 'Menu BG: ' .. tostring(save.menubg and 'Falling Blocks' or 'Disabled'), 200, 138, center)
+		drawtext(assets[vars.selection == 8 and 'disco' or 'discoteca'], 'In-Game BG: ' .. tostring(save.background == 0 and 'Disabled' or save.background == 1 and 'Forest' or save.background == 2 and 'Mountains' or save.background == 3 and 'Ornate Frame' or save.background == 4 and 'Falling Blocks' or save.background == 5 and 'City Nights'), 200, 152, center)
+		if vars.selection == 8 then
 			setcolor('white')
-			fillrect(146, 79, 108, 59)
+			fillrect(146, 93, 108, 59)
 			setcolor()
-			fillrect(148, 81, 104, 55)
+			fillrect(148, 95, 104, 55)
 			setcolor('white')
-			fillrect(150, 83, 100, 51)
+			fillrect(150, 97, 100, 51)
 			if save.background == 1 then
-				drawimage(assets.forest_preview, 150, 83)
+				drawimage(assets.forest_preview, 150, 97)
 			elseif save.background == 2 then
-				drawimage(assets.mountains_preview, 150, 83)
+				drawimage(assets.mountains_preview, 150, 97)
 			elseif save.background == 3 then
-				drawimage(assets.frame_preview, 150, 83)
+				drawimage(assets.frame_preview, 150, 97)
 			elseif save.background == 4 then
-				drawimage(assets.blocks_preview, 150, 83)
+				drawimage(assets.blocks_preview, 150, 97)
 			elseif save.background == 5 then
-				drawimage(assets.city_preview, 150, 83)
+				drawimage(assets.city_preview, 150, 97)
 			end
 			setcolor()
 		end
-		drawtext(assets[vars.selection == 8 and 'disco' or 'discoteca'], 'Dark Mode: ' .. tostring(save.darkmode == 0 and 'Disabled' or save.darkmode == 1 and 'Enabled' or save.darkmode == 2 and 'Auto ' ..  (save.hours and '(6a/6p)' or '(06:00/18:00)')), 200, 152, center)
 		drawtext(assets[vars.selection == 9 and 'disco' or 'discoteca'], 'Bold Text: ' .. tostring(save.boldtext and 'Enabled' or 'Disabled'), 200, 166, center)
 		setcolor('black', 0.5)
 		if vars.selection == 1 then drawrect(85 - vars.bump, 52, 230 + (vars.bump * 2), 18) end
@@ -205,7 +205,6 @@ function options:draw()
 		if vars.selection == 6 then drawrect(85 - vars.bump, 122, 230 + (vars.bump * 2), 18) end
 		if vars.selection == 7 then drawrect(85 - vars.bump, 136, 230 + (vars.bump * 2), 18) end
 		if vars.selection == 8 then drawrect(85 - vars.bump, 150, 230 + (vars.bump * 2), 18) end
-		if vars.selection == 9 then drawrect(85 - vars.bump, 164, 230 + (vars.bump * 2), 18) end
 		setcolor()
 	elseif vars.page == 2 then
 		if platform == 'peedee' then
@@ -365,6 +364,8 @@ function options:keypressed(button)
 					vars.remap_step = 1
 					vars.handler = 'remap'
 				end
+			elseif vars['selections' .. vars.page][vars.selection] == 'flip' then
+			save.flip = not save.flip
 			elseif vars['selections' .. vars.page][vars.selection] == 'time' then
 				save.time = not save.time
 			elseif vars['selections' .. vars.page][vars.selection] == 'hours' then
@@ -383,12 +384,6 @@ function options:keypressed(button)
 				if save.background > 5 then
 					save.background = 0
 				end
-			elseif vars['selections' .. vars.page][vars.selection] == 'darkmode' then
-				save.darkmode = save.darkmode + 1
-				if save.darkmode > 2 then
-					save.darkmode = 0
-				end
-				setinverted(isdarkmode())
 			elseif vars['selections' .. vars.page][vars.selection] == 'boldtext' then
 				save.boldtext = not save.boldtext
 				assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓')

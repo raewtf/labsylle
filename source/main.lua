@@ -1,22 +1,21 @@
--- NOTE: add achievements on peedee
--- NOTE: daily seeded quik-word?
+-- NOTE: solver/optimum swaps finder function, that returns a number
 -- TODO: write manual
--- NOTE: statistics menu
+-- TODO: statistics menu
 	-- Total words found (exclude shapes and math)
+	-- Brainfreezes (swaps immediately followed by un-swaps)
+	-- Kerplosions
 	-- Paks completed (how many times is "complete" found in the save table?)
 	-- Quik-Word games played
-	-- Highest Quik-Word round
+	-- Quik-Word best score
 	-- Quik-Words found
 	-- Time spent playing
 	-- Time spent in Quik-Word
 	-- Time spent in paks
--- NOTE: solver/optimum swaps finder function, that returns a number
 -- TODO: randomization that remains consistent between love/peedee
 -- TODO: optimize a biiit on peedee
--- TODO: invert screen when dark mode is on, in love
 
 -- Build target. 'peedee' or 'love'
-platform = 'love'
+platform = 'peedee'
 local fps = 30
 
 local pd
@@ -32,6 +31,7 @@ local center
 music = nil
 volume = 1
 quit = 0
+catalog = false
 
 local random = math.random
 local floor = math.floor
@@ -65,7 +65,6 @@ if platform == 'peedee' then
 	gfx.setBackgroundColor(gfx.kColorWhite)
 	gfx.setStrokeLocation(gfx.kStrokeInside)
 
-	catalog = false
 	if pd.metadata.bundleID == 'wtf.rae.labsylle' then
 		catalog = true
 	end
@@ -109,11 +108,6 @@ loadingimages = {
 	loading2 = newimage('images/loading/loading2'),
 	loading1 = newimage('images/loading/loading1'),
 	loading0 = newimage('images/loading/loading0'),
-	loading4d = newimage('images/loading/loading4d'),
-	loading3d = newimage('images/loading/loading3d'),
-	loading2d = newimage('images/loading/loading2d'),
-	loading1d = newimage('images/loading/loading1d'),
-	loading0d = newimage('images/loading/loading0d')
 }
 
 gfx.setLineWidth(2)
@@ -150,8 +144,8 @@ function savecheck()
 		save.down = save.down or 'down'
 		save.left = save.left or 'left'
 		save.right = save.right or 'right'
-		save.primary = save.primary or 'a'
-		save.secondary = save.secondary or 'b'
+		save.primary = save.primary or 'z'
+		save.secondary = save.secondary or 'x'
 
 		save.color = save.color or 1
 
@@ -164,7 +158,7 @@ function savecheck()
 
 	if save.time == nil then save.time = true end
 	if save.menubg == nil then save.menubg = true end
-
+	if save.flip == nil then save.flip = (platform == 'peedee' and false or platform == 'love' and true) end
 	save.hours = save.hours or true
 
 	-- Fix for old save.hours logic
@@ -173,7 +167,6 @@ function savecheck()
 	save.quikwordbest = save.quikwordbest or 0
 
 	save.background = save.background or 0
-	save.darkmode = save.darkmode or 0
 
 	if save.boldtext == nil then save.boldtext = false end
 	if save.autosubmit == nil then save.autosubmit = false end
@@ -208,10 +201,10 @@ function resetsave(keepoptions, keepquikword)
 
 		newsave.time = save.time
 		newsave.menubg = save.menubg
+		newsave.flip = save.flip
 		newsave.hours = save.hours
 
 		newsave.background = save.background
-		newsave.darkmode = save.darkmode
 
 		newsave.boldtext = save.boldtext
 		newsave.autosubmit = save.autosubmit
@@ -241,10 +234,10 @@ function resetsave(keepoptions, keepquikword)
 
 		newsave.time = true
 		newsave.menubg = true
+		newsave.flip = (platform == 'peedee' and false or platform == 'love' and true)
 		newsave.hours = true
 
 		newsave.background = 0
-		newsave.darkmode = 0
 
 		newsave.boldtext = false
 		newsave.autosubmit = false
@@ -265,12 +258,13 @@ function resetsave(keepoptions, keepquikword)
 	newmusic('audio/music/title', true)
 	create_bg()
 	setredraw(true)
-	setinverted(isdarkmode())
 	assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓')
 end
 
 if platform == 'peedee' then
 	savecheck()
+
+	-- TODO: peedee cheevo setup
 end
 
 local lasthour = gettime().hour
@@ -366,19 +360,6 @@ function remove_bg()
 	bgblocks = {}
 end
 
-function isdarkmode()
-	local hour = gettime().hour
-	if save.darkmode == 0 then
-		return false
-	elseif save.darkmode == 1 then
-		return true
-	elseif save.darkmode == 2 and not (hour >= 6 and hour <= 18) then
-		return true
-	else
-		return false
-	end
-end
-
 if platform == 'peedee' then
 	function pd.gameWillTerminate()
 		suspend()
@@ -401,23 +382,8 @@ if platform == 'peedee' then
 		gfx.sprite.update()
 		pd.timer.updateTimers()
 
+		-- TODO: remove drawFPS
 		pd.drawFPS(0, 0)
-
-		-- Automatic dark mode
-		local hour = gettime().hour
-		if save.darkmode == 2 then
-			if lasthour < 18 and hour >= 18 then
-				setinverted(true)
-				lasthour = hour
-			elseif lasthour < 6 and hour >= 6 then
-				setinverted(false)
-				lasthour = hour
-			end
-		else
-			if lasthour ~= hour then
-				lasthour = hour
-			end
-		end
 	end
 
 	function drawontop()
@@ -582,7 +548,7 @@ elseif platform == 'love' then
 
 		if vars.transition ~= nil and value('transition') > 0 then
 			setcolor('white', (-value('transition') + 5))
-			drawimage(loadingimages['loading4' .. tostring(isdarkmode() and 'd' or '')], 0, 0)
+			drawimage(loadingimages.loading4, 0, 0)
 		end
 		setcolor()
 

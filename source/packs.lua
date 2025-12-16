@@ -2,6 +2,7 @@
 -- TODO: make tricky paks a bit tougher
 -- TODO: make shapes paks
 -- TODO: make maths paks
+-- TODO: revise pack leaderboards on catalog
 
 packs = {
 	{
@@ -22,13 +23,13 @@ packs = {
 				target = {
 					{'won', 'der', 'ful', 'ly'}
 				},
-				text = 'Great work! Let\'s try another one. Your aim is to\nperform as few swaps as you can — your count\nis up in the top-right. If you make a mistake,\nyou can pause and select "retry puzzle".'
+				text = 'Great work! Let\'s try another one. Your aim is to\nperform as few swaps as you can — your count\nis up in the top-right. If you make a mistake,\nyou can pause and select "Retry" for a do-over.'
 			},
 			{
 				target = {
 					{'be', 'wil', 'der', 'ing', 'ly'}
 				},
-				text = 'Try one more standard puzzle!\nIf you ever wanna take a break, you\ncan pause and select "suspend", and\ncome back to the puzzle in progress later.'
+				text = 'Try one more standard puzzle!\nIf you ever wanna take a break, you\ncan pause and select "Suspend", and\ncome back to the puzzle in progress later.'
 			},
 			{
 				target = {
@@ -822,7 +823,7 @@ packs = {
 	}, -- weather
 	{
 		name = 'Shapes!',
-		id = 'shapes',
+		id = 'wordshapes',
 		subtitle = 'Standard Pak #12',
 		difficulty = 'Tricksy',
 		contains_impostors = true,
@@ -907,7 +908,7 @@ packs = {
 				}
 			}
 		}
-	}, -- shapes
+	}, -- wordshapes
 	--[[{
 		name = 'Animals II',
 		id = 'tbd',
@@ -1794,19 +1795,16 @@ packs = {
 				}
 			},
 			{
-				-- manufacturing
 				target = {
 					{'man', 'u', 'fac', 'tur', 'ing'}
 				}
 			},
 			{
-				-- computational
 				target = {
 					{'com', 'pu', 'ta', 'tion', 'al'}
 				}
 			},
 			{
-				-- accelerometer
 				target = {
 					{'ac', 'cel', 'er', 'om', 'e', 'ter'}
 				},
@@ -1815,13 +1813,11 @@ packs = {
 				}
 			},
 			{
-				-- optimization
 				target = {
 					{'op', 'ti', 'mi', 'za', 'tion'}
 				}
 			},
 			{
-				-- operating system
 				target = {
 					{'op', 'er', 'at', 'ing', '', 'sys', 'tem'}
 				},
@@ -1830,7 +1826,6 @@ packs = {
 				}
 			},
 			{
-				-- electromagnetism
 				target = {
 					{'e', 'lec', 'tro', 'mag', 'net', 'ism'}
 				},
@@ -2997,7 +2992,7 @@ packs = {
 bonus = {
 	{
 		name = 'Simple Shapes',
-		id = 'shapes_simple',
+		id = 'shapessimple',
 		subtitle = 'Shapes Pak #1',
 		difficulty = 'Easy',
 		contains_impostors = true,
@@ -3033,10 +3028,10 @@ bonus = {
 				}
 			}
 		}
-	}, -- shapes_simple
+	}, -- shapessimple
 	{
 		name = 'Spicier Shapes',
-		id = 'shapes_spice',
+		id = 'shapesspice',
 		subtitle = 'Shapes Pak #2',
 		difficulty = 'Easy',
 		contains_impostors = true,
@@ -3074,10 +3069,10 @@ bonus = {
 				}
 			}
 		}
-	}, -- shapes_spice
+	}, -- shapesspice
 	{
 		name = 'Take Sides',
-		id = 'shapes_sides',
+		id = 'shapessides',
 		subtitle = 'Shapes Pak #3',
 		difficulty = 'Easy',
 		contains_impostors = true,
@@ -3114,10 +3109,10 @@ bonus = {
 				}
 			}
 		}
-	}, -- shapes_sides
+	}, -- shapessides
 	{
 		name = 'Polygons Only',
-		id = 'shapes_polygons',
+		id = 'shapespolygons',
 		subtitle = 'Shapes Pak #4',
 		difficulty = 'Tricksy',
 		contains_impostors = true,
@@ -3152,10 +3147,10 @@ bonus = {
 				}
 			}
 		}
-	}, -- shapes_polygons
+	}, -- shapespolygons
 	{
 		name = 'Intro to "Colors"',
-		id = 'shapes_colors',
+		id = 'shapescolors',
 		subtitle = 'Shapes Pak #5',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3189,10 +3184,10 @@ bonus = {
 				}
 			}
 		}
-	}, -- shapes_colors
+	}, -- shapescolors
 	{
 		name = 'Card Stock',
-		id = 'shapes_cards',
+		id = 'shapescards',
 		subtitle = 'Shapes Pak #6',
 		difficulty = 'Tricksy',
 		contains_impostors = true,
@@ -3226,10 +3221,10 @@ bonus = {
 				}
 			},
 		}
-	}, -- shapes_cards
+	}, -- shapescards
 	{
 		name = '',
-		id = 'shapes_tbd',
+		id = 'shapestbd',
 		subtitle = 'Shapes Pak #7',
 		difficulty = 'Difficult',
 		contains_impostors = false,
@@ -3267,25 +3262,24 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- shapes_tbd
+	}, -- shapestbd
 	{
-		name = 'Mind the Gap',
-		id = 'shapes_gap',
+		name = '',
+		id = 'shapestbd',
 		subtitle = 'Shapes Pak #8',
 		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
-		shapes_used = {'circ', 'squa', 'tria', 'star'},
+		shapes_used = {''},
 		puzzles = {
 			{
 				target = {
-					{'none00 circ00', 'circ00 squa00', 'squa00 none00', 'none00 tria00', 'tria00 squa00', 'squa00 none00'},
-					{'none00 tria00', 'tria00 squa00', 'squa00 none00', 'none00 circ00', 'circ00 squa00', 'squa00 none00'}
+					{''}
 				}
 			},
 			{
 				target = {
-					{'none00 star00', 'star00 none00', 'none00 star00', 'star00 none00', 'none00 star00', 'star00 none00'},
+					{''}
 				}
 			},
 			{
@@ -3304,13 +3298,15 @@ bonus = {
 				}
 			}
 		}
-		-- circ99 circ75 circ50 circ25 circ00 none
 		-- TBD
 		-- TBD
-	}, -- shapes_gap
+		-- TBD
+		-- TBD
+		-- TBD
+	}, -- shapestbd
 	{
 		name = 'More "Colors"!',
-		id = 'shapes_morecolors',
+		id = 'shapesmorecolors',
 		subtitle = 'Shapes Pak #9',
 		difficulty = 'Difficult',
 		contains_impostors = true,
@@ -3345,10 +3341,10 @@ bonus = {
 				}
 			}
 		}
-	}, -- shapes_morecolors
+	}, -- shapesmorecolors
 	{
 		name = 'Together Now!',
-		id = 'shapes_all',
+		id = 'shapesall',
 		subtitle = 'Shapes Pak #10',
 		difficulty = 'Difficult',
 		contains_impostors = false,
@@ -3386,10 +3382,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}, -- shapes_all
+	}, -- shapesall
 	--[[{
 		name = 'Basic Addition',
-		id = 'math_add',
+		id = 'mathadd',
 		subtitle = 'Math Pak #1',
 		difficulty = 'Easy',
 		contains_impostors = false,
@@ -3436,10 +3432,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_add
+	},]] -- mathadd
 	--[[{
 		name = 'Basic Subtraction',
-		id = 'math_subtract',
+		id = 'mathsubtract',
 		subtitle = 'Math Pak #2',
 		difficulty = 'Easy',
 		contains_impostors = false,
@@ -3476,10 +3472,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_subtract
+	},]] -- mathsubtract
 	--[[{
 		name = 'Basic Multiplication',
-		id = 'math_multiply',
+		id = 'mathmultiply',
 		subtitle = 'Math Pak #3',
 		difficulty = 'Easy',
 		contains_impostors = false,
@@ -3516,10 +3512,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_multiply
+	},]] -- mathmultiply
 	--[[{
 		name = 'Basic Division',
-		id = 'math_divide',
+		id = 'mathdivide',
 		subtitle = 'Math Pak #4',
 		difficulty = 'Easy',
 		contains_impostors = false,
@@ -3556,10 +3552,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_divide
+	},]] -- mathdivide
 	--[[{
 		name = 'Decimal Addition',
-		id = 'math_decimaladd',
+		id = 'mathdecimaladd',
 		subtitle = 'Math Pak #5',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3596,10 +3592,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_decimaladd
+	},]] -- mathdecimaladd
 	--[[{
 		name = 'Fractional Division',
-		id = 'math_fractiondivide',
+		id = 'mathfractiondivide',
 		subtitle = 'Math Pak #6',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3636,10 +3632,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_fractiondivide
+	},]] -- mathfractiondivide
 	--[[{
 		name = 'TBD',
-		id = 'math_tbd',
+		id = 'mathtbd',
 		subtitle = 'Math Pak #7',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3676,10 +3672,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_tbd
+	},]] -- mathtbd
 	--[[{
 		name = 'TBD',
-		id = 'math_tbd',
+		id = 'mathtbd',
 		subtitle = 'Math Pak #8',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -3716,10 +3712,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_tbd
+	},]] -- mathtbd
 	--[[{
 		name = 'Algebraic',
-		id = 'math_algebra',
+		id = 'mathalgebra',
 		subtitle = 'Math Pak #9',
 		difficulty = 'Difficult',
 		contains_impostors = false,
@@ -3756,10 +3752,10 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	},]] -- math_algebra
+	},]] -- mathalgebra
 	--[[{
 		name = 'TBD',
-		id = 'math_tbd',
+		id = 'mathtbd',
 		subtitle = 'Math Pak #10',
 		difficulty = 'Very Tough',
 		contains_impostors = false,
@@ -3796,7 +3792,7 @@ bonus = {
 		-- TBD
 		-- TBD
 		-- TBD
-	}]] -- math_tbd
+	}]] -- mathtbd
 }
 
 quikwords = {

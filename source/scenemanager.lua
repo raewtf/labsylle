@@ -66,13 +66,13 @@ function scenemanager:transitionscene(scene, ...)
 		end, transition)
 		if platform == 'peedee' then
 			vars.transition.updateCallback = function(timer)
-				self.sprite:setImage(loadingimages['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
+				self.sprite:setImage(loadingimages['loading' .. floor(timer.value)])
 			end
 		end
 	end, transition)
 	if platform == 'peedee' then
 		vars.transition.updateCallback = function(timer)
-			self.sprite:setImage(loadingimages['loading' .. floor(timer.value) .. (isdarkmode() and 'd' or '')])
+			self.sprite:setImage(loadingimages['loading' .. floor(timer.value)])
 		end
 	end
 end

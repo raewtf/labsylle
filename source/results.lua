@@ -70,7 +70,11 @@ function results:initialize(args)
 			vars.best = true
 		end
 		if platform == 'peedee' and catalog then
-			pd.scoreboards.addScore('speed', vars.variable)
+			pd.scoreboards.addScore('speed', vars.variable, function(status, result)
+				if status.code == 'OK' then
+					pd.scoreboards.addScore('speeddaily', vars.variable)
+				end
+			end)
 		end
 		vars.scroll = 0
 		vars.scroll_max = -(25 + (14 * #quikwords_completed))
@@ -111,6 +115,12 @@ function results:update()
 			vars.lastscroll = vars.scroll
 		end
 	elseif platform == 'love' then
+		if love.keyboard.isDown(save.up) then
+			self:keypressed(save.up)
+		elseif love.keyboard.isDown(save.down) then
+			self:keypressed(save.down)
+		end
+
 		if vars.scroll ~= nil and vars.variable ~= 0 then
 			if vars.scroll > 0 then vars.scroll = 0 end
 			if vars.scroll < vars.scroll_max then vars.scroll = vars.scroll_max end
@@ -138,6 +148,8 @@ function results:draw()
 		if platform == 'peedee' then
 			gfx.setClipRect(80, 63 + (vars.bump.value * 4), 240, 106)
 		elseif platform == 'love' then
+			sx, sy, sw, sh = gfx.getScissor()
+			gfx.setScissor()
 			-- TODO: love equivalent for cliprect
 		end
 		if vars.variable == 0 then
@@ -155,6 +167,8 @@ function results:draw()
 		if platform == 'peedee' then
 			gfx.clearClipRect()
 		elseif platform == 'love' then
+			gfx.setScissor(sx, sy, sw, sh)
+			-- TODO: make sure this is fine too
 		end
 	else
 		drawtext(assets.cal, 'Pack Complete!', 200, 11 - (value('bump') * 1.5), center)
@@ -179,7 +193,6 @@ end
 
 function results:keypressed(button)
 	if vars.handler ~= 'results' then return end
-	-- TODO: hold logic for scrolling
 	if button == (platform == 'peedee' and 'up' or platform == 'love' and save.up) then
 		if vars.scroll ~= nil and vars.variable ~= 0 then
 			vars.scroll = vars.scroll + 2
