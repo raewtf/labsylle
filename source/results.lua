@@ -63,6 +63,7 @@ function results:initialize(args)
 	end)
 
 	if vars.pack == 'speed' then
+		save.quikwordsplayed = save.quikwordsplayed + 1
 		vars.variable = vars.variable - 1
 		vars.best = false
 		if vars.variable > save.quikwordbest then
@@ -87,6 +88,8 @@ function results:initialize(args)
 			pd.scoreboards.addScore(vars.pack.id, vars.variable)
 		end
 	end
+
+	updatecheevos()
 
 	create_bg()
 end

@@ -146,7 +146,7 @@ function credits:keypressed(button)
 		end
 	elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 		playsound(assets.pop)
-		scenemanager:transitionscene(title, false, 5)
+		scenemanager:transitionscene(title, false, 7)
 		rumble(0.3, 0.3, 0.025)
 	end
 end

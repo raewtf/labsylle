@@ -68,6 +68,7 @@ function options:initialize(args)
 		selection = 1,
 		page = 1,
 		bump = 0,
+		remapbump = 0,
 		clearquikword = 1,
 		clearpak = 1,
 		clearall = 1,
@@ -143,8 +144,13 @@ function options:update()
 		vars.bump = 0
 	end
 
+	vars.remapbump = vars.remapbump - (vars.remapbump * 0.4)
+	if vars.remapbump <= 0.1 and vars.remapbump >= -0.1 and vars.remapbump ~= 0 then
+		vars.remapbump = 0
+	end
+
 	if platform == 'peedee' and not redraw then
-		if vars.bump ~= 0 then
+		if vars.bump ~= 0 or vars.remapbump ~= 0 then
 			gfx.sprite.redrawBackground()
 		end
 	end
@@ -205,6 +211,7 @@ function options:draw()
 		if vars.selection == 6 then drawrect(85 - vars.bump, 122, 230 + (vars.bump * 2), 18) end
 		if vars.selection == 7 then drawrect(85 - vars.bump, 136, 230 + (vars.bump * 2), 18) end
 		if vars.selection == 8 then drawrect(85 - vars.bump, 150, 230 + (vars.bump * 2), 18) end
+		if vars.selection == 9 then drawrect(85 - vars.bump, 164, 230 + (vars.bump * 2), 18) end
 		setcolor()
 	elseif vars.page == 2 then
 		if platform == 'peedee' then
@@ -253,9 +260,9 @@ function options:draw()
 		setcolor('black', 0.5)
 		fillrect(0, 0, 400, 240)
 		setcolor('white')
-		fillrect(30, 75, 340, 90, 10)
+		fillrect(30 - vars.remapbump, 75 - vars.remapbump, 340 + (vars.remapbump * 2), 90 + (vars.remapbump * 2), 10)
 		setcolor()
-		drawrect(30, 75, 340, 90, 8)
+		drawrect(30 - vars.remapbump, 75 - vars.remapbump, 340 + (vars.remapbump * 2), 90 + (vars.remapbump * 2), 8)
 
 		setcolor('white')
 
@@ -345,7 +352,7 @@ function options:keypressed(button)
 			end
 		elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 			playsound(assets.pop)
-			scenemanager:transitionscene(title, false, 4)
+			scenemanager:transitionscene(title, false, 6)
 			rumble(0.3, 0.3, 0.025)
 		elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
 			if vars['selections' .. vars.page][vars.selection] == 'music' then
@@ -361,6 +368,7 @@ function options:keypressed(button)
 				if platform == 'peedee' then
 					save.crank = not save.crank
 				else
+					setmusicvolume(0.5)
 					vars.remap_step = 1
 					vars.handler = 'remap'
 				end
@@ -416,21 +424,21 @@ function options:keypressed(button)
 					vars.clearquikword = vars.clearquikword + 1
 				end
 				if vars.clearquikword == 4 then
-					save.quikwordbest = 0
+					resetsave('quikword')
 				end
 			elseif vars['selections' .. vars.page][vars.selection] == 'clearpak' then
 				if vars.clearpak < 4 then
 					vars.clearpak = vars.clearpak + 1
 				end
 				if vars.clearpak == 4 then
-					resetsave(true, true)
+					resetsave('paks')
 				end
 			elseif vars['selections' .. vars.page][vars.selection] == 'clearall' then
 				if vars.clearall < 4 then
 					vars.clearall = vars.clearall + 1
 				end
 				if vars.clearall == 4 then
-					resetsave()
+					resetsave('everything')
 				end
 			end
 			playsound(assets.pop)
@@ -477,11 +485,15 @@ function options:keypressed(button)
 			playsound(assets.pop)
 			vars.remap_step = vars.remap_step + 1
 			if vars.remap_step > 6 then
+				setmusicvolume(1)
 				vars.handler = 'options'
 				self:holdbuttons()
 				savegame()
 			end
+			rumble(0.3, 0.3, 0.025)
 		else
+			vars.remapbump = -3
+			rumble(0.1, 0.1, 0.025)
 			randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 		end
 	end

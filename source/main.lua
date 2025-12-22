@@ -1,21 +1,9 @@
 -- NOTE: solver/optimum swaps finder function, that returns a number
--- TODO: write manual
--- TODO: statistics menu
-	-- Total words found (exclude shapes and math)
-	-- Brainfreezes (swaps immediately followed by un-swaps)
-	-- Kerplosions
-	-- Paks completed (how many times is "complete" found in the save table?)
-	-- Quik-Word games played
-	-- Quik-Word best score
-	-- Quik-Words found
-	-- Time spent playing
-	-- Time spent in Quik-Word
-	-- Time spent in paks
 -- TODO: randomization that remains consistent between love/peedee
 -- TODO: optimize a biiit on peedee
 
 -- Build target. 'peedee' or 'love'
-platform = 'peedee'
+platform = 'love'
 local fps = 30
 
 local pd
@@ -86,7 +74,7 @@ elseif platform == 'love' then
 	white = love.math.colorFromBytes(1, 1, 1, 1)
 	fullscreen = false
 
-	version = '1.0.0b2'
+	version = '1.0.0'
 
 	gfx.setLineStyle('rough')
 	gfx.setLineJoin('miter')
@@ -164,19 +152,31 @@ function savecheck()
 	-- Fix for old save.hours logic
 	if tonumber(save.hours) == save.hours then save.hours = (save.hours == 1 and true or save.hours == 2 and false) or true end
 
-	save.quikwordbest = save.quikwordbest or 0
-
 	save.background = save.background or 0
 
 	if save.boldtext == nil then save.boldtext = false end
 	if save.autosubmit == nil then save.autosubmit = false end
 	if save.showcontrols == nil then save.showcontrols = true end
+
+	save.wordsfound = save.wordsfound or 0
+	save.brainfreezes = save.brainfreezes or 0
+	save.kerplosions = save.kerplosions or 0
+	save.quikwordsplayed = save.quikwordsplayed or 0
+	save.quikwordbest = save.quikwordbest or 0
+	save.quikwordsfound = save.quikwordsfound or 0
+	save.playtime = save.playtime or 0
+	save.paktime = save.paktime or 0
+	save.quiktime = save.quiktime or 0
 end
 
-function resetsave(keepoptions, keepquikword)
-	newsave = {}
-
-	if keepoptions then
+function resetsave(what)
+	if what == 'quikword' then
+		save.quiktime = 0
+		save.quikwordbest = 0
+		save.quikwordsfound = 0
+		save.quikwordsplayed = 0
+	elseif what == 'paks' then
+		newsave = {}
 		if platform == 'peedee' then
 			newsave.crank = save.crank
 		elseif platform == 'love' then
@@ -209,62 +209,58 @@ function resetsave(keepoptions, keepquikword)
 		newsave.boldtext = save.boldtext
 		newsave.autosubmit = save.autosubmit
 		newsave.showcontrols = save.showcontrols
-	else
-		if platform == 'peedee' then
-			newsave.crank = true
-		elseif platform == 'love' then
-			newsave.scale = 1
-			newsave.gamepad = false
 
-			save.up = 'up'
-			save.down = 'down'
-			save.left = 'left'
-			save.right = 'right'
-			save.primary = 'z'
-			save.secondary = 'x'
-
-			save.color = 1
-
-			save.clean_scaling = true
-			save.rumble = true
-		end
-
-		newsave.music = true
-		newsave.sfx = true
-
-		newsave.time = true
-		newsave.menubg = true
-		newsave.flip = (platform == 'peedee' and false or platform == 'love' and true)
-		newsave.hours = true
-
-		newsave.background = 0
-
-		newsave.boldtext = false
-		newsave.autosubmit = false
-		newsave.showcontrols = true
-	end
-
-	if keepquikword then
+		newsave.wordsfound = save.wordsfound
+		newsave.brainfreezes = save.brainfreezes
+		newsave.quikwordsplayed = save.quikwordsplayed
 		newsave.quikwordbest = save.quikwordbest
-	else
-		newsave.quikwordbest = 0
+		newsave.quikwordsfound = save.quikwordsfound
+		newsave.playtime = save.playtime
+		newsave.quiktime = save.quiktime
+
+		save = newsave
+		newsave = nil
+	elseif what == 'everything' then
+		save = {}
+		savegame()
+		savecheck()
+		newmusic('audio/music/title', true)
+		create_bg()
+		setredraw(true)
+		assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓')
 	end
-
-	save = newsave
-	newsave = nil
-
 	savegame()
-
-	newmusic('audio/music/title', true)
-	create_bg()
-	setredraw(true)
-	assets.discoteca = newfont(save.boldtext and 'fonts/disco' or 'fonts/discoteca', save.boldtext and '0123456789 !"&\'(),./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz–—➖|ⒶⒷ➕➡⬅⬆⬇🐟❓-' or '0123456789 !"#%&\'()+,-./:;?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz–—❓')
 end
 
 if platform == 'peedee' then
 	savecheck()
 
-	-- TODO: peedee cheevo setup
+	achievements.initialize(achievementData, true)
+	function updatecheevos()
+		if save.tutorial.status == 'complete' then achievements.grant('welcome') end
+		achievements.advanceTo('words25', save.wordsfound)
+		achievements.advanceTo('words50', save.wordsfound)
+		achievements.advanceTo('words100', save.wordsfound)
+		achievements.advanceTo('words250', save.wordsfound)
+		achievements.advanceTo('words500', save.wordsfound)
+		achievements.advanceTo('words1000', save.wordsfound)
+		achievements.advanceTo('brainfreeze', save.brainfreezes)
+		achievements.advanceTo('kerplode', save.kerplosions)
+		achievements.advanceTo('quikword', save.quikwordsplayed)
+		achievements.advanceTo('quikwords25', save.quikwordsfound)
+		achievements.advanceTo('quikwords50', save.quikwordsfound)
+		achievements.advanceTo('quikwords100', save.quikwordsfound)
+		achievements.advanceTo('quikwords250', save.quikwordsfound)
+		achievements.advanceTo('quikwordbest5', save.quikwordbest)
+		achievements.advanceTo('quikwordbest15', save.quikwordbest)
+		achievements.advanceTo('quikwordbest30', save.quikwordbest)
+		achievements.save()
+	end
+	updatecheevos()
+elseif platform == 'love' then
+	function updatecheevos()
+		-- noop
+	end
 end
 
 local lasthour = gettime().hour
@@ -382,6 +378,8 @@ if platform == 'peedee' then
 		gfx.sprite.update()
 		pd.timer.updateTimers()
 
+		save.playtime = save.playtime + 1
+
 		-- TODO: remove drawFPS
 		pd.drawFPS(0, 0)
 	end
@@ -414,6 +412,7 @@ elseif platform == 'love' then
 				options:restorebuttons()
 				playsound(assets.pop)
 				vars.remap_step = 1
+				setmusicvolume(1)
 				vars.handler = 'options'
 				savegame()
 			else
@@ -503,6 +502,8 @@ elseif platform == 'love' then
 
 	function love.update(dt)
 		next_time = next_time + min_dt
+
+		save.playtime = save.playtime + 1
 
 		if vars ~= nil and not vars.paused then
 			timer.update(dt, transition)

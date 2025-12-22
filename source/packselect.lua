@@ -65,6 +65,10 @@ function packselect:initialize(args)
 		block3 = newsound('audio/sfx/block3'),
 		block4 = newsound('audio/sfx/block4'),
 		block5 = newsound('audio/sfx/block5'),
+		bubble1 = newsound('audio/sfx/bubble1'),
+		bubble2 = newsound('audio/sfx/bubble2'),
+		bubble3 = newsound('audio/sfx/bubble3'),
+		scribble = newsound('audio/sfx/scribble'),
 		pop = newsound('audio/sfx/pop'),
 	}
 
@@ -75,6 +79,7 @@ function packselect:initialize(args)
 		scroll = 0,
 		scroll_target = 0,
 		bump = 0,
+		lbbump = 0,
 		reset = false,
 		handler = 'packselect',
 		lbloading = false,
@@ -261,9 +266,14 @@ function packselect:update()
 		end
 	end
 
-	vars.bump = vars.bump - (vars.bump * 0.6)
+	vars.bump = vars.bump - (vars.bump * 0.4)
 	if vars.bump <= 0.1 and vars.bump >= -0.1 and vars.bump ~= 0 then
 		vars.bump = 0
+	end
+
+	vars.lbbump = vars.lbbump - (vars.lbbump * 0.4)
+	if vars.lbbump <= 0.1 and vars.lbbump >= -0.1 and vars.lbbump ~= 0 then
+		vars.lbbump = 0
 	end
 
 	vars.sellerp = vars.sellerp + ((vars.selection - vars.sellerp) * 0.6)
@@ -325,9 +335,9 @@ function packselect:draw()
 		fillrect(0, 0, 400, 240)
 
 		setcolor('white')
-		fillrect(10, 10, 380, 215, 10)
+		fillrect(10 - vars.lbbump, 10 - vars.lbbump, 380 + (vars.lbbump * 2), 215 + (vars.lbbump * 2), 10)
 		setcolor()
-		drawrect(10, 10, 380, 215, 8)
+		drawrect(10 - vars.lbbump, 10 - vars.lbbump, 380 + (vars.lbbump * 2), 215 + (vars.lbbump * 2), 8)
 
 		setcolor('white')
 		fillrect(80, 200, 240, 30, 5)
@@ -409,6 +419,7 @@ function packselect:keypressed(button)
 		elseif button == (platform == 'peedee' and 'left' or platform == 'love' and save.left) then
 			if vars.reset_armed < 5 and save[pack[vars.selection].id] ~= nil then
 				vars.reset_armed = 60
+				randomizesfx(assets.bubble1, assets.bubble2, assets.bubble3)
 			end
 		elseif button == (platform == 'peedee' and 'right' or platform == 'love' and save.right) then
 			if vars.reset_armed > 5 then
@@ -418,13 +429,14 @@ function packselect:keypressed(button)
 			if pack[1] == packs[1] then
 				scenemanager:transitionscene(title, false, 1)
 			else
-				scenemanager:transitionscene(title, false, 3)
+				scenemanager:transitionscene(title, false, 5)
 			end
 			playsound(assets.pop)
 			rumble(0.3, 0.3, 0.025)
 		elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
 			if vars.reset_armed > 5 then
 				self:resetpack(vars.selection)
+				playsound(assets.scribble)
 				vars.reset_armed = 0
 			else
 				if pack[vars.selection].puzzles ~= nil and #pack[vars.selection].puzzles > 0 then
@@ -459,6 +471,7 @@ function packselect:keypressed(button)
 			if vars.lbloading then
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				rumble(0.1, 0.1, 0.025)
+				vars.lbbump = -3
 			else
 				self:refreshboards()
 				playsound(assets.pop)

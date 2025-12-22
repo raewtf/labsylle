@@ -9,6 +9,7 @@ if platform == 'peedee' then
 	import 'options'
 	import 'credits'
 	import 'game'
+	import 'statistics'
 
 	pd = playdate
 	gfx = pd.graphics
@@ -40,6 +41,7 @@ elseif platform == 'love' then
 	options = require 'options'
 	credits = require 'credits'
 	game = require 'game'
+	statistics = require 'statistics'
 
 	gfx = love.graphics
 	center = 'center'
@@ -74,6 +76,7 @@ function title:initialize(args)
 		selection = args[2] or 1,
 		dir = false,
 		bump = 0,
+		lbbump = 0,
 		handler = '',
 		offset = 0,
 		offsettarget = 0,
@@ -88,6 +91,11 @@ function title:initialize(args)
 		end)
 	else
 		vars.handler = 'title'
+	end
+
+	if vars.selection > 1 then
+		vars.offset = -40
+		vars.offsettarget = -40
 	end
 
 	newtimer('gaming', 1, 1, 1)
@@ -152,19 +160,24 @@ function title:update()
 		vars.bump = 0
 	end
 
-	vars.offset = vars.offset - ((vars.offsettarget + vars.offset) * 0.4)
-	if vars.offset <= vars.offsettarget + 0.1 and vars.offset >= vars.offsettarget - 0.1 and vars.offset ~= 0 then
+	vars.lbbump = vars.lbbump - (vars.lbbump * 0.4)
+	if vars.lbbump <= 0.1 and vars.lbbump >= -0.1 and vars.lbbump ~= 0 then
+		vars.lbbump = 0
+	end
+
+	vars.offset = vars.offset + ((vars.offsettarget - vars.offset) * 0.4)
+	if vars.offset <= vars.offsettarget + 0.1 and vars.offset >= vars.offsettarget - 0.1 and vars.offset ~= vars.offsettarget then
 		vars.offset = vars.offsettarget
 	end
 
 	if vars.selection > 1 then
-		vars.offsettarget = 40
+		vars.offsettarget = -40
 	else
 		vars.offsettarget = 0
 	end
 
 	if platform == 'peedee' and not redraw then
-		if (vars.launchfade ~= nil and vars.launchfade.timeLeft ~= 0) or (vars.logopull ~= nil and vars.logopull.timeLeft ~= 0) or vars.bump ~= 0 then
+		if (vars.launchfade ~= nil and vars.launchfade.timeLeft ~= 0) or (vars.logopull ~= nil and vars.logopull.timeLeft ~= 0) or vars.bump ~= 0 or vars.lbbump ~= 0 then
 			gfx.sprite.redrawBackground()
 		end
 	end
@@ -238,9 +251,9 @@ function title:draw()
 		fillrect(0, 0, 400, 240)
 
 		setcolor('white')
-		fillrect(10, 10, 380, 215, 10)
+		fillrect(10 - vars.lbbump, 10 - vars.lbbump, 380 + (vars.lbbump * 2), 215 + (vars.lbbump * 2), 10)
 		setcolor()
-		drawrect(10, 10, 380, 215, 8)
+		drawrect(10 - vars.lbbump, 10 - vars.lbbump, 380 + (vars.lbbump * 2), 215 + (vars.lbbump * 2), 8)
 
 		setcolor('white')
 		fillrect(70, 200, 260, 30, 5)
@@ -397,6 +410,7 @@ function title:keypressed(button)
 				quikwords_completed = {'Quik-Words Seen:'}
 			elseif vars.selection == 3 then
 				vars.handler = 'leaderboards'
+				setmusicvolume(0.5)
 				self:refreshboards(vars.lbdaily)
 			elseif vars.selection == 4 then
 				scenemanager:transitionscene(statistics)
@@ -414,6 +428,7 @@ function title:keypressed(button)
 			if vars.lbloading or not vars.lbdaily then
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				rumble(0.1, 0.1, 0.025)
+				vars.lbbump = -3
 			else
 				vars.lbdaily = false
 				self:refreshboards(vars.lbdaily)
@@ -424,6 +439,7 @@ function title:keypressed(button)
 			if vars.lbloading or vars.lbdaily then
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				rumble(0.1, 0.1, 0.025)
+				vars.lbbump = -3
 			else
 				vars.lbdaily = true
 				self:refreshboards(vars.lbdaily)
@@ -432,12 +448,14 @@ function title:keypressed(button)
 			end
 		elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 			vars.handler = 'title'
+			setmusicvolume(1)
 			playsound(assets.pop)
 			rumble(0.3, 0.3, 0.025)
 		elseif button == (platform == 'peedee' and 'a' or platform == 'love' and save.primary) then
 			if vars.lbloading then
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
 				rumble(0.1, 0.1, 0.025)
+				vars.lbbump = -3
 			else
 				self:refreshboards(vars.lbdaily)
 				playsound(assets.pop)

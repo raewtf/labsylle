@@ -86,12 +86,12 @@ function game:initialize(args)
 		slide3 = newsound('audio/sfx/slide3'),
 		slide4 = newsound('audio/sfx/slide4'),
 		slide5 = newsound('audio/sfx/slide5'),
-		bubble1 = newsound('audio/sfx/bubble1'),
-		bubble2 = newsound('audio/sfx/bubble2'),
-		bubble3 = newsound('audio/sfx/bubble3'),
 		snap1 = newsound('audio/sfx/snap1'),
 		snap2 = newsound('audio/sfx/snap2'),
 		snap3 = newsound('audio/sfx/snap3'),
+		bubble1 = newsound('audio/sfx/bubble1'),
+		bubble2 = newsound('audio/sfx/bubble2'),
+		bubble3 = newsound('audio/sfx/bubble3'),
 		scribble = newsound('audio/sfx/scribble'),
 		pop = newsound('audio/sfx/pop'),
 	}
@@ -125,6 +125,7 @@ function game:initialize(args)
 		pauseselection = 1,
 		pauseselections = {},
 		bump = 0,
+		brainfreezeprime = false,
 	}
 
 	loopingtimer('rattle', 100, -1, 1, 'inOutElastic')
@@ -422,6 +423,7 @@ end
 
 function game:pause()
 	if not vars.paused then
+		setmusicvolume(0.5)
 		vars.paused = true
 		vars.oldhandler = vars.handler
 		vars.handler = 'paused'
@@ -647,6 +649,13 @@ function game:swap(dir)
 		end
 	end
 	if not kerploded then
+		if vars.brainfreezeprime then
+			vars.brainfreezeprime = false
+			save.brainfreezes = save.brainfreezes + 1
+			updatecheevos()
+		else
+			vars.brainfreezeprime = true
+		end
 		playsound(assets.swish)
 		vars.swaps = vars.swaps + 1
 		vars.boomp = 5
@@ -686,6 +695,8 @@ end
 function game:kerplode()
 	if not vars.finished and vars.playing then
 		playsound(assets.kerplode)
+		save.kerplosions = save.kerplosions + 1
+		updatecheevos()
 		rumble(1, 1, 1.5)
 		vars.playing = false
 		vars.handler = ''
@@ -706,11 +717,13 @@ function game:endround()
 	if not vars.finished then
 		vars.finished = true
 		vars.handler = ''
+		save.wordsfound = save.wordsfound + 1
 		if vars.pack == 'speed' then
 			if quikwordtimeleft() ~= 0 then
 				pausequikword()
 				game:updateheader(gettime())
 			end
+			save.quikwordsfound = save.quikwordsfound + 1
 		else
 			if vars.puzzle == #vars.pack.puzzles then
 				fademusic()
@@ -726,6 +739,7 @@ function game:endround()
 				newtimer('texx', 1, 0, 0)
 			end
 		end
+		updatecheevos()
 		resettimer('cursor', 300, value('cursor'), 1, 'inOutSine')
 		vars.playing = false
 		for i = 1, vars.tiles do
@@ -929,6 +943,9 @@ function game:update()
 			end
 		end
 		vars.quikwold = quikwordvalue()
+		save.quiktime = save.quiktime + 1
+	else
+		save.paktime = save.paktime + 1
 	end
 
 	vars.bump = vars.bump - (vars.bump * 0.4)
@@ -1108,6 +1125,7 @@ function game:keypressed(button)
 				vars.crank = 0
 				randomizesfx(assets.snap1, assets.snap2, assets.snap3)
 				rumble(0.3, 0.3, 0.025)
+				vars.brainfreezeprime = false
 			else
 				vars.sellerp = vars.sellerp - 0.5
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
@@ -1120,6 +1138,7 @@ function game:keypressed(button)
 				vars.crank = 0
 				randomizesfx(assets.snap1, assets.snap2, assets.snap3)
 				rumble(0.3, 0.3, 0.025)
+				vars.brainfreezeprime = false
 			else
 				vars.sellerp = vars.sellerp + 0.5
 				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
@@ -1174,10 +1193,12 @@ function game:keypressed(button)
 			playsound(assets.pop)
 			if vars.pauseselections[vars.pauseselection] == 'resume' then
 				self:unpause()
+				setmusicvolume(1)
 			elseif vars.pauseselections[vars.pauseselection] == 'suspend' then
 				self:quit(true)
 			elseif vars.pauseselections[vars.pauseselection] == 'retry' then
 				self:restart()
+				setmusicvolume(1)
 			elseif vars.pauseselections[vars.pauseselection] == 'quit' then
 				self:quit(false)
 			end

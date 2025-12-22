@@ -209,6 +209,12 @@ function stopmusic()
 	end
 end
 
+function setmusicvolume(newvol)
+	if music ~= nil then
+		music:setVolume(newvol)
+	end
+end
+
 -- New music track. This should be called in a scene's init, only if there's no track leading into it. File is a path to an audio file in the PDX. Loop, if true, will loop the audio file. Range will set the loop's starting range.
 function newmusic(file, loop, range)
 	if save.music and music == nil then -- If a music file isn't actively playing...then go ahead and set a new one.
