@@ -83,7 +83,7 @@ function results:initialize(args)
 		assets.packcomplete = newsound('audio/sfx/packcomplete')
 		playsound(assets.packcomplete)
 		vars.sayings = {'Great work!', 'Good job!', 'Nice work!', 'Nice job!', 'You did it!', 'Yahoo!', 'Yippee!', 'Have a good day!', 'No sweat!'}
-		vars.randsaying = math.random(1, #vars.sayings)
+		vars.randsaying = randInt(1, #vars.sayings)
 		if platform == 'peedee' and catalog then
 			pd.scoreboards.addScore(vars.pack.id, vars.variable)
 		end
@@ -149,29 +149,48 @@ function results:draw()
 	if vars.pack == 'speed' then
 		drawtext(assets.cal, 'Time Up!', 200, 11 - (value('bump') * 1.5), center)
 		if platform == 'peedee' then
-			gfx.setClipRect(80, 63 + (vars.bump.value * 4), 240, 106)
-		elseif platform == 'love' then
-			sx, sy, sw, sh = gfx.getScissor()
-			gfx.setScissor()
-			-- TODO: love equivalent for cliprect
-		end
-		if vars.variable == 0 then
-			drawtext(assets.discoteca, 'You didn\'t beat any rounds.', 200, 75 + (value('bump') * 4) + vars.scroll, center)
-			drawtext(assets.discoteca, 'Did you forget to\npause your game...?', 200, 101 + (value('bump') * 4) + vars.scroll, center)
-		else
-			drawtext(assets.discoteca, 'You made it up past Round...', 200, 77 + (value('bump') * 4) + vars.scroll, center)
-			drawtext(assets.cal, commalize(vars.variable) .. '!', 200, 94 + (value('bump') * 4) + vars.scroll, center)
-		end
-		drawtext(assets.discoteca, tostring(vars.best and 'That\'s a new best!' or 'Your best is ' .. save.quikwordbest .. tostring(save.quikwordbest == 1 and ' round.' or ' rounds.')), 200, 143 + (value('bump') * 4) + vars.scroll, center)
-		drawline(140, 168 + (value('bump') * 4) + vars.scroll, 260, 168 + (value('bump') * 4) + vars.scroll)
-		for i = 1, #quikwords_completed do
-			drawtext(assets[i == 1 and 'disco' or 'discoteca'], quikwords_completed[i], 200, 166 + (14 * i) + (value('bump') * 4) + vars.scroll, center)
-		end
-		if platform == 'peedee' then
+			gfx.setClipRect(80, 63 + (value('bump') * 4), 240, 106)
+
+			if vars.variable == 0 then
+				drawtext(assets.discoteca, 'You didn\'t beat any rounds.', 200, 75 + (value('bump') * 4) + vars.scroll, center)
+				drawtext(assets.discoteca, 'Did you forget to\npause your game...?', 200, 101 + (value('bump') * 4) + vars.scroll, center)
+			else
+				drawtext(assets.discoteca, 'You made it up past Round...', 200, 77 + (value('bump') * 4) + vars.scroll, center)
+				drawtext(assets.cal, commalize(vars.variable) .. '!', 200, 94 + (value('bump') * 4) + vars.scroll, center)
+			end
+			drawtext(assets.discoteca, tostring(vars.best and 'That\'s a new best!' or 'Your best is ' .. save.quikwordbest .. tostring(save.quikwordbest == 1 and ' round.' or ' rounds.')), 200, 143 + (value('bump') * 4) + vars.scroll, center)
+			drawline(140, 168 + (value('bump') * 4) + vars.scroll, 260, 168 + (value('bump') * 4) + vars.scroll)
+			for i = 1, #quikwords_completed do
+				drawtext(assets[i == 1 and 'disco' or 'discoteca'], quikwords_completed[i], 200, 166 + (14 * i) + (value('bump') * 4) + vars.scroll, center)
+			end
+
 			gfx.clearClipRect()
 		elseif platform == 'love' then
+			assets.scroll = gfx.newCanvas(240, 106)
+			gfx.setCanvas(assets.scroll)
+			gfx.push()
+			sx, sy, sw, sh = gfx.getScissor()
+			gfx.setScissor()
+			gfx.origin()
+			gfx.clear()
+
+			if vars.variable == 0 then
+				drawtext(assets.discoteca, 'You didn\'t beat any rounds.', 120, 12 + vars.scroll, center)
+				drawtext(assets.discoteca, 'Did you forget to\npause your game...?', 200, 38 + vars.scroll, center)
+			else
+				drawtext(assets.discoteca, 'You made it up past Round...', 120, 14 + vars.scroll, center)
+				drawtext(assets.cal, commalize(vars.variable) .. '!', 120, 31 + vars.scroll, center)
+			end
+			drawtext(assets.discoteca, tostring(vars.best and 'That\'s a new best!' or 'Your best is ' .. save.quikwordbest .. tostring(save.quikwordbest == 1 and ' round.' or ' rounds.')), 120, 80 + vars.scroll, center)
+			drawline(60, 105 + vars.scroll, 180, 105 + vars.scroll)
+			for i = 1, #quikwords_completed do
+				drawtext(assets[i == 1 and 'disco' or 'discoteca'], quikwords_completed[i], 120, 103 + (14 * i) + vars.scroll, center)
+			end
+
 			gfx.setScissor(sx, sy, sw, sh)
-			-- TODO: make sure this is fine too
+			gfx.pop()
+			gfx.setCanvas()
+			drawimage(assets.scroll, 80, 63 + (value('bump') * 4))
 		end
 	else
 		drawtext(assets.cal, 'Pack Complete!', 200, 11 - (value('bump') * 1.5), center)

@@ -246,7 +246,7 @@ function packselect:update()
 		end
 
 		local ticks = pd.getCrankTicks(6)
-		if ticks ~= 0 and not scenemanager.transitioning then
+		if ticks ~= 0 and not scenemanager.transitioning and vars.handler == 'packselect' then
 			vars.selection = vars.selection + ticks
 			if vars.selection > #pack then
 				vars.selection = #pack
@@ -424,6 +424,7 @@ function packselect:keypressed(button)
 		elseif button == (platform == 'peedee' and 'right' or platform == 'love' and save.right) then
 			if vars.reset_armed > 5 then
 				vars.reset_armed = 0
+				playsound(assets.pop)
 			end
 		elseif button == (platform == 'peedee' and 'b' or platform == 'love' and save.secondary) then
 			if pack[1] == packs[1] then

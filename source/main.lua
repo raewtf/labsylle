@@ -1,9 +1,7 @@
 -- NOTE: solver/optimum swaps finder function, that returns a number
--- TODO: randomization that remains consistent between love/peedee
--- TODO: optimize a biiit on peedee
 
 -- Build target. 'peedee' or 'love'
-platform = 'love'
+platform = 'peedee'
 local fps = 30
 
 local pd
@@ -21,7 +19,6 @@ volume = 1
 quit = 0
 catalog = false
 
-local random = math.random
 local floor = math.floor
 local ceil = math.ceil
 
@@ -33,13 +30,15 @@ if platform == 'peedee' then
 	import 'CoreLibs/sprites'
 	import 'CoreLibs/graphics'
 	import 'CoreLibs/animation'
-	import 'wrappers_peedee'
+	import 'libraries/achievements'
+	import 'libraries/xorpeedee'
+	import 'cheevos'
 
+	import 'wrappers_peedee'
 	import 'scenemanager'
 	scenemanager = scenemanager()
 
 	import 'packs' -- Puzzle paks
-
 	import 'title'
 
 	pd = playdate
@@ -61,12 +60,12 @@ elseif platform == 'love' then
 	timer = require 'libraries/timer'
 	easings = require 'libraries/easing'
 	gamestate = require 'libraries/gamestate'
-	require 'wrappers_love'
+	require 'libraries/xorlove'
 
+	require 'wrappers_love'
 	scenemanager = require 'scenemanager'
 
 	packs, bonus, quikword = require 'packs' ()
-
 	title = require 'title'
 
 	gfx = love.graphics
@@ -237,7 +236,7 @@ if platform == 'peedee' then
 
 	achievements.initialize(achievementData, true)
 	function updatecheevos()
-		if save.tutorial.status == 'complete' then achievements.grant('welcome') end
+		if (save.tutorial ~= nil and save.tutorial.status ~= nil and save.tutorial.status == 'complete') then achievements.grant('welcome') end
 		achievements.advanceTo('words25', save.wordsfound)
 		achievements.advanceTo('words50', save.wordsfound)
 		achievements.advanceTo('words100', save.wordsfound)
@@ -307,11 +306,11 @@ end
 function create_bg(game)
 	if not game and not save.menubg then return end
 	for i = 1, 10 do
-		local x = random(-20, 420)
-		local y = random(-190, -20)
-		local fallspeed = random(25, 50)
-		local delay = random(500, 9000)
-		local rotspeed = random()
+		local x = randInt(-20, 420)
+		local y = randInt(-190, -20)
+		local fallspeed = randInt(25, 50)
+		local delay = randInt(500, 9000)
+		local rotspeed = randFloat()
 		local size
 		if i <= 5 then
 			size = 'small'
@@ -379,9 +378,6 @@ if platform == 'peedee' then
 		pd.timer.updateTimers()
 
 		save.playtime = save.playtime + 1
-
-		-- TODO: remove drawFPS
-		pd.drawFPS(0, 0)
 	end
 
 	function drawontop()

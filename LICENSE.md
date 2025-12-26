@@ -6,11 +6,21 @@
 
 (source/audio/music, source/audio/sfx) Music made by rae, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
+(source/libraries/timer.lua) Knife library made by airstruck, under [MIT](https://github.com/airstruck/knife/blob/master/license)
+
+(source/libraries/class.lua, source/libraries/gamestate.lua) HUMP library made by Matthias Richter, under [their license](https://github.com/HDictus/hump/blob/temp-master/README.md)
+
+(source/libraries/easing.lua) Tween easings made by Yuichi Tateno and Emmanuel Oga, under [MIT](https://github.com/EmmanuelOga/easing/blob/master/license.txt)
+
+(source/libraries/json.lua) Lua JSON parser made by rxi, under [MIT](https://github.com/rxi/json.lua/blob/master/LICENSE)
+
+(source/libraries/xorlove.lua, source/libraries/xorpeedee.lua) xorshift Lua implementation made by 2DArray, under [CC0](https://creativecommons.org/public-domain/cc0/)
+
 The rest of the code made by rae, except where noted.
 
 MIT License
 
-Copyright (c) 2025 rae
+Copyright (c) 2026 rae
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

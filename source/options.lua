@@ -122,7 +122,7 @@ function options:update()
 		end
 
 		local ticks = pd.getCrankTicks(4)
-		if ticks ~= 0 and not transitioning then
+		if ticks ~= 0 and not transitioning and vars.handler == 'options' then
 			vars.selection = vars.selection + ticks
 			if vars.selection > #vars['selections' .. vars.page] then
 				vars.selection = #vars['selections' .. vars.page]

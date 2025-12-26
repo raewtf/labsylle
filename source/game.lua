@@ -153,7 +153,8 @@ function game:initialize(args)
 		assets.speedcountin5 = newsound('audio/sfx/speedcountin5')
 		assets.speedcountin6 = newsound('audio/sfx/speedcountin6')
 
-		local random = math.random(1, #quikwords)
+		setRandomSeed(save.playtime)
+		local random = randInt(1, #quikwords)
 
 		vars.target = self:deepcopy(quikwords[random])
 		vars.word = self:deepcopy(quikwords[random])
@@ -223,7 +224,7 @@ function game:initialize(args)
 
 		vars.target = self:deepcopy(vars.pack.puzzles[vars.puzzle].target)
 		vars.tiles = #vars.target[1]
-		math.randomseed(#vars.target[1] * (vars.puzzle * 50))
+		setRandomSeed(#vars.target[1] * (vars.puzzle * 50))
 		if vars.word == nil then
 			vars.word = self:deepcopy(vars.target[1])
 			local same = true
@@ -829,7 +830,7 @@ end
 -- Shuffly code from https://gist.github.com/Uradamus/10323382
 function game:shuffle(tbl)
 	  for i = #tbl, 2, -1 do
-		local j = math.random(i)
+		local j = randInt(1, i)
 		tbl[i], tbl[j] = tbl[j], tbl[i]
 	end
 	  return tbl

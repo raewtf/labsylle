@@ -207,7 +207,7 @@ function randomizesfx(sfx1, sfx2, sfx3, sfx4, sfx5, rate)
 		if sfx3 ~= nil then sfc = sfc + 1 end
 		if sfx4 ~= nil then sfc = sfc + 1 end
 		if sfx5 ~= nil then sfc = sfc + 1 end
-		local rand = math.random(1, sfc)
+		local rand = randInt(1, sfc)
 		if rand == 1 then
 			sfx1:setPitch(rate or 1)
 			playsound(sfx1)

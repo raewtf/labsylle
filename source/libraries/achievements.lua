@@ -54,9 +54,9 @@ achievements = {
 achievements.paths.shared_data_root = shared_achievement_folder
 
 --- Returns the path to the root folder for the game with the supplied `gameID`.
---- 
+---
 --- This function doesn't check if the folder at the resulting path exists.
---- 
+---
 --- @param gameID string The ID of the game for which to get the path.
 --- @return string # The path to the root folder of the game.
 function achievements.paths.get_achievement_folder_root_path(gameID)
@@ -68,9 +68,9 @@ function achievements.paths.get_achievement_folder_root_path(gameID)
 end
 
 --- Returns the path to the file containing the achievement data for the game with the supplied `gameID`.
---- 
+---
 --- This function doesn't check if the file at the resulting path exists.
---- 
+---
 --- @param gameID string The ID of the game for which to get the path.
 --- @return string # The path to the file containing the achievement data for the game.
 function achievements.paths.get_achievement_data_file_path(gameID)
@@ -82,9 +82,9 @@ function achievements.paths.get_achievement_data_file_path(gameID)
 end
 
 --- Returns the path to the folder containing shared images for the game with the supplied `gameID`.
---- 
+---
 --- This function doesn't check if the folder at the resulting path exists.
---- 
+---
 --- @param gameID string The ID of the game for which to get the path.
 --- @return string # The path to the folder containing shared images for the game.
 function achievements.paths.get_shared_images_path(gameID)
@@ -96,9 +96,9 @@ function achievements.paths.get_shared_images_path(gameID)
 end
 
 --- Returns the path to the file containing the last seen version of the shared images for the game with the supplied `gameID`.
---- 
+---
 --- This function doesn't check if the file at the resulting path exists.
---- 
+---
 --- @param gameID string The ID of the game for which to get the path.
 --- @return string # The path to the file containing the last seen version of the shared images for the game.
 function achievements.paths.get_shared_images_updated_file_path(gameID)
@@ -141,7 +141,7 @@ local function export_data(force_minimize)
 end
 
 --- Returns the parent directory of the supplied string path.
---- 
+---
 --- @param str string The string path of which to get the parent directory.
 --- @return string # The parent directory of the supplied string path.
 local function dirname(str)
@@ -149,7 +149,7 @@ local function dirname(str)
 end
 
 --- Changes the file extension of a string path to the supplied extension.
---- 
+---
 --- @param str string The string path of which to change the extension.
 --- @param new_ext string The new extension to use.
 --- @return string # The modified string path.
@@ -158,9 +158,9 @@ local function force_extension(str, new_ext)
 end
 
 --- Returns a set of the unique image paths for the supplied fields in configured achievements.
---- 
+---
 --- This function automatically adds the ".pdi" extension to the paths.
---- 
+---
 --- @param ... string The names of the fields to copy.
 --- @return table # A set of the unique image paths for the supplied fields.
 local function crawlImagePaths(...)
@@ -179,7 +179,7 @@ local function crawlImagePaths(...)
 end
 
 --- Copies the file at `src_path` to the supplied `dest_path`, creating any intermediate directories.
---- 
+---
 --- @param src_path string The path to the source file to copy.
 --- @param dest_path string The path to the destination file to copy to.
 --- @throws If the source file does not exist or if the destination path is invalid.
@@ -219,7 +219,7 @@ local function copy_file(src_path, dest_path)
 	if buffer == nil then
 		error("Can't read source file '"..src_path.."', because: '"..err.."'.")
 	end
-	-- NOTE: the documentation says this should be a string, but it seems we can get away with just yeeting the buffer in there
+	-- NOOTE: the documentation says this should be a string, but it seems we can get away with just yeeting the buffer in there
 	local res, err = out_file:write(buffer)
 	if res == 0 then
 		error("Can't write to destination file '"..dest_path.."' because: '"..err.."'.")
@@ -230,9 +230,9 @@ local function copy_file(src_path, dest_path)
 end
 
 --- Copies the images from the game's data folder to the shared images folder.
---- 
+---
 --- This function skips copying if the shared folder already contains the images for the current build.
---- 
+---
 --- @param gameID string The ID of the game for which to copy the images.
 --- @param current_build_nr number The current build number of the game.
 --- @throws If the the version file in the shared folder can't be read or written to, or if there's an error copying the images.
@@ -283,7 +283,7 @@ end
 local function donothing(...) end
 
 --- Validates the values of the supplied game data.
---- 
+---
 --- @param ach_root game_data The game data to validate.
 --- @param prevent_debug boolean Whether to suppress debug output. Defaults to false.
 --- @throws If any fields are invalid or if any non-optional fields are missing.
@@ -331,7 +331,7 @@ local function validate_gamedata(ach_root, prevent_debug)
 end
 
 --- Validates the values of the supplied achievement.
---- 
+---
 --- @param ach achievement The achievement to validate.
 --- @throws If any fields are invalid or if any non-optional fields are missing.
 local function validate_achievement(ach)
@@ -383,9 +383,9 @@ local function validate_achievement(ach)
 end
 
 --- Initializes the achievement system for the game.
---- 
+---
 --- Call this function once, before using other functions in the library.
---- 
+---
 --- @param gamedata game_data The game data and achievement definitions to manage.
 --- @param prevent_debug boolean Whether to suppress debug output. Defaults to false.
 --- @throws If the supplied data is invalid.
@@ -422,7 +422,7 @@ function achievements.initialize(gamedata, prevent_debug)
 end
 
 --- Returns the achievement with the supplied `achievement_id`.
---- 
+---
 --- @param achievement_id string The ID of the achievement to retrieve.
 --- @return achievement|boolean # The achievement, or false if it doesn't exist.
 achievements.getInfo = function(achievement_id)
@@ -430,7 +430,7 @@ achievements.getInfo = function(achievement_id)
 end
 
 --- Returns whether the achievement with the supplied `achievement_id` has been granted.
---- 
+---
 --- @param achievement_id string The ID of the achievement to check.
 --- @return boolean # Whether the achievement has been granted.
 achievements.isGranted = function(achievement_id)
@@ -438,7 +438,7 @@ achievements.isGranted = function(achievement_id)
 end
 
 --- Grants the achievement with the supplied `achievement_id`.
---- 
+---
 --- @param achievement_id string The ID of the achievement to grant.
 --- @return boolean # Whether the achievement was successfully granted.
 --- @throws If the achievement doesn't exist.
@@ -462,7 +462,7 @@ achievements.grant = function(achievement_id)
 end
 
 --- Revokes the achievement with the supplied `achievement_id`.
---- 
+---
 --- @param achievement_id string The ID of the achievement to revoke.
 --- @return boolean # Whether the achievement was successfully revoked.
 --- @throws If the achievement doesn't exist.
@@ -481,7 +481,7 @@ achievements.revoke = function(achievement_id)
 end
 
 --- Advances the achievement with the supplied `achievement_id` to the specified progress.
---- 
+---
 --- @param achievement_id string The ID of the achievement to advance.
 --- @param advance_to number The progress to advance to.
 --- @return boolean # Whether the achievement was successfully advanced.
@@ -509,7 +509,7 @@ achievements.advanceTo = function(achievement_id, advance_to)
 end
 
 --- Advances the achievement with the supplied `achievement_id` by the specified amount.
---- 
+---
 --- @param achievement_id string The ID of the achievement to advance.
 --- @param advance_by number The amount to advance the achievement by.
 --- @return boolean # Whether the achievement was successfully advanced.
@@ -529,7 +529,7 @@ achievements.advance = function(achievement_id, advance_by)
 end
 
 --- Returns the fractional completion of all configured achievements, taking into account the `scoreValue` of any achievements if configured.
---- 
+---
 --- @return number # The completion percentage as a float between 0 and 1.
 achievements.completionPercentage = function()
 	local completion_total = 0
