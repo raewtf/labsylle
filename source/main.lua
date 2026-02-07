@@ -1,7 +1,7 @@
 -- NOTE: solver/optimum swaps finder function, that returns a number
 
 -- Build target. 'peedee' or 'love'
-platform = 'peedee'
+platform = 'love'
 local fps = 30
 
 local pd

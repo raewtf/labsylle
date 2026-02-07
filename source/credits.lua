@@ -66,9 +66,9 @@ function credits:initialize(args)
 		page = 1,
 		bump = 0,
 		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pack Writing', name = 'Rae, Toad, & Voxy'}, {thing = 'Quik-Word List', name = 'Gaute Solheim'}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
-		credits2 = {{thing = 'xorshift implementation', name = '2DArray'}, {thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = '& Toad'}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
+		credits2 = {{thing = 'xorshift implementation', name = '2DArray'}, {thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = 'Toad, BrittOmnRex, & Angry'}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
 		handler = '',
-		credits3 = {{thing = 'Knife library', name = 'airstruck'}, {thing = 'HUMP library', name = 'Matthias Richter'}, {thing = 'Tween easings', name = 'Yuichi Tateno &'}, {thing = '', name = 'Emmanuel Oga'}, {thing = 'JSON Parser', name = 'rxi'}, {thing = '', name = ''}, {thing = 'PC Playtesters:', name = ''}},
+		credits3 = {{thing = 'HUMP library', name = 'Matthias Richter'}, {thing = '', name = ''}, {thing = 'Knife library', name = 'airstruck'}, {thing = '', name = ''}, {thing = 'Tween easings', name = 'Yuichi Tateno &'}, {thing = '', name = 'Emmanuel Oga'}, {thing = '', name = ''}, {thing = 'JSON Parser', name = 'rxi'}},
 		handler = 'credits'
 	}
 

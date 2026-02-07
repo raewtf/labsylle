@@ -191,7 +191,7 @@ function title:draw()
 	fillrect(320, 0, 80, 240)
 
 	if platform == 'love' then setcolor('white') end
-	drawimage(assets.logo, 65, 6 + (vars.logopull ~= nil and value('logopull') or 0) + vars.offset)
+	drawimage(assets.logo, 65, 6 + (vars.logopull ~= nil and value('logopull') or 0) + (vars.offset / 1.5))
 
 	setcolor('white', 0.15)
 	fillrect(100 - tonumber(vars.selection == 1 and 3 + vars.bump or 0), 110 - tonumber(vars.selection == 1 and 3 + vars.bump or 0) + vars.offset, 200 + tonumber(vars.selection == 1 and ((3 + vars.bump) * 2) or 0), 50 + tonumber(vars.selection == 1 and ((3 + vars.bump) * 2) or 0), 5)

@@ -91,8 +91,10 @@ function packselect:initialize(args)
 	newtimer('gaming', 0, 1, 1)
 
 	for i = 1, #pack do
-		if vars.return_pack == pack[i] then
-			vars.selection = i
+		if vars.return_pack ~= nil then
+			if vars.return_pack.name == pack[i].name then
+				vars.selection = i
+			end
 		end
 		self:packtextprep(i)
 	end
@@ -142,7 +144,7 @@ function packselect:drawpacktext(i)
 	drawtext(assets.disco, pack[i].name or '', 20, 21)
 	local len = textwidth(assets.disco, pack[i].name or '')
 	if pack == packs and i > 1 then
-		drawtext(assets.discoteca, '(Standard Pak #' .. i .. ')', 25 + len, 21)
+		drawtext(assets.discoteca, '(Standard Pak #' .. i - 1 .. ')', 25 + len, 21)
 	else
 		drawtext(assets.discoteca, (pack[i].subtitle ~= nil and '(' .. pack[i].subtitle .. ')' or ''), 25 + len, 21)
 	end
@@ -200,11 +202,20 @@ end
 function packselect:scroll(lerp)
 	if #pack > 4 then
 		if vars.selection <= 3 then
-			vars[lerp and 'scroll_target' or 'scroll'] = 0
+			vars.scroll_target = 0
+			if not lerp then
+				vars.scroll = 0
+			end
 		elseif vars.selection == #pack or vars.selection >= #pack - 2 then
-			vars[lerp and 'scroll_target' or 'scroll'] = 224 - (55 * #pack)
+			vars.scroll_target = 224 - (55 * #pack)
+			if not lerp then
+				vars.scroll = 224 - (55 * #pack)
+			end
 		else
-			vars[lerp and 'scroll_target' or 'scroll'] = 140 - (55 * vars.selection)
+			vars.scroll_target = 140 - (55 * vars.selection)
+			if not lerp then
+				vars.scroll = 140 - (55 * vars.selection)
+			end
 		end
 	else
 		vars.scroll_target = 0

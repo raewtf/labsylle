@@ -1,8 +1,4 @@
--- TODO: make standard paks
--- TODO: make tricky paks a bit tougher
--- TODO: make shapes paks
--- TODO: make maths paks
--- TODO: revise pack leaderboards on catalog
+-- NOTE: make maths paks
 
 packs = {
 	{
@@ -51,7 +47,7 @@ packs = {
 				bombs = {
 					{
 						key = 'i',
-						swaps = 4,
+						swaps = 5,
 						intensity = 0
 					},
 				},
@@ -467,8 +463,8 @@ packs = {
 				bombs = {
 					{
 						key = 'i',
-						swaps = 3,
-						intensity = 1
+						swaps = 4,
+						intensity = 0
 					}
 				}
 			},
@@ -603,80 +599,10 @@ packs = {
 			}
 		}
 	}, -- supplies
-	--[[{
-		name = 'TBD',
-		id = 'tbd',
-		subtitle = 'Standard Pak #9',
-		difficulty = 'Easy',
-		contains_impostors = false,
-		contains_bombs = false,
-		puzzles = {
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			}
-		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
 	{
 		name = 'Fun & Games',
 		id = 'games',
-		subtitle = 'Standard Pak #10',
+		subtitle = 'Standard Pak #9',
 		difficulty = 'Easy',
 		contains_impostors = false,
 		contains_bombs = false,
@@ -733,6 +659,84 @@ packs = {
 			}
 		}
 	}, -- games
+	{
+		name = '4-Syllable Words',
+		id = 'foursyllables',
+		subtitle = 'Standard Pak #10',
+		difficulty = 'Easy',
+		contains_impostors = true,
+		contains_bombs = true,
+		puzzles = {
+			{
+				target = {
+					{'kin', 'der', 'gar', 'ten', 'den'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'li', 'brar', 'i', 'an'}
+				}
+			},
+			{
+				target = {
+					{'un', 'a', 'ware', 'ness'}
+				},
+				bombs = {
+					{
+						key = 'ware',
+						swaps = 3,
+						intensity = 1
+					}
+				}
+			},
+			{
+				target = {
+					{'co', 'in', 'ci', 'dence'}
+				}
+			},
+			{
+				target = {
+					{'a', 'bra', 'sive', 'ly', 'sieve'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'e', 'mer', 'gen', 'cy'}
+				}
+			},
+			{
+				target = {
+					{'e', 'ques', 'tri', 'an'}
+				}
+			},
+			{
+				target = {
+					{'tu', 'mul', 'tu', 'ous'}
+				}
+				,
+				bombs = {
+					{
+						key = 'mul',
+						swaps = 4,
+						intensity = 0
+					}
+				}
+			},
+			{
+				target = {
+					{'ge', 'ner', 'i', 'cize'}
+				}
+			},
+			{
+				target = {
+					{'strat', 'o', 'spher', 'ic', 'sphere'}
+				},
+				impostor = true
+			}
+		}
+	}, -- foursyllables
 	{
 		name = 'Weather Events',
 		id = 'weather',
@@ -909,9 +913,9 @@ packs = {
 			}
 		}
 	}, -- wordshapes
-	--[[{
+	{
 		name = 'Animals II',
-		id = 'tbd',
+		id = 'animals2',
 		subtitle = 'Standard Pak #13',
 		difficulty = 'Tricksy',
 		contains_impostors = true,
@@ -919,96 +923,94 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
-				}
+					{'drag', 'on', 'fly', 'ing'}
+				},
+				impostor = true
 			},
 			{
 				target = {
-					{''}
+					{'ca', 'ter', 'pil', 'lar'}
 				},
 			},
 			{
 				target = {
-					{''}
+					{'cal', 'i', 'co', '', 'cat'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'am', 'phib', 'i', 'an'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'an', 'te', 'lope', 'can'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'cha', 'me', 'le', 'on'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'hip', 'po', 'pot', 'a', 'mus'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'a', 'pex', '', 'pred', 'a', 'tor'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'lat', 'er', '', 'al', 'li', 'ga', 'tor'}
+				},
+				tilevis = {
+					width = 45,
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ko', 'mo', 'do', '', 'drag', 'on', 'ite'}
+				},
+				impostor = true,
+				tilevis = {
+					width = 45,
 				}
 			},
 			{
 				target = {
-					{''}
+					{'em', 'per', 'or', '', 'pen', 'guin'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'deep', 'wa', 'ter', '', 'sting', 'ray'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'or', 'ni', 'thol', 'o', 'gist'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mul', 'ti', 'cel', 'lu', 'lar'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'lab', 'ra', 'dor', '', 're', 'triev', 'er'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 15,
 				}
 			}
 		}
-		-- dragonfly(ing)
-		-- ornithologist
-		-- antelope (can)
-		-- komodo dragon (ite)
-		-- later alligator (width 45)
-		-- labrador retriever (width 45, parallax 15)
-		-- hippopotamus
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
+	}, -- animals2
 	{
 		name = 'Automotive',
 		id = 'cars',
@@ -1413,9 +1415,9 @@ packs = {
 			}
 		}
 	}, -- food2
-	--[[{
+	{
 		name = 'World Sights',
-		id = 'tbd',
+		id = 'worldsights',
 		subtitle = 'Standard Pak #18',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
@@ -1423,96 +1425,104 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'cat', 'a', 'combs'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'grand', '', 'can', 'yon'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'col', 'os', 'se', 'um'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'taj', '', 'ma', 'hal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ma', 'chu', '', 'pic', 'chu'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'eif', 'fel', '', 'tow', 'er'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mount', '', 'ev', 'er', 'est'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ha', 'gi', 'a', '', 'so', 'phi', 'a'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 15
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pan', 'a', 'ma', '', 'ca', 'nal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ni', 'ag', 'a', 'ra', '', 'falls'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'lean', 'ing', '', 'tow', 'er', '', 'of', '', 'pi', 'sa'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 20
 				}
 			},
 			{
 				target = {
-					{''}
+					{'great', '', 'wall', '', 'of', '', 'chi', 'na'}
+				},
+				tilevis = {
+					parallax = 15
 				}
 			},
 			{
 				target = {
-					{''}
+					{'au', 'ro', 'ra', '', 'bo', 're', 'al', 'is'}
+				},
+				tilevis = {
+					width = 40,
+					parallax = 15
 				}
 			},
 			{
 				target = {
-					{''}
+					{'great', '', 'pyr', 'a', 'mid', '', 'of', '', 'gi', 'za'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 20
 				}
 			},
 			{
 				target = {
-					{''}
+					{'yel', 'low', 'stone', '', 'na', 'tion', 'al', '', 'park'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 15
 				}
 			}
 		}
-		-- catacombs
-		-- grand canyon
-		-- colosseum
-		-- taj mahal
-		-- machu picchu
-		-- eiffel tower
-		-- mount everest
-		-- hagia sophia
-		-- panama canal
-		-- niagara falls
-		-- aurora borealis
-		-- great wall of china
-		-- leaning tower of pisa (zza)
-		-- great pyramid of giza
-		-- TBD
-	},]] -- tbd
+	}, -- worldsights
 	{
 		name = 'Television',
 		id = 'television',
@@ -1601,106 +1611,110 @@ packs = {
 			}
 		}
 	}, -- television
-	--[[{
+	{
 		name = 'Musical II',
-		id = 'tbd',
+		id = 'musical2',
 		subtitle = 'Standard Pak #20',
 		difficulty = 'Tricksy',
 		contains_impostors = false,
-		contains_bombs = false,
+		contains_bombs = true,
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'dis', 'cog', 'ra', 'phy'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'trans', 'po', 'si', 'tion'}
+				},
+				bombs = {
+					{
+						key = 'po',
+						swaps = 3,
+						intensity = 1
+					}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'four-', 'on-', 'the-', 'floor'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'e', 'qual', 'iz', 'er'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'lead', '', 'vo', 'cal', 'ist'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'time', '', 'sig', 'na', 'ture'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'string', '', 'en', 'sem', 'ble'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pol', 'y', 'rhyth', 'mic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'am', 'pli', 'fi', 'ca', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mul', 'ti', 'plat', 'i', 'num'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ac', 'com', 'pa', 'ni', 'ment'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'stru', 'men', 'tal', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pi', 'a', 'nis', 'si', 'mo'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'e', 'lec', 'tro', 'a', 'cous', 'tic'}
+				},
+				bombs = {
+					{
+						key = 'e',
+						swaps = 5,
+						intensity = 0
+					},
+					{
+						key = 'a',
+						swaps = 6,
+						intensity = 0
+					}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'di', 'min', 'ished', '', 'sev', 'enth'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
+	}, -- musical2
 	{
 		name = 'Technology',
 		id = 'tech',
@@ -1835,9 +1849,9 @@ packs = {
 			}
 		}
 	}, -- tech
-	--[[{
-		name = 'Prehistoric',
-		id = 'tbd',
+	{
+		name = '5-Syllable Words',
+		id = 'fivesyllables',
 		subtitle = 'Standard Pak #22',
 		difficulty = 'Difficult',
 		contains_impostors = false,
@@ -1845,387 +1859,370 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'em', 'bar', 'rass', 'ing', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'im', 'ag', 'i', 'na', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'rep', 're', 'sen', 'ta', 'tives'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'ac', 'ces', 'si', 'ble'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'un', 'meas', 'ur', 'a', 'ble'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mag', 'net', 'i', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'o', 'blig', 'a', 'to', 'ry'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'for', 'ma', 'tion', 'al'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'math', 'e', 'mat', 'i', 'cal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ab', 'sent-', 'mind', 'ed', 'ness'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ther', 'mo', 'dy', 'nam', 'ics'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ex', 'clam', 'a', 'to', 'ry'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'plu', 'ral', 'i', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'vid', 'e', 'o', 'cas', 'sette'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pre', 'pos', 'ter', 'ous', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'trig', 'o', 'nom', 'e', 'try'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'plan', 'e', 'tar', 'i', 'um'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'tel', 'e', 'ki', 'ne', 'sis'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pol', 'y', 'car', 'bon', 'ate'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'lex', 'i', 'cog', 'ra', 'phy'}
 				}
 			}
 		}
-		-- museum
-		-- jurassic
-		-- herbivore
-		-- egg-laying
-		-- triceratops
-		-- megalodon
-		-- tyrannosaurus
-		-- velociraptor
-		-- paleontologist
-		-- pachycephalosaurus
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
-	--[[{
+	}, -- fivesyllables
+	{
 		name = 'Series of Tubes',
-		id = 'tbd',
+		id = 'internet',
 		subtitle = 'Standard Pak #23',
 		difficulty = 'Difficult',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'world', '', 'wide', '', 'web'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'search', '', 'en', 'gine', 'eer'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'I', 'P', '', 'ad', 'dress'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ex', 'e', 'cut', 'a', 'ble'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'for', 'ma', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ap', 'pli', 'ca', 'tions'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'flu', 'enc', 'er'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'su', 'per', 'high', 'way'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mi', 'cro', 'blog', 'ging'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'im', 'age', '', 'mac', 'ro'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'stream', 'ing', '', 'serv', 'ice'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'cloud', '', 'com', 'put', 'ing'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'di', 'al-', 'up', '', 'mo', 'dem', 'del'}
+				},
+				impostor = true,
+				tilevis = {
+					width = 45
 				}
 			},
 			{
 				target = {
-					{''}
+					{'re', 'bec', 'ca', '', 'pur', 'ple'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'so', 'cial', '', 'net', 'work', 'ing'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mon', 'e', 'ti', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'doc', 'u', 'ment', '', 'ob', 'ject', '', 'mod', 'el'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 10
 				}
 			},
 			{
 				target = {
-					{''}
+					{'cy', 'ber', 'se', 'cur', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'Q', 'W', 'E', 'R', 'T', 'Y', 'Z'}
+				},
+				impostor = true,
+				tilevis = {
+					width = 35
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'hy', 'per', 'text', '', 'trans', 'fer', '', 'pro', 'to', 'col'}
+				},
+				tilevis = {
+					width = 45,
+					parallax = 25
 				}
 			}
 		}
-		-- world wide web
-		-- wireless
-		-- firewall
-		-- cyberspace
-		-- compression
-		-- search engine (eer)
-		-- IP address
-		-- executable
-		-- information
-		-- applications
-		-- influencer
-		-- superhighway
-		-- dial-up modem (del)
-		-- social networking
-		-- QWERTY (individual letters?!)
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
-	--[[{
+	}, -- internet
+	{
 		name = 'Photography',
-		id = 'tbd',
+		id = 'photography',
 		subtitle = 'Standard Pak #24',
 		difficulty = 'Difficult',
 		contains_impostors = false,
-		contains_bombs = false,
+		contains_bombs = true,
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'pho', 'to', '', 'shoot'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'fish', 'eye', '', 'lens'}
+				},
+				bombs = {
+					{
+						key = 'fish',
+						swaps = 3,
+						intensity = 1
+					}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'shut', 'ter', '', 'speed'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'neg', 'a', 'tive', '', 'im', 'age'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mon', 'o', 'chro', 'mat', 'ic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'de', 'vel', 'op', 'ment'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'an', 'a', 'mor', 'phic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'com', 'po', 'si', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'field', '', 'of', '', 'view'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'o', 'ver', 'ex', 'posed'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pho', 'to', 'bomb', 'ing'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'rule', '', 'of', '', 'thirds'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pan', 'chro', 'mat', 'ic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'da', 'guerre', 'o', 'type'}
+				},
+				bombs = {
+					{
+						key = 'guerre',
+						swaps = 4,
+						intensity = 0
+					}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ster', 'e', 'o', 'scop', 'ic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'un', 'der', 'de', 'vel', 'oped'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'dig', 'i', 'tal', '', 'cam', 'er', 'a'}
+				},
+				tilevis = {
+					width = 40
 				}
 			},
 			{
 				target = {
-					{''}
+					{'tel', 'e', 'pho', 'to', '', 'lens'}
+				},
+				bombs = {
+					{
+						key = 'pho',
+						swaps = 5,
+						intensity = 0
+					}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'cam', 'er', 'a', '', 'ob', 'scu', 'ra'}
+				},
+				tilevis = {
+					width = 40
 				}
 			},
 			{
 				target = {
-					{''}
+					{'or', 'tho', 'chro', 'mat', 'ic'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
+	}, -- photography
 	{
 		name = 'Periodic Table',
 		id = 'elements',
@@ -2337,139 +2334,119 @@ packs = {
 			}
 		}
 	}, -- elements
-	--[[{
-		name = 'TBD',
-		id = 'tbd',
+	{
+		name = '6-Syllable Words',
+		id = 'sixsyllables',
 		subtitle = 'Standard Pak #26',
-		difficulty = 'Very Tough',
+		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'el', 'i', 'gi', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ac', 'ces', 'si', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'un', 'sat', 'is', 'fac', 'to', 'ry'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'rev', 'o', 'lu', 'tion', 'ar', 'y'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'math', 'e', 'mat', 'i', 'cal', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'re', 'spon', 'si', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pre', 'dict', 'a', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'un', 'der', 'es', 'ti', 'ma', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'au', 'to', 'bi', 'og', 'ra', 'phy'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'or', 'gan', 'i', 'za', 'tion', 'al'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'au', 'then', 'tic', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'al', 'pha', 'nu', 'mer', 'i', 'cal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'val', 'e', 'dic', 'to', 'ri', 'an'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'im', 'prob', 'a', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'dis', 'in', 'gen', 'u', 'ous', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'vul', 'ner', 'a', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'de', 'ci', 'pher', 'a', 'ble'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pa', 'le', 'on', 'tol', 'o', 'gy'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'cin', 'e', 'ma', 'tog', 'ra', 'pher'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'bi', 'o', 'lu', 'mi', 'nes', 'cence'}
 				}
 			},
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
-	--[[{
+	}, -- sixsyllables
+	{
 		name = 'Bones',
-		id = 'tbd',
+		id = 'bones',
 		subtitle = 'Standard Pak #27',
 		difficulty = 'Very Tough',
 		contains_impostors = false,
@@ -2477,129 +2454,112 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'skel', 'e', 'tal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'col', 'lar', 'bone'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'bone', '', 'mar', 'row'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'clav', 'i', 'cle'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'an', 'a', 'tom', 'i', 'cal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'car', 'ti', 'lage'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'lig', 'a', 'ments'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'met', 'a', 'car', 'pals'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'tra', 'pe', 'zi', 'um'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pa', 'ri', 'e', 'tal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'cal', 'ca', 'ne', 'us'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'met', 'a', 'tar', 'sals'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'e', 'piph', 'y', 'sis'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ma', 'nu', 'bri', 'um'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'os', 'te', 'o', 'blasts'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'zy', 'go', 'mat', 'ic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'per', 'i', 'os', 'te', 'um'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'lum', 'bar', '', 'ver', 'te', 'brae'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'prox', 'i', 'mal', '', 'pha', 'lan', 'ges'}
+				},
+				tilevis = {
+					width = 45
 				}
 			},
 			{
 				target = {
-					{''}
+					{'en', 'do', 'skel', 'e', 'ton'}
 				}
 			},
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
-	--[[{
-		name = 'Scientific Names',
-		id = 'tbd',
+	}, -- bones
+	{
+		name = 'Mathematics',
+		id = 'wordmathematics',
 		subtitle = 'Standard Pak #28',
 		difficulty = 'Very Tough',
 		contains_impostors = false,
@@ -2607,129 +2567,118 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'de', 'vi', 'a', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'fin', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'fac', 'to', 'ri', 'al'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'os', 'cil', 'la', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'dis', 'tri', 'bu', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'com', 'mu', 'ta', 'tive'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'stat', 'is', 'ti', 'cian'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pol', 'y', 'no', 'mi', 'al'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'prob', 'a', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'long', '', 'di', 'vi', 'sion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'trig', 'o', 'nom', 'e', 'try'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'per', 'pen', 'dic', 'u', 'lar'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'di', 'vis', 'i', 'ble'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'top', 'o', 'log', 'i', 'cal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mul', 'ti', 'pli', 'ca', 'tive'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ex', 'po', 'nen', 'tial', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ra', 'tion', 'al', '', 'num', 'ber'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'fi', 'bo', 'nac', 'ci', '', 'se', 'quence'}
+				},
+				tilevis = {
+					parallax = 10
 				}
 			},
 			{
 				target = {
-					{''}
+					{'log', 'a', 'rith', 'mic', '', 'func', 'tion'}
+				},
+				tilevis = {
+					width = 45
 				}
 			},
 			{
 				target = {
-					{''}
+					{'sci', 'en', 'tif', 'ic', '', 'no', 'ta', 'tion'}
+				},
+				tilevis = {
+					width = 40
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
-	--[[{
-		name = 'TBD',
-		id = 'tbd',
+	}, -- wordmathematics
+	{
+		name = 'Prehistoric',
+		id = 'prehistoric',
 		subtitle = 'Standard Pak #29',
 		difficulty = 'Very Tough',
 		contains_impostors = false,
@@ -2737,129 +2686,109 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'an', 'ces', 'tors'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'prim', 'i', 'tive'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ag', 'ri', 'cul', 'ture'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ex', 'ca', 'va', 'tions'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ne', 'an', 'der', 'thal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'cre', 'ta', 'ceous'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'wool', 'ly', '', 'mam', 'moth'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'tri', 'cer', 'a', 'tops'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'steg', 'o', 'saur', 'us'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'me', 'ga', 'lo', 'don'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'civ', 'i', 'li', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ge', 'o', 'log', 'i', 'cal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ar', 'chae', 'ol', 'o', 'gy'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'do', 'mes', 'ti', 'ca', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ty', 'ran', 'no', 'saur', 'us'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ve', 'loc', 'i', 'rap', 'tor'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'fos', 'sil', 'i', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'bron', 'to', 'saur', 'us'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pa', 'le', 'on', 'tol', 'o', 'gist'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pach', 'y', 'ceph', 'a', 'lo', 'saur'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	},]] -- tbd
-	--[[{
-		name = 'TBD',
-		id = 'tbd',
+	}, -- prehistoric
+	{
+		name = '7-Syllable Words',
+		id = 'sevensyllables',
 		subtitle = 'Standard Pak #30',
 		difficulty = 'Very Tough',
 		contains_impostors = false,
@@ -2867,126 +2796,106 @@ packs = {
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'e', 'lec', 'tro', 'car', 'di', 'o', 'gram'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'de', 'con', 'tex', 'tu', 'al', 'iz', 'ing'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ab', 'o', 'rig', 'i', 'nal', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'bi', 'o', 'tech', 'nol', 'o', 'gi', 'cal'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'com', 'pat', 'i', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'ev', 'i', 'ta', 'bil', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ar', 'ti', 'fi', 'ci', 'al', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'ra', 'di', 'o', 'ac', 'tiv', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'tel', 'e', 'com', 'mu', 'ni', 'ca', 'tions'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'un', 'im', 'ag', 'i', 'na', 'tive', 'ly'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'pro', 'fes', 'sion', 'al', 'i', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'su', 'per', 'fi', 'ci', 'al', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'mul', 'ti', 'dis', 'ci', 'pli', 'nar', 'y'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'com', 'part', 'men', 'tal', 'i', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'an', 'es', 'the', 'si', 'ol', 'o', 'gy'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'in', 'dus', 'tri', 'al', 'i', 'za', 'tion'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'hy', 'per', 'sen', 'si', 'tiv', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'so', 'ci', 'o', 'ec', 'o', 'nom', 'ic'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'su', 'per', 'con', 'duc', 'tiv', 'i', 'ty'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'un', 'dif', 'fer', 'en', 'ti', 'at', 'ed'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	}]] -- tbd
+	} -- sevensyllables
 }
 
 bonus = {
@@ -3161,7 +3070,7 @@ bonus = {
 				target = {
 					{'none00 circ00', 'circ00 squa99', 'squa99 circ00', 'circ00 none00'}
 				},
-				text = 'Hey, things are getting pretty colorful, no?\n...No?\nWell, just make sure you sort the shapes\nalong the ones with the matching shade.'
+				text = 'Hey, things are getting pretty colorful, no?\n...No?\nWell, just make sure you match the shapes\nas well as their shades.'
 			},
 			{
 				target = {
@@ -3223,91 +3132,57 @@ bonus = {
 		}
 	}, -- shapescards
 	{
-		name = '',
-		id = 'shapestbd',
+		name = 'Mind the Gap',
+		id = 'shapesgap',
 		subtitle = 'Shapes Pak #7',
 		difficulty = 'Difficult',
-		contains_impostors = false,
+		contains_impostors = true,
 		contains_bombs = false,
-		shapes_used = {''},
+		shapes_used = {'squa', 'circ', 'ring', 'oval', 'rect', 'zoid', 'star', 'plus'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 squa00', 'squa00 none00', 'none00 squa00', 'squa00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 ring00', 'ring00 none00', 'none00 oval00', 'oval00 none00'},
+					{'none00 oval00', 'oval00 none00', 'none00 circ00', 'circ00 ring00', 'ring00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 squa00', 'squa00 rect00', 'rect00 none00', 'none00 rect00', 'rect00 squa00', 'squa00 none00', 'zoid00 none00'},
+					{'none00 rect00', 'rect00 squa00', 'squa00 none00', 'none00 squa00', 'squa00 rect00', 'rect00 none00', 'zoid00 none00'}
+				},
+				impostor = true,
+				tilevis = {
+					parallax = 20,
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 squa00', 'squa00 none00', 'none00 star00', 'star00 none00', 'none00 squa00', 'squa00 none00'},
+					{'none00 star00', 'star00 none00', 'none00 squa00', 'squa00 none00', 'none00 squa00', 'squa00 none00'},
+					{'none00 squa00', 'squa00 none00', 'none00 squa00', 'squa00 none00', 'none00 star00', 'star00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 plus99', 'plus99 plus50', 'plus50 none00', 'none00 plus50', 'plus50 plus99', 'plus99 none00'},
+					{'none00 plus50', 'plus50 plus99', 'plus99 none00', 'none00 plus99', 'plus99 plus50', 'plus50 none00'},
+					{'none00 plus50', 'plus50 none00', 'none00 plus99', 'plus99 none00', 'none00 plus99', 'plus99 none00'},
+					{'none00 plus99', 'plus99 none00', 'none00 plus50', 'plus50 none00', 'none00 plus99', 'plus99 none00'},
+					{'none00 plus99', 'plus99 none00', 'none00 plus99', 'plus99 none00', 'none00 plus50', 'plus50 none00'},
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	}, -- shapestbd
-	{
-		name = '',
-		id = 'shapestbd',
-		subtitle = 'Shapes Pak #8',
-		difficulty = 'Difficult',
-		contains_impostors = false,
-		contains_bombs = false,
-		shapes_used = {''},
-		puzzles = {
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
-				}
-			}
-		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-	}, -- shapestbd
+	}, -- shapesgap
 	{
 		name = 'More "Colors"!',
 		id = 'shapesmorecolors',
-		subtitle = 'Shapes Pak #9',
+		subtitle = 'Shapes Pak #8',
 		difficulty = 'Difficult',
 		contains_impostors = true,
 		contains_bombs = false,
@@ -3343,45 +3218,85 @@ bonus = {
 		}
 	}, -- shapesmorecolors
 	{
+		name = 'Card Sharp',
+		id = 'shapescards2',
+		subtitle = 'Shapes Pak #9',
+		difficulty = 'Difficult',
+		contains_impostors = false,
+		contains_bombs = false,
+		shapes_used = {'love', 'club', 'spad', 'diam'},
+		puzzles = {
+			{
+				target = {
+					{'none00 love50', 'love50 love50', 'love50 club99', 'club99 love50', 'love50 club99', 'club99 none00'}
+				}
+			},
+			{
+				target = {
+					{'none00 club99', 'club99 spad99', 'spad99 spad99', 'spad99 diam50', 'diam50 none00'}
+				}
+			},
+			{
+				target = {
+					{'none00 spad99', 'spad99 club99', 'club99 diam50', 'diam50 spad99', 'spad99 none00', 'spad50 none00'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 love50', 'love50 diam50', 'diam50 love50', 'love50 diam50', 'diam50 diam50', 'diam50 none00', 'love50 none00'},
+					{'none00 love50', 'love50 diam50', 'diam50 diam50', 'diam50 love50', 'love50 diam50', 'diam50 none00', 'love50 none00'},
+				},
+				impostor = true,
+				tilevis = {
+					parallax = 20
+				}
+			},
+			{
+				target = {
+					{'none00 love50', 'love50 club99', 'club99 none00', 'none00 spad99', 'spad99 diam50', 'diam50 none00'},
+					{'none00 spad99', 'spad99 diam50', 'diam50 none00', 'none00 love50', 'love50 club99', 'club99 none00'},
+				}
+			}
+		}
+	}, -- shapescards2
+	{
 		name = 'Together Now!',
 		id = 'shapesall',
 		subtitle = 'Shapes Pak #10',
 		difficulty = 'Difficult',
 		contains_impostors = false,
 		contains_bombs = false,
-		shapes_used = {''},
+		shapes_used = {'circ', 'squa', 'tria', 'rect', 'octa', 'sept', 'hexa', 'pent', 'diam', 'ring', 'oval', 'spad', 'club', 'love'},
 		puzzles = {
 			{
 				target = {
-					{''}
+					{'none00 circ00', 'circ00 squa00', 'squa00 tria00', 'tria00 rect00', 'rect00 none00', 'tria00 none00'}
+				},
+				impostor = true
+			},
+			{
+				target = {
+					{'none00 octa00', 'octa00 sept00', 'sept00 hexa00', 'hexa00 pent00', 'pent00 diam00', 'diam00 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 circ50', 'circ50 ring99', 'ring99 circ50', 'circ50 none00', 'none00 oval25', 'oval25 none00'},
+					{'none00 oval25', 'oval25 none00', 'none00 circ50', 'circ50 ring99', 'ring99 circ50', 'circ50 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
+					{'none00 spad99', 'spad99 club99', 'club99 spad99', 'spad99 club99', 'club99 love50', 'love50 none00'}
 				}
 			},
 			{
 				target = {
-					{''}
-				}
-			},
-			{
-				target = {
-					{''}
+					{'none00 circ00', 'circ00 ring25', 'ring25 circ50', 'circ50 ring75', 'ring75 love99', 'love99 ring00', 'ring00 none00'}
 				}
 			}
 		}
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
-		-- TBD
 	}, -- shapesall
 	--[[{
 		name = 'Basic Addition',

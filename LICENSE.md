@@ -14,7 +14,7 @@
 
 (source/libraries/json.lua) Lua JSON parser made by rxi, under [MIT](https://github.com/rxi/json.lua/blob/master/LICENSE)
 
-(source/libraries/xorlove.lua, source/libraries/xorpeedee.lua) xorshift Lua implementation made by 2DArray, under [CC0](https://creativecommons.org/public-domain/cc0/)
+(source/libraries/xorlove.lua, source/libraries/xorpeedee.lua) xorshift Lua implementation made by Eli Piilonen, under [CC0](https://creativecommons.org/public-domain/cc0/)
 
 The rest of the code made by rae, except where noted.
 
