@@ -6,7 +6,7 @@ achievementData = {
 		{
 			id = "welcome",
 			name = "Welcome to Labsylle!",
-			description = "Play the Tutorial pack.",
+			description = "Play the Tutorial pak.",
 			isSecret = false,
 			scoreValue = 1,
 		},

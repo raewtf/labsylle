@@ -22,7 +22,7 @@ if platform == 'peedee' then
 			local menu = pd.getSystemMenu()
 			menu:removeAllMenuItems()
 			if catalog then
-				menu:addMenuItem('pack boards', function()
+				menu:addMenuItem('pak boards', function()
 					vars.handler = 'leaderboards'
 					self:refreshboards()
 				end)
@@ -45,7 +45,7 @@ elseif platform == 'love' then
 
 	packselect = {}
 	function packselect:enter(current, ...)
-		love.window.setTitle('Labsylle — Pack Select')
+		love.window.setTitle('Labsylle — Pak Select')
 		local args = {...} -- Arguments passed in through the scene management will arrive here
 
 		self:initialize(args)
@@ -167,7 +167,7 @@ function packselect:drawpacktext(i)
 			end
 		end
 		if save[pack[i].id].packswaps ~= nil then
-			drawtext(assets.discoteca, 'Best: ' .. commalize(save[pack[i].id].packswaps) .. (save[pack[i].id].packswaps == 1 and ' Pack Swap' or ' Pack Swaps'), 361, 35, right)
+			drawtext(assets.discoteca, 'Best: ' .. commalize(save[pack[i].id].packswaps) .. (save[pack[i].id].packswaps == 1 and ' Pak Swap' or ' Pak Swaps'), 361, 35, right)
 		else
 			drawtext(assets.discoteca, commalize(save[pack[i].id].puzzle - 1) .. ' of ' .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or 0) .. ' Completed', 361, 35, right)
 		end
@@ -356,7 +356,7 @@ function packselect:draw()
 		drawrect(80, 200, 240, 30, 5)
 
 		drawtext(assets.disco, pack[vars.selection].name, 20, 20)
-		drawtext(assets.discoteca, 'Fewest Pack Swaps', 380, 20, right)
+		drawtext(assets.discoteca, 'Fewest Pak Swaps', 380, 20, right)
 
 		if vars.lbloading then
 			drawtext(assets.disco, ('Ⓑ' or string.upper(save.secondary)) .. ' Back', 200, 208, center)

@@ -136,6 +136,7 @@ end
 
 function resetquikword(duration, startvalue, endvalue, callback)
 	quikwordvvalue = startvalue
+	quikwordpaused = false
 	quikword = timer.tween(duration / 1000, {
 		[_G] = {['quikwordvvalue'] = endvalue}
 	})
@@ -192,7 +193,7 @@ end
 
 -- Plays a sound (stopping the previous instance if already playing). Import LÖVE sound object
 function playsound(sound)
-	if save.sfx then
+	if save.sfx and sound ~= nil then
 		sound:stop()
 		sound:play()
 	end

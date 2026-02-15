@@ -514,11 +514,11 @@ function game:updateheader(time)
 			if vars.pack == 'speed' then
 				drawtext(assets.discoteca, 'Best Score: ' .. commalize((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest)) .. ((vars.puzzle - 1 > save.quikwordbest and vars.puzzle - 1 or save.quikwordbest) == 1 and ' Round' or ' Rounds') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
 			else
-				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' Pack Swap' or ' Pack Swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
+				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' Pak Swap' or ' Pak Swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
 			end
 		else
 			if vars.pack ~= 'speed' then
-				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' Pack Swap' or ' Pack Swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
+				drawtext(assets.discoteca, commalize(vars.packswaps + vars.swaps) .. (vars.packswaps + vars.swaps == 1 and ' Pak Swap' or ' Pak Swaps') .. ' — ' .. (save.hours and (string.format("%01d:%02d", ((hour % 12) == 0 and 12 or (hour % 12)), minute)) or (string.format("%02d:%02d", hour, minute))), 390, 18, right)
 			end
 		end
 	if platform == 'peedee' then
@@ -776,7 +776,7 @@ function game:endround()
 								save[vars.pack.id].puzzleswaps = nil
 								save[vars.pack.id].word = nil
 								save[vars.pack.id].bombs = nil
-								scenemanager:switchscene(results, vars.pack, vars.packswaps + vars.swaps)
+								scenemanager:switchscene(results, vars.pack, vars.packswaps)
 							else
 								scenemanager:switchscene(game, vars.pack, vars.puzzle + 1, vars.packswaps + vars.swaps)
 							end
@@ -1002,7 +1002,7 @@ function game:draw()
 	fillrect(0, 0, 400, 240)
 
 	-- Top bar
-	setcolor(platform == 'peedee' and 'black' or 'white')
+	setcolor('image')
 	drawimage(assets.header, 0, 0 + value('headerx'))
 
 	local time = gettime()

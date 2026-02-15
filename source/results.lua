@@ -72,8 +72,9 @@ function results:initialize(args)
 		end
 		if platform == 'peedee' and catalog then
 			pd.scoreboards.addScore('speed', vars.variable, function(status, result)
+				printTable(result)
 				if status.code == 'OK' then
-					pd.scoreboards.addScore('speeddaily', vars.variable)
+					pd.scoreboards.addScore('speeddaily', result.value)
 				end
 			end)
 		end
@@ -109,7 +110,7 @@ function results:update()
 		if vars.bump.timeLeft ~= 0 or vars.fade.timeLeft ~= 0 then
 			gfx.sprite.redrawBackground()
 		elseif vars.scroll ~= nil and vars.variable ~= 0 then
-			vars.scroll = vars.scroll + pd.getCrankChange()
+			vars.scroll = vars.scroll - pd.getCrankChange()
 			if vars.scroll > 0 then vars.scroll = 0 end
 			if vars.scroll < vars.scroll_max then vars.scroll = vars.scroll_max end
 			if vars.lastscroll ~= vars.scroll then
@@ -193,7 +194,7 @@ function results:draw()
 			drawimage(assets.scroll, 80, 63 + (value('bump') * 4))
 		end
 	else
-		drawtext(assets.cal, 'Pack Complete!', 200, 11 - (value('bump') * 1.5), center)
+		drawtext(assets.cal, 'Pak Complete!', 200, 11 - (value('bump') * 1.5), center)
 		drawtext(assets.disco, vars.pack.name or '', 200, 75 + (value('bump') * 4), center)
 		drawtext(assets.discoteca, (vars.pack.subtitle ~= nil and '(' .. vars.pack.subtitle .. ')' or ''), 200, 89 + (value('bump') * 4), center)
 		drawtext(assets.discoteca, (vars.pack.difficulty ~= nil and vars.pack.difficulty .. ' — ' or '') .. commalize(vars.pack.puzzles ~= nil and #vars.pack.puzzles or '0') .. ((vars.pack.puzzles ~= nil and #vars.pack.puzzles == 1) and ' puzzle' or ' puzzles'), 200, 103 + (value('bump') * 4), center)

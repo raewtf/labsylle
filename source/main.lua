@@ -73,7 +73,7 @@ elseif platform == 'love' then
 	white = love.math.colorFromBytes(1, 1, 1, 1)
 	fullscreen = false
 
-	version = '1.0.0'
+	version = '1.0.1'
 
 	gfx.setLineStyle('rough')
 	gfx.setLineJoin('miter')

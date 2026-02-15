@@ -114,6 +114,7 @@ end
 
 function resetquikword(duration, startvalue, endvalue, callback)
 	resettimer('quikword', duration, startvalue, endvalue, 'linear', callback)
+	quikwordpaused = false
 end
 
 function pausequikword()
@@ -156,7 +157,7 @@ end
 
 -- Plays a sound (stopping the previous instance if already playing). Import peedee sound object
 function playsound(sound)
-	if save.sfx then
+	if save.sfx and sound ~= nil then
 		sound:stop()
 		sound:play()
 	end
