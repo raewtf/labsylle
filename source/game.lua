@@ -269,6 +269,8 @@ function game:initialize(args)
 		end
 	end
 
+	vars.selection = math.floor(vars.tiles / 2)
+
 	if platform == 'peedee' then
 		assets.header_base = newimage(400, 40 + (save.showcontrols and 20 or 0))
 		gfx.lockFocus(assets.header_base)
@@ -567,7 +569,7 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 		x = x - (value('rattle') * vars.bombs[bomb].intensity)
 		setcolor('white')
 		drawimage(assets.bomb, x + 5, offsety + 5)
-		drawtext(assets.disco, commalize(vars.bombs[bomb].swaps), x + 19, offsety + 3)
+		drawtext(assets.disco, commalize(vars.bombs[bomb].swaps - 1), x + 19, offsety + 3)
 	end
 	setcolor()
 	if vars.pack ~= 'speed' and string.find(vars.pack.id, 'shapes') then

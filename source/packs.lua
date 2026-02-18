@@ -55,7 +55,8 @@ packs = {
 			},
 			{
 				target = {
-					{'on', 'ward', '', 'and', '', 'up', 'ward'}
+					{'on', 'ward', '', 'and', '', 'up', 'ward'},
+					{'up', 'ward', '', 'and', '', 'on', 'ward'}
 				},
 				text = 'That\'s the end of this tutorial!\n\nI hope you enjoy this game — as always, I put\na lot of love into it. Have fun!',
 				tilevis = {
@@ -158,6 +159,9 @@ packs = {
 			{
 				target = {
 					{'brus', 'sels', '', 'sprouts'}
+				},
+				tilevis = {
+					width = 65
 				}
 			},
 			{
@@ -236,8 +240,8 @@ packs = {
 				bombs = {
 					{
 						key = 'ble',
-						swaps = 3,
-						intensity = 1
+						swaps = 5,
+						intensity = 0
 					}
 				}
 			},
