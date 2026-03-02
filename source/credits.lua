@@ -66,9 +66,9 @@ function credits:initialize(args)
 		page = 1,
 		bump = 0,
 		credits1 = {{thing = 'Graphics and design', name = 'Rae'}, {thing = 'Programming', name = 'Rae'}, {thing = 'Music', name = 'Rae'}, {thing = 'SFX', name = 'Rae\'s mouth & hands'}, {thing = '', name = ''}, {thing = 'Pak Writing', name = 'Rae, Toad, & Voxy'}, {thing = 'Quik-Word List', name = 'Gaute Solheim'}, {thing = '"Digital Disco" font', name = 'Font End Dev'}, {thing = '"Cal Sans" font', name = 'Mark Davis'}},
-		credits2 = {{thing = 'xorshift implementation', name = '2DArray'}, {thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = 'Toad, BrittOmnRex, & Angry'}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
+		credits2 = {{thing = 'xorshift RNG', name = 'Eli Piilonen'}, {thing = 'Playtesters', name = 'Oatcup, Dimitri,'}, {thing = '', name = 'dennens, scizzorz, benjymous,'}, {thing = '', name = 'TheOddLinguist, Scenic Route,'}, {thing = '', name = 'Toad, BrittOmnRex, & Angry'}, {thing = 'Thank you!', name = 'Voxy, Toad, Robbo,'}, {thing = '', name = 'Scenic Route, Orchid, Winter,'}, {thing = '', name = 'Rev, The Rhythm League, the'}, {thing = '', name = 'PeeDee Dev Server, & Panic!'}},
 		handler = '',
-		credits3 = {{thing = 'HUMP library', name = 'Matthias Richter'}, {thing = '', name = ''}, {thing = 'Knife library', name = 'airstruck'}, {thing = '', name = ''}, {thing = '', name = ''}, {thing = 'Tween easings', name = 'Yuichi Tateno &'}, {thing = '', name = 'Emmanuel Oga'}, {thing = '', name = ''}, {thing = 'JSON Parser', name = 'rxi'}},
+		credits3 = {{thing = 'HUMP library', name = 'Matthias Richter'}, {thing = '', name = ''}, {thing = 'Knife library', name = 'airstruck'}, {thing = '', name = ''}, {thing = '', name = ''}, {thing = 'Tween easings', name = 'Yuichi Tateno'}, {thing = '', name = '& Emmanuel Oga'}, {thing = '', name = ''}, {thing = 'JSON Parser', name = 'rxi'}},
 		handler = 'credits'
 	}
 
@@ -115,7 +115,8 @@ function credits:draw()
 	drawrect(80 - vars.bump, 43 - vars.bump, 240 + (vars.bump * 2), 146 + (vars.bump * 2), 5)
 	drawrect(100, 200, 200, 30, 5)
 	setcolor('white')
-	drawtext(assets.disco, '➖ Move     ' .. ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. ' Back', 200, 208, center)
+	drawtext(assets.disco, '➖ Move     ' .. 'Ⓑ Back', 200, 208, center)
+	drawtext(assets.discoteca, 'p. ' .. vars.page .. '/' .. (platform == 'peedee' and '2' or platform == 'love' and '3'), 81, 29)
 
 	drawontop()
 end

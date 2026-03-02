@@ -133,7 +133,7 @@ function statistics:draw()
 	drawrect(80, 43, 240, 146, 5)
 	drawrect(100, 200, 200, 30, 5)
 	setcolor('white')
-	drawtext(assets.disco, ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. ' Back', 200, 208, center)
+	drawtext(assets.disco, 'Ⓑ Back', 200, 208, center)
 
 	drawontop()
 end

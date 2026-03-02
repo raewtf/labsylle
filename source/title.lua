@@ -108,11 +108,16 @@ function title:refreshboards(daily)
 	if vars.lbloading then return end
 	vars.lbloading = true
 	vars.result = {}
-	vars.best = {}
+	vars.bestresult = {}
 	if platform == 'peedee' then gfx.sprite.redrawBackground() end
 	pd.scoreboards.getScores(daily and 'speeddaily' or 'speed', function(status, result)
 		if status.code == 'OK' then
 			vars.result = result
+			pd.scoreboards.getPersonalBest(daily and 'speeddaily' or 'speed', function(status, result)
+				if status.code == 'OK' then
+					vars.bestresult = result
+				end
+			end)
 		else
 			vars.result = 'fail'
 		end
@@ -266,12 +271,18 @@ function title:draw()
 		if vars.lbloading then
 			drawtext(assets.disco, ('Ⓑ' or string.upper(save.secondary)) .. ' Back', 200, 208, center)
 		else
-			drawtext(assets.disco, (vars.lbdaily and '⬅ All-Time  ' or '➡ Daily  ') .. ('Ⓑ' or string.upper(save.secondary)) .. ' Back  ' .. ((save.gamepad or platform == 'peedee') and 'Ⓐ' or string.upper(save.primary)) .. ' Refresh', 200, 208, center)
+			drawtext(assets.disco, (vars.lbdaily and '⬅ All-Time  ' or '➡ Daily  ') .. 'Ⓑ Back  Ⓐ Refresh', 200, 208, center)
 		end
 
+		local dumbusername = false
+		if vars.bestresult.rank ~= nil then
+			if string.len(vars.bestresult.player) == 16 and tonumber(vars.bestresult.player) then
+				dumbusername = true
+			end
+		end
 		if vars.result.scores ~= nil and next(vars.result.scores) ~= nil then
 			for _, v in ipairs(vars.result.scores) do
-				if v.rank <= 10 then
+				if v.rank <= (dumbusername and 8 or 10) then
 					local lefttext = v.rank .. '. ' .. v.player
 					local righttext = v.value
 
@@ -285,6 +296,10 @@ function title:draw()
 					drawline(30 + leftlen, 36 + (15 * v.rank), 370 - (rightlen), 36 + (15 * v.rank))
 					setcolor()
 				end
+			end
+			if dumbusername then
+				drawtext(assets.disco, 'Please set a username for your profile!', 200, 163, center)
+				drawtext(assets.discoteca, 'https://play.date/account/change-username', 200, 179, center)
 			end
 		elseif vars.result == 'fail' then
 			drawtext(assets.disco, 'Score loading failed. Try again?', 200, 115, center)

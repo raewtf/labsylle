@@ -103,7 +103,6 @@ function game:initialize(args)
 		word = args[4] or nil,
 		swaps = args[5] or 0,
 		bombs = args[6] or {},
-		shouldanimate = args[7] or 1,
 		finished = false,
 		tilevis = {
 			width = 55,
@@ -142,6 +141,12 @@ function game:initialize(args)
 	end
 
 	if vars.pack == 'speed' then
+		if vars.puzzle == 1 then
+			newtimer('headerx', 500, -90, 0, 'outBack')
+		else
+			newtimer('headerx', 1, 0, 0)
+		end
+
 		assets.cal = newfont('fonts/cal', '0123456789 !ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz❓')
 		assets.caldown = newfont('fonts/caldown', '123!GO❓')
 		assets.speedcountdown1 = newsound('audio/sfx/speedcountdown1')
@@ -184,7 +189,7 @@ function game:initialize(args)
 		assets.doubledisco = newfont('fonts/doubledisco', '0123456789 %+-<=>x❓')
 		assets.complete = newsound('audio/sfx/complete')
 
-		if string.find(vars.pack.id, 'shapes') then
+		if string.find(vars.pack.id, 'shapes') == 1 then
 			for i = 1, #vars.pack.shapes_used do
 				assets[vars.pack.shapes_used[i] .. '_line'] = newimage('images/shapes/line/' .. vars.pack.shapes_used[i])
 				assets[vars.pack.shapes_used[i] .. '_fill'] = newimage('images/shapes/fill/' .. vars.pack.shapes_used[i])
@@ -210,13 +215,30 @@ function game:initialize(args)
 
 		newtimer('kerplode', 1, 1, 1)
 
+		if save[vars.pack.id] ~= nil and save[pack[vars.selection].id].status == 'in_progress' then
+			newtimer('headerx', 500, -90, 0, 'outBack')
+			newtimer('texx', 500, 120, 0, 'outBack')
+		else
+			if vars.puzzle == 1 then
+				newtimer('headerx', 500, -90, 0, 'outBack')
+			else
+				newtimer('headerx', 1, 0, 0)
+			end
+
+			if vars.puzzle - 1 == 0 or vars.pack.puzzles[vars.puzzle - 1].text == nil then
+				newtimer('texx', 500, 120, 0, 'outBack')
+			else
+				newtimer('texx', 1, 0, 0)
+			end
+		end
+
 		if save[vars.pack.id] ~= nil then
-			save[vars.pack.id].status = 'in_progress'
+			save[vars.pack.id].status = 'playing'
 			save[vars.pack.id].puzzle = vars.puzzle
 			save[vars.pack.id].heldpackswaps = vars.packswaps
 		else
 			save[vars.pack.id] = {
-				status = 'in_progress',
+				status = 'playing',
 			}
 			save[vars.pack.id].puzzle = vars.puzzle
 			save[vars.pack.id].heldpackswaps = vars.packswaps
@@ -302,7 +324,7 @@ function game:initialize(args)
 			drawline(30, 34, 370, 34)
 			setcolor('white')
 			gfx.setLineWidth(2)
-			drawtext(assets.disco, '➖ Move  ' .. tostring(save.crank and '🐟' or ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. '/' .. ((save.gamepad or platform == 'peedee') and 'Ⓐ' or string.upper(save.primary))) .. ' Swap  ' .. tostring(save.autosubmit and '' or '⬆ Submit'), 10, 38)
+			drawtext(assets.disco, '➖ Move  ' .. tostring(save.crank and '🐟' or 'Ⓑ/Ⓐ') .. ' Swap  ' .. tostring(save.autosubmit and '' or '⬆ Submit'), 10, 38)
 			setcolor()
 		end
 	if platform == 'peedee' then
@@ -338,22 +360,6 @@ function game:initialize(args)
 				gfx.setScissor(sx, sy, sw, sh)
 				gfx.pop()
 			gfx.setCanvas()
-		end
-	end
-
-	if vars.shouldanimate > 0 then
-		if vars.puzzle == 1 or vars.shouldanimate == 2 then
-			newtimer('headerx', 500, -90, 0, 'outBack')
-		else
-			newtimer('headerx', 1, 0, 0)
-		end
-
-		if vars.pack ~= 'speed' then
-			if vars.puzzle - 1 == 0 or vars.pack.puzzles[vars.puzzle - 1].text == nil or vars.shouldanimate == 2 then
-				newtimer('texx', 500, 120, 0, 'outBack')
-			else
-				newtimer('texx', 1, 0, 0)
-			end
 		end
 	end
 
@@ -454,6 +460,7 @@ end
 
 function game:quit(suspend)
 	self:unpause()
+	vars.handler = ''
 	if vars.pack == 'speed' then
 		stopmusic()
 		pausequikword()
@@ -462,6 +469,7 @@ function game:quit(suspend)
 	else
 		if suspend then
 			stopmusic()
+			save[vars.pack.id].status = 'in_progress'
 			save[vars.pack.id].puzzle = vars.puzzle
 			save[vars.pack.id].puzzleswaps = vars.swaps
 			save[vars.pack.id].heldpackswaps = vars.packswaps
@@ -473,6 +481,7 @@ function game:quit(suspend)
 			scenemanager:transitionscene(packselect, vars.pack)
 		else
 			stopmusic()
+			save[vars.pack.id].status = 'in_progress'
 			save[vars.pack.id].puzzle = vars.puzzle
 			save[vars.pack.id].puzzleswaps = nil
 			save[vars.pack.id].heldpackswaps = vars.packswaps
@@ -572,7 +581,7 @@ function game:drawblock(i, x, y, offsety, width, height, radius)
 		drawtext(assets.disco, commalize(vars.bombs[bomb].swaps - 1), x + 19, offsety + 3)
 	end
 	setcolor()
-	if vars.pack ~= 'speed' and string.find(vars.pack.id, 'shapes') then
+	if vars.pack ~= 'speed' and string.find(vars.pack.id, 'shapes') == 1 then
 		local shape1 = string.sub(vars.word[i], 1, 4)
 		local color1 = string.sub(vars.word[i], 5, 6)
 		local shape2 = string.sub(vars.word[i], 8, 11)
@@ -670,6 +679,10 @@ function game:swap(dir)
 			save[vars.pack.id].word = vars.word
 			self:updateheader(gettime())
 		end
+		if save.autosubmit and game:check() then
+			game:endround()
+			if vars.pack == 'speed' then vars.grace = vars.grace + 1 end
+		end
 	end
 end
 
@@ -761,7 +774,7 @@ function game:endround()
 							if quikwordvalue() == 0 then
 								scenemanager:switchscene(results, vars.pack, vars.puzzle + vars.grace)
 							else
-								scenemanager:switchscene(game, 'speed', vars.puzzle + 1, 0, nil, 0, {}, 1)
+								scenemanager:switchscene(game, 'speed', vars.puzzle + 1, 0, nil, 0, {}, 0)
 							end
 						else
 							if vars.puzzle == #vars.pack.puzzles then
@@ -780,7 +793,7 @@ function game:endround()
 								save[vars.pack.id].bombs = nil
 								scenemanager:switchscene(results, vars.pack, vars.packswaps)
 							else
-								scenemanager:switchscene(game, vars.pack, vars.puzzle + 1, vars.packswaps + vars.swaps)
+								scenemanager:switchscene(game, vars.pack, vars.puzzle + 1, vars.packswaps + vars.swaps, nil, 0, {}, 0)
 							end
 						end
 					end)
@@ -883,11 +896,6 @@ function game:update()
 				if vars.crank > -0.1 and vars.crank < 0.1 and vars.crank ~= 0 then
 					vars.crank = 0
 				end
-			end
-
-			if save.autosubmit and game:check() then
-				game:endround()
-				if vars.pack == 'speed' then vars.grace = vars.grace + 1 end
 			end
 		else
 			vars.sellerp = vars.sellerp + (((vars.tiles / 2) - vars.sellerp) * 0.6)
@@ -1098,8 +1106,12 @@ function game:draw()
 			elseif vars.pauseselections[i] == 'quit' then
 				text = 'Quit'
 			end
-			drawtext(assets[vars.pauseselection == i and 'disco' or 'discoteca'], text, 200, 90 - (10 * (#vars.pauseselections - 1)) + (20 * i), center)
+			drawtext(assets[vars.pauseselection == i and 'disco' or 'discoteca'], text, 200, 95 - (10 * (#vars.pauseselections - 1)) + (20 * i), center)
 		end
+
+		setcolor('black', 0.5)
+		drawrect(85 - vars.bump, 93 - (10 * (#vars.pauseselections - 1)) + (20 * vars.pauseselection), 230 + (vars.bump * 2), 18)
+		setcolor()
 	end
 
 	drawontop()

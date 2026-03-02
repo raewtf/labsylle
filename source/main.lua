@@ -73,7 +73,7 @@ elseif platform == 'love' then
 	white = love.math.colorFromBytes(1, 1, 1, 1)
 	fullscreen = false
 
-	version = '1.0.2'
+	version = '1.0.3'
 
 	gfx.setLineStyle('rough')
 	gfx.setLineJoin('miter')
@@ -398,26 +398,28 @@ elseif platform == 'love' then
 		save.gamepad = gamepad
 		gamepad = false
 		if key == 'escape' and vars ~= nil then
-			if vars.playing ~= nil then
+			if vars.playing ~= nil and vars.handler == 'game' then
 				if vars.paused then
 					game:unpause()
 				else
 					game:pause()
 				end
-			elseif vars.handler == 'remap' then
-				options:restorebuttons()
-				playsound(assets.pop)
-				vars.remap_step = 1
-				setmusicvolume(1)
-				vars.handler = 'options'
-				savegame()
-			else
-				quit = quit + 1
-				afterdelay('quittimer', 2000, function()
-					quit = 0
-				end)
-				if quit == 2 then
-					love.event.quit()
+			elseif vars.playing == nil then
+				if vars.handler == 'remap' then
+					options:restorebuttons()
+					playsound(assets.pop)
+					vars.remap_step = 1
+					setmusicvolume(1)
+					vars.handler = 'options'
+					savegame()
+				else
+					quit = quit + 1
+					afterdelay('quittimer', 2000, function()
+						quit = 0
+					end)
+					if quit == 2 then
+						love.event.quit()
+					end
 				end
 			end
 		end

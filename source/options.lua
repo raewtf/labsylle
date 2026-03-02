@@ -125,13 +125,27 @@ function options:update()
 		if ticks ~= 0 and not transitioning and vars.handler == 'options' then
 			vars.selection = vars.selection + ticks
 			if vars.selection > #vars['selections' .. vars.page] then
-				vars.selection = #vars['selections' .. vars.page]
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
+				if vars.page < 2 then
+					vars.page = vars.page + 1
+					vars.selection = 1
+					playsound(assets.swish)
+					gfx.sprite.redrawBackground()
+				else
+					vars.selection = #vars['selections' .. vars.page]
+					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+					vars.bump = -3
+				end
 			elseif vars.selection < 1 then
-				vars.selection = 1
-				randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
-				vars.bump = -3
+				if vars.page > 1 then
+					vars.page = vars.page - 1
+					vars.selection = #vars['selections' .. vars.page]
+					playsound(assets.swish)
+					gfx.sprite.redrawBackground()
+				else
+					vars.selection = 1
+					randomizesfx(assets.block1, assets.block2, assets.block3, assets.block4, assets.block5)
+					vars.bump = -3
+				end
 			else
 				playsound(assets.swish)
 				gfx.sprite.redrawBackground()
@@ -251,9 +265,10 @@ function options:draw()
 	end
 	drawrect(80, 200, 240, 30, 5)
 	setcolor('white')
-	drawtext(assets.disco, '➕' .. (platform == 'peedee' and '/🐟' or '') .. ' Move  ' .. ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. ' Back  ' .. ((save.gamepad or platform == 'peedee') and 'Ⓐ' or string.upper(save.primary)) .. ' Toggle', 200, 208, center)
+	drawtext(assets.disco, '➕' .. (platform == 'peedee' and '/🐟' or '') .. ' Move  Ⓑ Back  Ⓐ Toggle', 200, 208, center)
 	setcolor()
 	drawtext(assets.discoteca, 'v' .. version, 65, 5)
+	drawtext(assets.discoteca, 'p. ' .. vars.page .. '/2', 81, 29)
 	if platform == 'peedee' then drawtext(assets.discoteca, commalize(pd.metadata.buildNumber), 335, 5, right) end
 
 	if vars.handler == 'remap' then

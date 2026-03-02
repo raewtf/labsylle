@@ -84,6 +84,7 @@ function packselect:initialize(args)
 		handler = 'packselect',
 		lbloading = false,
 		result = {},
+		bestresult = {},
 		reset_armed = 0,
 		reset_lerp = 0,
 	}
@@ -151,16 +152,19 @@ function packselect:drawpacktext(i)
 	drawtext(assets.discoteca, (pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' Puzzle' or ' Puzzles'), 20, 35)
 	local len = textwidth(assets.discoteca, (pack[i].difficulty ~= nil and pack[i].difficulty .. ' — ' or '') .. commalize(pack[i].puzzles ~= nil and #pack[i].puzzles or '0') .. ((pack[i].puzzles ~= nil and #pack[i].puzzles == 1) and ' Puzzle' or ' Puzzles'))
 	setcolor('white')
+	-- these imgs crash into the text a lot. maybe there's a better way to show 'em?
+	--[[
 	if pack[i].contains_impostors then
 		drawimage(assets.mask, 22 + len, 37)
 	end
 	if pack[i].contains_bombs then
 		drawimage(assets.bomb, 23 + (pack[i].contains_impostors and 38 or 0) + len, 37)
 	end
+	]]
 	setcolor()
 	if save[pack[i].id] ~= nil then
 		if save[pack[i].id].status ~= nil then
-			if save[pack[i].id].status == 'in_progress' then
+			if save[pack[i].id].status == 'in_progress' or save[pack[i].id].status == 'playing' then
 				drawtext(assets.discoteca, 'In Progress', 361, 21, right)
 			elseif save[pack[i].id].status == 'complete' then
 				drawtext(assets.discoteca, 'Complete!', 361, 21, right)
@@ -227,11 +231,16 @@ function packselect:refreshboards()
 	if vars.lbloading then return end
 	vars.lbloading = true
 	vars.result = {}
-	vars.best = {}
+	vars.bestresult = {}
 	if platform == 'peedee' then gfx.sprite.redrawBackground() end
 	pd.scoreboards.getScores(pack[vars.selection].id, function(status, result)
 		if status.code == 'OK' then
 			vars.result = result
+			pd.scoreboards.getPersonalBest(pack[vars.selection].id, function(status, result)
+				if status.code == 'OK' then
+					vars.bestresult = result
+				end
+			end)
 		else
 			vars.result = 'fail'
 		end
@@ -359,14 +368,20 @@ function packselect:draw()
 		drawtext(assets.discoteca, 'Fewest Pak Swaps', 380, 20, right)
 
 		if vars.lbloading then
-			drawtext(assets.disco, ('Ⓑ' or string.upper(save.secondary)) .. ' Back', 200, 208, center)
+			drawtext(assets.disco, 'Ⓑ Back', 200, 208, center)
 		else
-			drawtext(assets.disco, ('Ⓑ' or string.upper(save.secondary)) .. ' Back     ' .. ((save.gamepad or platform == 'peedee') and 'Ⓐ' or string.upper(save.primary)) .. ' Refresh', 200, 208, center)
+			drawtext(assets.disco, 'Ⓑ Back     Ⓐ Refresh', 200, 208, center)
 		end
 
+		local dumbusername = false
+		if vars.bestresult.rank ~= nil then
+			if string.len(vars.bestresult.player) == 16 and tonumber(vars.bestresult.player) then
+				dumbusername = true
+			end
+		end
 		if vars.result.scores ~= nil and next(vars.result.scores) ~= nil then
 			for _, v in ipairs(vars.result.scores) do
-				if v.rank <= 10 then
+				if v.rank <= (dumbusername and 8 or 10) then
 					local lefttext = v.rank .. '. ' .. v.player
 					local righttext = v.value
 
@@ -380,6 +395,10 @@ function packselect:draw()
 					drawline(30 + leftlen, 36 + (15 * v.rank), 370 - (rightlen), 36 + (15 * v.rank))
 					setcolor()
 				end
+			end
+			if dumbusername then
+				drawtext(assets.disco, 'Please set a username for your profile!', 200, 163, center)
+				drawtext(assets.discoteca, 'https://play.date/account/change-username', 200, 179, center)
 			end
 		elseif vars.result == 'fail' then
 			drawtext(assets.disco, 'Score loading failed. Try again?', 200, 115, center)
@@ -458,12 +477,15 @@ function packselect:keypressed(button)
 					resettimer('gaming', 350, 1, -0.75, 'linear', function()
 						if save[pack[vars.selection].id] ~= nil then
 							if save[pack[vars.selection].id].status == 'in_progress' then
-								scenemanager:switchscene(game, pack[vars.selection], save[pack[vars.selection].id].puzzle, save[pack[vars.selection].id].heldpackswaps, save[pack[vars.selection].id].word, save[pack[vars.selection].id].puzzleswaps, save[pack[vars.selection].id].bombs, 2)
+								scenemanager:switchscene(game, pack[vars.selection], save[pack[vars.selection].id].puzzle, save[pack[vars.selection].id].heldpackswaps, save[pack[vars.selection].id].word, save[pack[vars.selection].id].puzzleswaps, save[pack[vars.selection].id].bombs)
+							elseif save[pack[vars.selection].id].status == 'playing' then
+								save[pack[vars.selection].id].status = 'in_progress'
+								scenemanager:switchscene(game, pack[vars.selection], save[pack[vars.selection].id].puzzle, save[pack[vars.selection].id].heldpackswaps, save[pack[vars.selection].id].word, save[pack[vars.selection].id].puzzleswaps, save[pack[vars.selection].id].bombs)
 							else
-								scenemanager:switchscene(game, pack[vars.selection], 1, 0, nil, 0, {}, 1)
+								scenemanager:switchscene(game, pack[vars.selection], 1, 0, nil, 0, {})
 							end
 						else
-							scenemanager:switchscene(game, pack[vars.selection], 1)
+							scenemanager:switchscene(game, pack[vars.selection], 1, 0, nil, 0, {})
 						end
 					end)
 					rumble(0.3, 0.3, 0.025)

@@ -205,9 +205,9 @@ function results:draw()
 	drawrect(scroll and 80 or 100, 190 + (value('bump') * 2), scroll and 240 or 200, 30, 5)
 	setcolor('white')
 	if scroll then
-		drawtext(assets.disco, '|' .. (platform == 'peedee' and '/🐟' or '') .. ' Scroll  ' .. ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. ' Back  ' .. ((save.gamepad or platform == 'peedee') and 'Ⓐ' or string.upper(save.primary)) .. ' Retry', 200, 198 + (value('bump') * 2), center)
+		drawtext(assets.disco, '|' .. (platform == 'peedee' and '/🐟' or '') .. ' Scroll  Ⓑ Back  Ⓐ Retry', 200, 198 + (value('bump') * 2), center)
 	else
-		drawtext(assets.disco, ((save.gamepad or platform == 'peedee') and 'Ⓑ' or string.upper(save.secondary)) .. ' Back     ' .. ((save.gamepad or platform == 'peedee') and 'Ⓐ' or string.upper(save.primary)) .. ' Retry', 200, 198 + (value('bump') * 2), center)
+		drawtext(assets.disco, 'Ⓑ Back     Ⓐ Retry', 200, 198 + (value('bump') * 2), center)
 	end
 	setcolor()
 

@@ -3124,7 +3124,7 @@ bonus = {
 			},
 			{
 				target = {
-					{'none00 club99', 'club99 spad99', 'spad99 club99', 'club99 diam50', 'diam50 none00', 'none00, diam50'}
+					{'none00 club99', 'club99 spad99', 'spad99 club99', 'club99 diam50', 'diam50 none00', 'none00 diam50'}
 				},
 				impostor = true
 			},
