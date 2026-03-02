@@ -215,7 +215,7 @@ function game:initialize(args)
 
 		newtimer('kerplode', 1, 1, 1)
 
-		if save[vars.pack.id] ~= nil and save[pack[vars.selection].id].status == 'in_progress' then
+		if save[vars.pack.id] ~= nil and save[vars.pack.id].status == 'in_progress' then
 			newtimer('headerx', 500, -90, 0, 'outBack')
 			newtimer('texx', 500, 120, 0, 'outBack')
 		else
